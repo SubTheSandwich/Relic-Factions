@@ -1,0 +1,27 @@
+primary:
+  not-player: "&cYou must be a player in order to execute this command."
+  no-permission: "&cNo permission."
+  faction:
+    doesnt-exist: "&cA faction or player by this name does not exist."
+    self-none: "&cYou do not have a faction."
+    captain-above: "&cYou must be a captain or above to execute this command."
+    coleader-above: "&cYou must be a coleader or above to execute this command."
+    leader: "&cYou must be the leader of the faction to execute this command."
+  none: "None"
+
+
+commands:
+  faction:
+    exists: "&cA faction by this name already exists."
+    have: "&cYou already have a faction."
+    not-alphanumeric: "&cYour faction name must be alphanumeric."
+    blocked: "&cThis faction name is blocked."
+    length: "&cYour faction name must not be below %min% characters, or exceed %max% characters."
+    create:
+      success: "&eYou have created a faction named &a%faction%"
+      bc: "&fFaction &b%faction% &fhas been created by &d%player%"
+    open:
+      set: "&eYour faction is now %status%&e."
+      bc: "&d%player% &2has set the faction to be %status%&2."
+      open: "&aopen"
+      closed: "&cclosed"

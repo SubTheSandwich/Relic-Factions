@@ -1,0 +1,23 @@
+
+server:
+  name: "Relic-Factions"
+  color:
+    primary: GOLD
+    secondary: YELLOW
+  map:
+    number: 1
+    start-date: "5/16/25"
+
+chat:
+  format:
+    no-faction: "&7[*] &r%player%&7: &r%message%"
+    faction: "&7[%faction%&7] &r%player%&7: &r%message%"
+
+factions:
+  name:
+    min: 3
+    max: 15
+    blocked:
+      - "MINEHQ"
+      - "VELTPVP"
+      - "ARCANE"

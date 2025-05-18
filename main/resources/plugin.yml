@@ -1,0 +1,12 @@
+name: Relic-Factions
+description: A hardcore Minecraft factions plugin where player factions compete for dominance by capturing and defending powerful relics, controlling resource points, and advancing unique tech trees
+version: 1.0.0
+api-version: 1.21
+author: Sub
+main: me.sub.RelicFactions.Main.Main
+commands:
+  faction:
+    aliases:
+      - f
+      - team
+      - t

@@ -1,0 +1,38 @@
+faction:
+  help:
+    main:
+      - "&7&m----------------------------------------------------"
+      - "%primary%&l%servername% &7- %secondary%Faction Help"
+      - "&7&m----------------------------------------------------"
+      - "&9General Commands:"
+      - "&e/%alias% create <name> &7- Create a new faction"
+      - "&e/%alias% join <name> &7 - Joins a faction"
+      - "&9Information Commands:"
+      - "&e/%alias% show <faction;player> &7- Shows faction information"
+      - "&9Captain Commands:"
+      - "&e/%alias% invite <player> &7- Invites a player to the faction"
+      - "&9Coleader Commands:"
+      - "&e/%alias% open &7- Allows/denies players to join without an invite"
+      - "&7&m----------------------------------------------------"
+  show:
+    system:
+      - "&7&m----------------------------------------------------"
+      - "%name%"
+      - "&eLocation: &f%home%"
+      - "&7&m----------------------------------------------------"
+    player:
+      - "&7&m----------------------------------------------------"
+      - "&9%name% &7[%online%/%players%] &3- &eHQ: &f%home%"
+      - "&eLeader: %leader%"
+      - "&eColeaders: %coleaders%"
+      - "&eCaptains: %captains%"
+      - "&eMembers: %members%"
+      - "&eBalance: &9$%balance%"
+      - "&ePoints: &9%points%"
+      - "&eKOTH Captures: &9%kothcaptures%"
+      - "&eDeaths until Raidable: &a%dtr%%dtrsymbol%"
+      - "&eTime Until Regen: &9%regen%"
+      - "&eStatus: &9%open%"
+      - "&eLives: &c%lives%"
+      - "&eAnnouncement: &d%announcement%"
+      - "&7&m----------------------------------------------------"
