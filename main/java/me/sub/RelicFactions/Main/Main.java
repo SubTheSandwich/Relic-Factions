@@ -1,5 +1,6 @@
 package me.sub.RelicFactions.Main;
 
+import me.sub.RelicFactions.Commands.User.BalanceCommand;
 import me.sub.RelicFactions.Commands.User.FactionCommand;
 import me.sub.RelicFactions.Events.Player.Chat.FormatChatEvent;
 import me.sub.RelicFactions.Events.Player.UserRegisterEvent;
@@ -7,9 +8,14 @@ import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Data.FactionData;
 import me.sub.RelicFactions.Files.Data.UserData;
+import me.sub.RelicFactions.Utils.Econ;
 import me.sub.RelicFactions.Utils.Maps;
+import net.milkbowl.vault.economy.Economy;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -17,8 +23,12 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 public class Main extends JavaPlugin {
+
+    private static Economy econ = null;
+    private final Logger logger = getLogger();
 
     public HashMap<UUID, User> users = new HashMap<>();
     public HashMap<String, User> userNameHolder = new HashMap<>();
@@ -36,7 +46,17 @@ public class Main extends JavaPlugin {
     }
 
     @Override
+    public void onLoad() {
+        Bukkit.getServicesManager().register(Economy.class, new Econ(), this, ServicePriority.Highest);
+    }
+
+    @Override
     public void onEnable() {
+        if (!setupEconomy() ) {
+            getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
         files();
         events();
         commands();
@@ -60,7 +80,7 @@ public class Main extends JavaPlugin {
     private void commands() {
         // User
         getCommand("faction").setExecutor(new FactionCommand()); getCommand("faction").setTabCompleter(new FactionCommand());
-
+        getCommand("balance").setExecutor(new BalanceCommand()); getCommand("balance").setTabCompleter(new BalanceCommand());
     }
 
     private void events() {
@@ -77,6 +97,18 @@ public class Main extends JavaPlugin {
         saveResource("messages.yml", false);
     }
 
+    private boolean setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) {
+            return false;
+        }
+        econ = rsp.getProvider();
+        return econ != null;
+    }
+
     private void loadUsers() {
         if (UserData.getAll() != null) {
             for (File f : UserData.getAll()) {
@@ -84,7 +116,7 @@ public class Main extends JavaPlugin {
                 UUID uuid = UUID.fromString(file.getString("uuid"));
                 User user = new User(new UserData(uuid));
                 users.put(uuid, user);
-                userNameHolder.put(user.getName(), user);
+                userNameHolder.put(user.getName().toLowerCase(), user);
             }
         }
     }
@@ -96,7 +128,7 @@ public class Main extends JavaPlugin {
                 UUID uuid = UUID.fromString(file.getString("uuid"));
                 Faction faction = new Faction(new FactionData(uuid));
                 factions.put(uuid, faction);
-                factionNameHolder.put(faction.getName(), faction);
+                factionNameHolder.put(faction.getName().toLowerCase(), faction);
             }
         }
     }
@@ -116,7 +148,7 @@ public class Main extends JavaPlugin {
             userData.save();
             saved++;
         }
-        getLogger().info("Saved " + saved + (saved == 1 ? " user" : " users"));
+        logger.info("Saved " + saved + (saved == 1 ? " user" : " users"));
     }
 
     private void saveFactions() {
@@ -139,8 +171,11 @@ public class Main extends JavaPlugin {
             factionData.save();
             saved++;
         }
-        getLogger().info("Saved " + saved + (saved == 1 ? " faction" : " factions"));
+        logger.info("Saved " + saved + (saved == 1 ? " faction" : " factions"));
 
     }
 
+    public static Economy getEconomy() {
+        return econ;
+    }
 }

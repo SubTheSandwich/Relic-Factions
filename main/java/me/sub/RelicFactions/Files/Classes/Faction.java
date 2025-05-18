@@ -53,7 +53,7 @@ public class Faction {
         return Main.getInstance().factions.getOrDefault(uuid, null);
     }
     public static Faction get(String name) {
-        return Main.getInstance().factionNameHolder.getOrDefault(name, null);
+        return Main.getInstance().factionNameHolder.getOrDefault(name.toLowerCase(), null);
     }
 
     public FactionData getUserData() {
@@ -161,7 +161,6 @@ public class Faction {
 
     public Set<Player> getOnlineMembers() {
         Set<Player> players = new HashSet<>();
-        if (Bukkit.getPlayer(leader) != null) players.add(Bukkit.getPlayer(leader));
         for (UUID u : members.keySet()) {
             Player player = Bukkit.getPlayer(u);
             if (player == null) continue;

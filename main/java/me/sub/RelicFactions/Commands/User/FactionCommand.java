@@ -9,6 +9,7 @@ import me.sub.RelicFactions.Files.Normal.Messages;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
 import me.sub.RelicFactions.Utils.Calculate;
+import me.sub.RelicFactions.Utils.Maps;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -17,10 +18,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class FactionCommand implements TabExecutor {
 
@@ -36,7 +34,7 @@ public class FactionCommand implements TabExecutor {
             return true;
         }
         if (args.length == 1) {
-            if (args[0].equalsIgnoreCase("who")) {
+            if (args[0].equalsIgnoreCase("who") || args[0].equalsIgnoreCase("show")) {
                 if (!user.hasFaction()) {
                     p.sendMessage(C.chat(Locale.get().getString("primary.faction.none")));
                     return true;
@@ -56,9 +54,9 @@ public class FactionCommand implements TabExecutor {
                 }
                 boolean open = !faction.isOpen();
                 faction.setOpen(open);
-                p.sendMessage(C.chat(Locale.get().getString("commands.faction.open.set").replace("%status%", open ? Locale.get().getString("commands.faction.open.open") : Locale.get().getString("commands.faction.open.closed"))));
+                p.sendMessage(C.chat(Locale.get().getString("commands.faction.open.set").replace("%status%", open ? Locale.get().getString("commands.faction.open.open").toLowerCase() : Locale.get().getString("commands.faction.open.closed").toLowerCase())));
                 for (Player player : faction.getOnlineMembers()) {
-                    player.sendMessage(C.chat(Locale.get().getString("commands.faction.open.bc").replace("%player%", p.getName()).replace("%status%", open ? Locale.get().getString("commands.faction.open.open") : Locale.get().getString("commands.faction.open.closed"))));
+                    player.sendMessage(C.chat(Locale.get().getString("commands.faction.open.bc").replace("%player%", p.getName()).replace("%status%", open ? Locale.get().getString("commands.faction.open.open").toLowerCase() : Locale.get().getString("commands.faction.open.closed").toLowerCase())));
                 }
                 return true;
             }
@@ -90,17 +88,20 @@ public class FactionCommand implements TabExecutor {
                     return true;
                 }
                 UUID uuid = UUID.randomUUID();
+                HashMap<UUID, Integer> members = new HashMap<>();
+                members.put(p.getUniqueId(), 3);
                 FactionData factionData = new FactionData(uuid);
                 factionData.setup();
                 factionData.get().set("uuid", uuid.toString());
                 factionData.get().set("name", args[1]);
                 factionData.get().set("leader", p.getUniqueId().toString());
                 factionData.get().set("type", "PLAYER");
+                factionData.get().set("members", Maps.serialize(members));
                 factionData.save();
                 user.setFaction(uuid);
                 faction = new Faction(factionData);
                 Main.getInstance().factions.put(uuid, faction);
-                Main.getInstance().factionNameHolder.put(args[1], faction);
+                Main.getInstance().factionNameHolder.put(args[1].toLowerCase(), faction);
                 p.sendMessage(C.chat(Locale.get().getString("commands.faction.create.success").replace("%faction%", args[1])));
                 Bukkit.broadcastMessage(C.chat(Locale.get().getString("commands.faction.create.bc").replace("%faction%", args[1]).replace("%player%", p.getName())));
                 return true;
@@ -116,7 +117,7 @@ public class FactionCommand implements TabExecutor {
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
         List<String> values = new ArrayList<>();
         if (args.length == 1) {
-            values.addAll(List.of("create", "open"));
+            values.addAll(List.of("create", "open", "show"));
         }
         return values;
     }
@@ -127,7 +128,7 @@ public class FactionCommand implements TabExecutor {
             for (String s : Messages.get().getStringList("faction.show.player")) {
                 if (s.contains("%name%")) s = s.replace("%name%", faction.getValidName(p));
                 if (s.contains("%online%")) s = s.replace("%online%", faction.getOnlineMembers().size() + "");
-                if (s.contains("%players%")) s = s.replace("%members%", faction.getMembers().size() + "");
+                if (s.contains("%players%")) s = s.replace("%players%", faction.getMembers().size() + "");
                 if (s.contains("%home%")) {
                     // TODO: Implement
                 }
@@ -165,7 +166,7 @@ public class FactionCommand implements TabExecutor {
                     if (names.isEmpty()) continue;
                     s = s.replace("%members%", String.join("&e, ", names));
                 }
-                if (s.contains("%balance%")) s = s.replace("%balance%", Calculate.round(faction.getBalance().doubleValue(), 2) + "");
+                if (s.contains("%balance%")) s = s.replace("%balance%", Calculate.formatMoney(faction.getBalance().doubleValue()));
                 if (s.contains("%points%")) s = s.replace("%points%", faction.getPoints() + "");
                 if (s.contains("%kothcaptures%")) s = s.replace("%kothcaptures%", faction.getKothCaptures() + "");
                 if (s.contains("%dtr%")) {
@@ -176,7 +177,7 @@ public class FactionCommand implements TabExecutor {
                 }
                 if (s.contains("%open%")) {
                     if (!faction.isOpen()) continue;
-                    s = s.replace("%open%", Locale.get().getString("commands.faction.open.open").toUpperCase());
+                    s = s.replace("%open%", Locale.get().getString("commands.faction.open.open"));
                 }
                 if (s.contains("%lives%")) {
                     if (!user.hasFaction() || !user.getFaction().equals(faction.getUUID())) continue;

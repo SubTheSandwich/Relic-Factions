@@ -2,8 +2,10 @@ package me.sub.RelicFactions.Files.Classes;
 
 import me.sub.RelicFactions.Files.Data.UserData;
 import me.sub.RelicFactions.Main.Main;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -18,6 +20,7 @@ public class User {
     private boolean deathbanned;
     private int kills;
     private int deaths;
+    private BigDecimal balance;
 
     public User(UserData userData) {
         this.userData = userData;
@@ -28,6 +31,7 @@ public class User {
         deathbanned = userData.get().getBoolean("deathban.has");
         kills = userData.get().getInt("kills");
         deaths = userData.get().getInt("deaths");
+        balance = BigDecimal.valueOf(userData.get().getDouble("balance"));
         modified = false;
     }
 
@@ -35,12 +39,16 @@ public class User {
         return Main.getInstance().users.getOrDefault(uuid, null);
     }
 
+    public static User get(OfflinePlayer p) {
+        return Main.getInstance().users.getOrDefault(p.getUniqueId(), null);
+    }
+
     public static User get(Player p) {
         return Main.getInstance().users.getOrDefault(p.getUniqueId(), null);
     }
 
     public static User get(String name) {
-        return Main.getInstance().userNameHolder.getOrDefault(name, null);
+        return Main.getInstance().userNameHolder.getOrDefault(name.toLowerCase(), null);
     }
 
     public UserData getUserData() {
@@ -106,5 +114,14 @@ public class User {
     public void setDeaths(int deaths) {
         modified = true;
         this.deaths = deaths;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        modified = true;
+        this.balance = balance;
     }
 }

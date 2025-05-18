@@ -13,6 +13,10 @@ chat:
     no-faction: "&7[*] &r%player%&7: &r%message%"
     faction: "&7[%faction%&7] &r%player%&7: &r%message%"
 
+economy:
+  type: en-US
+  default-balance: 500
+
 factions:
   name:
     min: 3

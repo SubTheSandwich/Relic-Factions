@@ -27,7 +27,7 @@ faction:
       - "&eColeaders: %coleaders%"
       - "&eCaptains: %captains%"
       - "&eMembers: %members%"
-      - "&eBalance: &9$%balance%"
+      - "&eBalance: &9%balance%"
       - "&ePoints: &9%points%"
       - "&eKOTH Captures: &9%kothcaptures%"
       - "&eDeaths until Raidable: &a%dtr%%dtrsymbol%"

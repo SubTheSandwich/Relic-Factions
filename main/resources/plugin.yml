@@ -10,3 +10,6 @@ commands:
       - f
       - team
       - t
+  balance:
+    aliases:
+      - bal

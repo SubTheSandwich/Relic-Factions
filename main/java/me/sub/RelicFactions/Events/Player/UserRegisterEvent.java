@@ -20,15 +20,16 @@ public class UserRegisterEvent implements Listener {
             userData.setup();
             userData.get().set("uuid", p.getUniqueId().toString());
             userData.get().set("name", p.getName());
+            userData.get().set("balance", Main.getInstance().getConfig().getDouble("economy.default-balance"));
             userData.save();
             user = new User(userData);
             Main.getInstance().users.put(p.getUniqueId(), user);
-            Main.getInstance().userNameHolder.put(p.getName(), user);
+            Main.getInstance().userNameHolder.put(p.getName().toLowerCase(), user);
         }
         if (!p.getName().equals(user.getName())) {
-            Main.getInstance().userNameHolder.remove(user.getName());
+            Main.getInstance().userNameHolder.remove(user.getName().toLowerCase());
             user.setName(p.getName());
-            Main.getInstance().userNameHolder.put(user.getName(), user);
+            Main.getInstance().userNameHolder.put(user.getName().toLowerCase(), user);
         }
     }
 }
