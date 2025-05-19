@@ -4,6 +4,8 @@ version: 1.0.0
 api-version: 1.21
 author: Sub
 main: me.sub.RelicFactions.Main.Main
+depend:
+  - Vault
 commands:
   faction:
     aliases:
@@ -13,3 +15,5 @@ commands:
   balance:
     aliases:
       - bal
+  hcf:
+    description: Debug command

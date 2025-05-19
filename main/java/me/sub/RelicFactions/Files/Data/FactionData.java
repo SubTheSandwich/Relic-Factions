@@ -6,6 +6,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.UUID;
 
 public class FactionData {
@@ -16,7 +17,7 @@ public class FactionData {
 
     public FactionData(UUID uuid) {
         id = uuid;
-        file = new File(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions").getDataFolder().getPath() + "/data/factions/", id.toString() + ".yml");
+        file = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder().getPath() + "/data/factions/", id.toString() + ".yml");
         customFile = YamlConfiguration.loadConfiguration(file);
     }
 
@@ -61,12 +62,12 @@ public class FactionData {
     }
 
     public static FactionData getByName(String name) {
-        File[] users = new File(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions").getDataFolder().getPath() + "/data/factions").listFiles();
+        File[] users = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder().getPath() + "/data/factions").listFiles();
         if (users != null) {
             for (File f : users) {
                 YamlConfiguration file = YamlConfiguration.loadConfiguration(f);
-                if (file.getString("name").equalsIgnoreCase(name.toLowerCase())) {
-                    return new FactionData(UUID.fromString(file.getString("uuid")));
+                if (Objects.requireNonNull(file.getString("name")).equalsIgnoreCase(name.toLowerCase())) {
+                    return new FactionData(UUID.fromString(Objects.requireNonNull(file.getString("uuid"))));
                 }
             }
         }
@@ -74,6 +75,6 @@ public class FactionData {
     }
 
     public static File[] getAll() {
-        return new File(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions").getDataFolder().getPath() + "/data/factions").listFiles();
+        return new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder().getPath() + "/data/factions").listFiles();
     }
 }

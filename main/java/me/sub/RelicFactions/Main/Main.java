@@ -1,8 +1,10 @@
 package me.sub.RelicFactions.Main;
 
+import me.sub.RelicFactions.Admin.HCFCommand;
 import me.sub.RelicFactions.Commands.User.BalanceCommand;
 import me.sub.RelicFactions.Commands.User.FactionCommand;
 import me.sub.RelicFactions.Events.Player.Chat.FormatChatEvent;
+import me.sub.RelicFactions.Events.Player.Interact.PlayerClaimEvents;
 import me.sub.RelicFactions.Events.Player.UserRegisterEvent;
 import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.User;
@@ -22,6 +24,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -78,9 +81,12 @@ public class Main extends JavaPlugin {
     }
 
     private void commands() {
+        // Admin
+        Objects.requireNonNull(getCommand("hcf")).setExecutor(new HCFCommand()); Objects.requireNonNull(getCommand("hcf")).setTabCompleter(new HCFCommand());
+
         // User
-        getCommand("faction").setExecutor(new FactionCommand()); getCommand("faction").setTabCompleter(new FactionCommand());
-        getCommand("balance").setExecutor(new BalanceCommand()); getCommand("balance").setTabCompleter(new BalanceCommand());
+        Objects.requireNonNull(getCommand("faction")).setExecutor(new FactionCommand()); Objects.requireNonNull(getCommand("faction")).setTabCompleter(new FactionCommand());
+        Objects.requireNonNull(getCommand("balance")).setExecutor(new BalanceCommand()); Objects.requireNonNull(getCommand("balance")).setTabCompleter(new BalanceCommand());
     }
 
     private void events() {
@@ -89,6 +95,7 @@ public class Main extends JavaPlugin {
         // User
         pm.registerEvents(new UserRegisterEvent(), this);
         pm.registerEvents(new FormatChatEvent(), this);
+        pm.registerEvents(new PlayerClaimEvents(), this);
     }
 
     private void files() {
@@ -113,7 +120,7 @@ public class Main extends JavaPlugin {
         if (UserData.getAll() != null) {
             for (File f : UserData.getAll()) {
                 YamlConfiguration file = YamlConfiguration.loadConfiguration(f);
-                UUID uuid = UUID.fromString(file.getString("uuid"));
+                UUID uuid = UUID.fromString(Objects.requireNonNull(file.getString("uuid")));
                 User user = new User(new UserData(uuid));
                 users.put(uuid, user);
                 userNameHolder.put(user.getName().toLowerCase(), user);
@@ -125,7 +132,7 @@ public class Main extends JavaPlugin {
         if (FactionData.getAll() != null) {
             for (File f : FactionData.getAll()) {
                 YamlConfiguration file = YamlConfiguration.loadConfiguration(f);
-                UUID uuid = UUID.fromString(file.getString("uuid"));
+                UUID uuid = UUID.fromString(Objects.requireNonNull(file.getString("uuid")));
                 Faction faction = new Faction(new FactionData(uuid));
                 factions.put(uuid, faction);
                 factionNameHolder.put(faction.getName().toLowerCase(), faction);
@@ -145,7 +152,9 @@ public class Main extends JavaPlugin {
             userData.get().set("deathbanned", user.isDeathBanned());
             userData.get().set("kills", user.getKills());
             userData.get().set("deaths", user.getDeaths());
+            userData.get().set("balance", user.getBalance().doubleValue());
             userData.save();
+            user.setModified(false);
             saved++;
         }
         logger.info("Saved " + saved + (saved == 1 ? " user" : " users"));
@@ -167,8 +176,12 @@ public class Main extends JavaPlugin {
             factionData.get().set("points", faction.getPoints());
             factionData.get().set("koth-captures", faction.getKothCaptures());
             factionData.get().set("balance", faction.getBalance().doubleValue());
+            factionData.get().set("dtr", faction.getDTR().doubleValue());
             factionData.get().set("lives", faction.getLives());
+            factionData.get().set("invites", Maps.uuidListToString(faction.getInvites()));
+            factionData.get().set("claims", Maps.cuboidListToString(faction.getClaims()));
             factionData.save();
+            faction.setModified(false);
             saved++;
         }
         logger.info("Saved " + saved + (saved == 1 ? " faction" : " factions"));
@@ -177,5 +190,10 @@ public class Main extends JavaPlugin {
 
     public static Economy getEconomy() {
         return econ;
+    }
+
+    public void saveFiles() {
+        saveUsers();
+        saveFactions();
     }
 }

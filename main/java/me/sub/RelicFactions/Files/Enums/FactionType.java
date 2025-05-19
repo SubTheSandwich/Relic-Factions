@@ -4,7 +4,17 @@ public enum FactionType {
 
     PLAYER,
     SYSTEM,
-    SPAWN,
+    SAFEZONE,
     KOTH,
-    ROAD,
+    ROAD;
+
+    public static boolean isValid(String input) {
+        if (input == null) return false;
+        try {
+            FactionType.valueOf(input.toUpperCase());
+            return true;
+        } catch (IllegalArgumentException ex) {
+            return false;
+        }
+    }
 }

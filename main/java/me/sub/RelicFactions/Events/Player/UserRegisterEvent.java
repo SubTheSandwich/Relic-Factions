@@ -3,7 +3,6 @@ package me.sub.RelicFactions.Events.Player;
 import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Data.UserData;
 import me.sub.RelicFactions.Main.Main;
-import me.sub.RelicFactions.Utils.ScoreboardHelper;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

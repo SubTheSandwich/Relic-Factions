@@ -2,16 +2,46 @@ primary:
   not-player: "&cYou must be a player in order to execute this command."
   no-permission: "&cNo permission."
   no-player: "&cA player by this name does not exist."
+  invalid-number: "&cThe specified number is invalid."
   faction:
+    faction-only: "&cA faction by this name does not exist."
     doesnt-exist: "&cA faction or player by this name does not exist."
     none: "&cYou do not have a faction."
     captain-above: "&cYou must be a captain or above to execute this command."
     coleader-above: "&cYou must be a coleader or above to execute this command."
     leader: "&cYou must be the leader of the faction to execute this command."
+    full: "&cThe specified faction is full."
+    wrong-type: "&cYou may only perform this command on non-PLAYER factions."
+    not-in: "&cThe specified player is not a member of your faction."
   none: "None"
+  error: "&cAn unknown error occurred."
+
+claiming:
+  success: "&aSuccessfully claimed your selected area."
+  attempting: "&eAttempting to claim area..."
+  trying: "&cYou are already attempting to claim. Please wait."
+  cancelled: "&cCancelled claiming."
+  cost: "&eClaim Cost: %cost%&e. &eCurrent size: (&f%sizeX%, %sizeZ%&e)"
+  already: "&cYou are already claiming."
+  inventory-full: "&cPlease ensure your inventory is not full."
+  error:
+    in-claim: "&cParts of this claim intersect with another claim."
+    world: "&cYou cannot select this location, as your other selection is not in the same dimension."
+    invalid-size: "&cYou must only claim a 5x5 area and claim must not exceed than 16 chunks."
+    location: "&cYou cannot claim here."
+    cost: "&cYour faction does not have enough money to claim this area."
+    not-selected: "&cSelect both your pillars."
+  set:
+    one: "&eSet position 1"
+    two: "&eSet position 2"
 
 
 commands:
+  hcf:
+    usage: "&cUsage: /hcf <reload/save>"
+    save:
+      attempt: "&cAttempting to save..."
+      success: "&aSuccessfully saved all files!"
   balance:
     self: "&eBalance: &b%balance%"
     other: "&d%player%&e's Balance: &b%balance%"
@@ -29,3 +59,70 @@ commands:
       bc: "&d%player% &2has set the faction to be %status%&2."
       open: "&aOpen"
       closed: "&cClosed"
+    deposit:
+      not-enough: "&cYour funds are insufficient for this deposit."
+      success: "&eYou have deposited &d%amount%&e to the team's balance."
+      bc: "&e%player% has deposited &d%amount% &eto the team's balance."
+    invite:
+      open: "&cYou cannot invite a player as your faction is open."
+      has-already: "&cThe specified player already has a faction."
+      already-invited: "&cThis player has already been invited to your faction."
+      success: "&eYou have invited &b%player% &eto join your faction."
+      bc: "&d%player% &2has invited &e%invited% &2to the faction."
+      message: "&eYou have been invited to join &b%faction% &eby &d%player%"
+    join:
+      not-invited: "&cYou were not invited to join this faction."
+      success: "&eYou have joined &d%faction%"
+      bc: "&e%player% has joined the faction."
+    withdraw:
+      not-enough: "&cYour faction lacks the funds to withdraw this amount."
+      success: "&eYou have withdrawn &d%amount% &efrom the faction balance."
+      bc: "&e%player% withdrew &d%amount% &efrom the faction balance."
+    show:
+      none: "&cThe specified player does not have a faction."
+    createsystem:
+      success: "&eYou have created a system faction named &a%faction%"
+      bc: "&fSystem faction &b%faction% &fhas been created by &d%player%"
+    setcolor:
+      invalid: "&cThe specified color is invalid. Valid colors: BLACK, BLUE, GREEN, CYAN, RED, PURPLE, GOLD, LIGHT_GRAY, GRAY, LIGHT_BLUE, LIME, AQUA, LIGHT_RED, MAGENTA, YELLOW, WHITE"
+      success: "&eYou have set the color of &d%faction% &eto %color%&e."
+    settype:
+      invalid: "&cThe specified faction type is invalid. Valid types: PLAYER, SYSTEM, SAFEZONE, KOTH, ROAD"
+      success: "&eYou have set the type of &d%faction% &eto &b%type%&e."
+    setlocation:
+      success: "&eYou have set the location of &d%faction% &eto &ayour current location&e."
+    captain:
+      already: "&cThe specified player is already a captain or above."
+      not: "&cThe specified player is not a captain."
+      add:
+        success: "&eYou have made &d%player% &ea captain."
+      remove:
+        success: "&eYou have made &d%player% &ea member."
+      list: "&6Captains&7: &e%captains%"
+    coleader:
+      already: "&cThe specified player is already a coleader or above."
+      not: "&cThe specified player is not a coleader."
+      add:
+        success: "&eYou have made &d%player% &ea coleader."
+      remove:
+        success: "&eYou have made &d%player% &ea captain."
+      list: "&6Coleaders&7: &e%coleaders%"
+    announcement: "&eYou have set the announcement of your faction to &d\"%announcement%\""
+    invites: "&6Invites&7: &e%invites%"
+    leave:
+      claiming: "&cYou cannot leave a faction while you are claiming."
+      leader: "&cYou cannot leave this faction, as you are the leader. Try /%alias% disband"
+      raidable: "&cYou cannot leave a faction while it is raidable."
+      success: "&eYou have left your faction."
+      bc: "&c%player% has left the faction."
+    uninvite:
+      open: "&cYou cannot uninvite a player as your faction is open."
+      not-invited: "&cThe specified player is not invited to the faction."
+      success: "&eYou have uninvited &b%player% &eto join your faction."
+      bc: "&d%player% &2has uninvited &e%invited% &2to the faction."
+    kick:
+      claiming: "&cYou cannot kick a player while they are claiming."
+      cannot: "&cYou cannot kick %player%."
+      message: "&c%player% has kicked you from the faction."
+      success: "&eYou have kicked &b%player% &efrom the faction."
+      bc: "&b%kicked% &ehas been kicked from the faction by &d%player%"

@@ -1,7 +1,6 @@
 package me.sub.RelicFactions.Utils;
 
 import me.sub.RelicFactions.Files.Classes.User;
-import me.sub.RelicFactions.Main.Main;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.OfflinePlayer;
@@ -13,12 +12,22 @@ public class Econ implements Economy {
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 
     @Override
     public String getName() {
-        return "";
+        return "Relic-Factions";
+    }
+
+    @Override
+    public String currencyNamePlural() {
+        return "Coins";
+    }
+
+    @Override
+    public String currencyNameSingular() {
+        return "Coin";
     }
 
     @Override
@@ -34,16 +43,6 @@ public class Econ implements Economy {
     @Override
     public String format(double v) {
         return Calculate.formatMoney(v);
-    }
-
-    @Override
-    public String currencyNamePlural() {
-        return "";
-    }
-
-    @Override
-    public String currencyNameSingular() {
-        return "";
     }
 
     @Override

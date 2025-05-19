@@ -1,5 +1,6 @@
 package me.sub.RelicFactions.Files.Classes;
 
+import me.sub.RelicFactions.Files.Data.Cuboid;
 import me.sub.RelicFactions.Files.Data.FactionData;
 import me.sub.RelicFactions.Files.Enums.Color;
 import me.sub.RelicFactions.Files.Enums.FactionType;
@@ -7,13 +8,11 @@ import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
 import me.sub.RelicFactions.Utils.Maps;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class Faction {
 
@@ -27,25 +26,33 @@ public class Faction {
     private HashMap<UUID, Integer> members;
     private boolean open;
     private BigDecimal balance;
+    private BigDecimal dtr;
     private int points;
     private int kothCaptures;
     private int lives;
     private String announcement;
+    private Location home;
+    private final ArrayList<UUID> invites;
+    private ArrayList<Cuboid> claims;
 
     public Faction(FactionData factionData) {
         this.factionData = factionData;
         this.uuid = factionData.getUUID();
         this.name = factionData.getName();
-        this.leader = factionData.get().getString("leader") == null ? null : UUID.fromString(factionData.get().getString("leader"));
+        this.leader = factionData.get().getString("leader") == null ? null : UUID.fromString(Objects.requireNonNull(factionData.get().getString("leader")));
         this.factionType = FactionType.valueOf(factionData.get().getString("type"));
         this.color = factionData.get().getString("color") == null ? null : Color.valueOf(factionData.get().getString("color"));
         members = Maps.deserialize(factionData.get().getString("members"));
         open = factionData.get().getBoolean("open");
         balance = BigDecimal.valueOf(factionData.get().getDouble("balance"));
+        dtr = BigDecimal.valueOf(factionData.get().getDouble("dtr"));
         points = factionData.get().getInt("points");
         kothCaptures = factionData.get().getInt("koth-captures");
         lives = factionData.get().getInt("lives");
         announcement = factionData.get().getString("announcement") == null ? null : factionData.get().getString("announcement");
+        home = factionData.get().getLocation("home") == null ? null : factionData.get().getLocation("home");
+        invites = Maps.stringToUuidList(factionData.get().getString("invites"));
+        claims = Maps.stringToCuboidList(factionData.get().getString("claims"));
         modified = false;
     }
 
@@ -212,5 +219,67 @@ public class Faction {
     public void setAnnouncement(String announcement) {
         modified = true;
         this.announcement = announcement;
+    }
+
+    public void setModified(boolean b) {
+        modified = b;
+    }
+
+    public Location getHome() {
+        return home;
+    }
+
+    public void setHome(Location home) {
+        modified = true;
+        this.home = home;
+    }
+
+    public ArrayList<UUID> getInvites() {
+        modified = true;
+        return invites;
+    }
+
+    public BigDecimal getDTR() {
+        return dtr;
+    }
+
+    public void setDTR(BigDecimal dtr) {
+        modified = true;
+        this.dtr = dtr;
+    }
+
+    public ArrayList<Cuboid> getClaims() {
+        return claims;
+    }
+
+    public void setClaims(ArrayList<Cuboid> claims) {
+        modified = true;
+        this.claims = claims;
+    }
+
+    public static Faction getAt(Location location) {
+        Location clone = location.clone();
+        clone.setY(0);
+        if (Main.getInstance().factions.isEmpty()) return null;
+        for (Faction faction : Main.getInstance().factions.values()) {
+            if (faction.getClaims().isEmpty()) continue;
+            for (Cuboid cuboid : faction.getClaims()) {
+                if (cuboid.isIn(location)) return faction;
+            }
+        }
+        return null;
+    }
+
+    public static boolean hasAt(Location location) {
+        Location clone = location.clone();
+        clone.setY(0);
+        if (Main.getInstance().factions.isEmpty()) return false;
+        for (Faction faction : Main.getInstance().factions.values()) {
+            if (faction.getClaims().isEmpty()) continue;
+            for (Cuboid cuboid : faction.getClaims()) {
+                if (cuboid.isIn(location)) return true;
+            }
+        }
+        return false;
     }
 }

@@ -39,4 +39,14 @@ public enum Color {
             case WHITE -> "&f";
         };
     }
+
+    public static boolean isValid(String input) {
+        if (input == null) return false;
+        try {
+            Color.valueOf(input.toUpperCase());
+            return true;
+        } catch (IllegalArgumentException ex) {
+            return false;
+        }
+    }
 }

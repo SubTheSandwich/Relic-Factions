@@ -4,6 +4,7 @@ import me.sub.RelicFactions.Main.Main;
 
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.Objects;
 
 public class Calculate {
 
@@ -13,7 +14,7 @@ public class Calculate {
     }
 
     public static String formatMoney(double amount) {
-        NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.forLanguageTag(Main.getInstance().getConfig().getString("economy.type")));
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.forLanguageTag(Objects.requireNonNull(Main.getInstance().getConfig().getString("economy.type"))));
         return formatter.format(amount);
     }
 }

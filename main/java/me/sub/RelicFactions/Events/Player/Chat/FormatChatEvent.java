@@ -11,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class FormatChatEvent implements Listener {
@@ -28,9 +29,9 @@ public class FormatChatEvent implements Listener {
             for (Player recipient : recipients) {
                 if (user.hasFaction()) {
                     Faction faction = Faction.get(user.getFaction());
-                    recipient.sendMessage(C.chat(Main.getInstance().getConfig().getString("chat.format.faction").replace("%faction%", faction.getValidName(recipient)).replace("%player%", p.getDisplayName()).replace("%message%", finalMessage)));
+                    recipient.sendMessage(C.chat(Objects.requireNonNull(Main.getInstance().getConfig().getString("chat.format.faction")).replace("%faction%", faction.getValidName(recipient)).replace("%player%", p.getDisplayName()).replace("%message%", finalMessage)));
                 } else {
-                    recipient.sendMessage(C.chat(Main.getInstance().getConfig().getString("chat.format.no-faction").replace("%player%", p.getDisplayName()).replace("%message%", finalMessage)));
+                    recipient.sendMessage(C.chat(Objects.requireNonNull(Main.getInstance().getConfig().getString("chat.format.no-faction")).replace("%player%", p.getDisplayName()).replace("%message%", finalMessage)));
                 }
             }
         });

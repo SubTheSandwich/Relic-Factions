@@ -10,6 +10,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ScoreboardHelper {
 
@@ -22,7 +23,7 @@ public class ScoreboardHelper {
     @SuppressWarnings("deprecation")
     public ScoreboardHelper(Player player, String title) {
         this.player = player;
-        this.scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+        this.scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard();
         this.objective = scoreboard.registerNewObjective(
                 "sidebar",
                 "dummy",
@@ -47,7 +48,7 @@ public class ScoreboardHelper {
 
     public void clear() {
         scoreboard.clearSlot(DisplaySlot.SIDEBAR);
-        player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+        player.setScoreboard(Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard());
         helpers.remove(player);
     }
 

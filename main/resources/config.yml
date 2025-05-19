@@ -18,6 +18,22 @@ economy:
   default-balance: 500
 
 factions:
+  claim:
+    buffer: RED_STAINED_GLASS
+    price:
+      multiplier: 250
+      selling-multiplier: 0.5
+      per-block: 0.25
+  sizes:
+    worlds:
+      default:
+        warzone-build-limit: 300
+        warzone: 750
+      nether:
+        warzone-build-limit: 80
+        warzone: 200
+  members:
+    max: 10
   name:
     min: 3
     max: 15

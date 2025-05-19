@@ -1,12 +1,12 @@
 package me.sub.RelicFactions.Files.Classes;
 
+import me.sub.RelicFactions.Files.Data.Claim;
 import me.sub.RelicFactions.Files.Data.UserData;
 import me.sub.RelicFactions.Main.Main;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.UUID;
 
 public class User {
@@ -16,23 +16,23 @@ public class User {
     private String name;
     private UUID faction;
     private boolean modified;
-    private final ArrayList<UUID> invites;
     private boolean deathbanned;
     private int kills;
     private int deaths;
     private BigDecimal balance;
+    private Claim claim;
 
     public User(UserData userData) {
         this.userData = userData;
         this.uuid = userData.getUUID();
         this.name = userData.getName();
         this.faction = userData.get().getString("faction") == null ? null : UUID.fromString(userData.get().getString("faction"));
-        invites = new ArrayList<>();
         deathbanned = userData.get().getBoolean("deathban.has");
         kills = userData.get().getInt("kills");
         deaths = userData.get().getInt("deaths");
         balance = BigDecimal.valueOf(userData.get().getDouble("balance"));
         modified = false;
+        claim = null;
     }
 
     public static User get(UUID uuid) {
@@ -85,10 +85,6 @@ public class User {
         return faction != null;
     }
 
-    public ArrayList<UUID> getInvites() {
-        return invites;
-    }
-
     public boolean isDeathBanned() {
         return deathbanned;
     }
@@ -123,5 +119,17 @@ public class User {
     public void setBalance(BigDecimal balance) {
         modified = true;
         this.balance = balance;
+    }
+
+    public void setModified(boolean b) {
+        modified = b;
+    }
+
+    public Claim getClaim() {
+        return claim;
+    }
+
+    public void setClaim(Claim claim) {
+        this.claim = claim;
     }
 }

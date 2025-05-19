@@ -13,12 +13,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class BalanceCommand implements TabExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
         if (!(sender instanceof Player p)) {
-            sender.sendMessage(C.chat(Locale.get().getString("primary.not-player")));
+            sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.not-player"))));
             return true;
         }
         User user = User.get(p);
@@ -26,12 +27,12 @@ public class BalanceCommand implements TabExecutor {
             String name = args[0].toLowerCase();
             User other = User.get(name);
             if (other == null) {
-                p.sendMessage(C.chat(Locale.get().getString("primary.no-player")));
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-player"))));
                 return true;
             }
-            p.sendMessage(C.chat(Locale.get().getString("commands.balance.other").replace("%player%", other.getName()).replace("%balance%", Main.getEconomy().format(other.getBalance().doubleValue()))));
+            p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.balance.other")).replace("%player%", other.getName()).replace("%balance%", Main.getEconomy().format(other.getBalance().doubleValue()))));
         } else {
-            p.sendMessage(C.chat(Locale.get().getString("commands.balance.self").replace("%balance%", Main.getEconomy().format(user.getBalance().doubleValue()))));
+            p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.balance.self")).replace("%balance%", Main.getEconomy().format(user.getBalance().doubleValue()))));
         }
         return false;
     }
