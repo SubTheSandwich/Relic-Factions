@@ -153,6 +153,7 @@ public class Main extends JavaPlugin {
             userData.get().set("kills", user.getKills());
             userData.get().set("deaths", user.getDeaths());
             userData.get().set("balance", user.getBalance().doubleValue());
+            userData.get().set("timers", Maps.timersToString(user.getTimers()));
             userData.save();
             user.setModified(false);
             saved++;

@@ -8,10 +8,14 @@ server:
     number: 1
     start-date: "5/16/25"
 
-chat:
-  format:
-    no-faction: "&7[*] &r%player%&7: &r%message%"
-    faction: "&7[%faction%&7] &r%player%&7: &r%message%"
+timers:
+  starting: 3600
+  pvp: 1800
+  combat: 30
+  home: 10
+  enderpearl: 16
+  apple: 10
+  gapple: 21600
 
 economy:
   type: en-US

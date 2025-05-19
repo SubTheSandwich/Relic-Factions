@@ -35,6 +35,10 @@ claiming:
     one: "&eSet position 1"
     two: "&eSet position 2"
 
+chat:
+  public:
+    no-faction: "&7[*] &r%player%&7: &r%message%"
+    faction: "&7[%faction%&7] &r%player%&7: &r%message%"
 
 commands:
   hcf:

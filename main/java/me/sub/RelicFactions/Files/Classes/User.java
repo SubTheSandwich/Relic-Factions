@@ -1,12 +1,15 @@
 package me.sub.RelicFactions.Files.Classes;
 
 import me.sub.RelicFactions.Files.Data.Claim;
+import me.sub.RelicFactions.Files.Data.PlayerTimer;
 import me.sub.RelicFactions.Files.Data.UserData;
 import me.sub.RelicFactions.Main.Main;
+import me.sub.RelicFactions.Utils.Maps;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.UUID;
 
 public class User {
@@ -21,6 +24,7 @@ public class User {
     private int deaths;
     private BigDecimal balance;
     private Claim claim;
+    private final HashMap<String, PlayerTimer> timers;
 
     public User(UserData userData) {
         this.userData = userData;
@@ -31,6 +35,7 @@ public class User {
         kills = userData.get().getInt("kills");
         deaths = userData.get().getInt("deaths");
         balance = BigDecimal.valueOf(userData.get().getDouble("balance"));
+        timers = Maps.stringToTimers(userData.get().getString("timers"));
         modified = false;
         claim = null;
     }
@@ -131,5 +136,14 @@ public class User {
 
     public void setClaim(Claim claim) {
         this.claim = claim;
+    }
+
+    public HashMap<String, PlayerTimer> getTimers() {
+        return timers;
+    }
+
+    public void addTimer(PlayerTimer timer) {
+        modified = true;
+        timers.put(timer.getTimer().name(), timer);
     }
 }

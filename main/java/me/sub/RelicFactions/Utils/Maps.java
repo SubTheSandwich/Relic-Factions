@@ -1,13 +1,12 @@
 package me.sub.RelicFactions.Utils;
 
 import me.sub.RelicFactions.Files.Data.Cuboid;
+import me.sub.RelicFactions.Files.Data.PlayerTimer;
+import me.sub.RelicFactions.Files.Enums.Timer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Maps {
@@ -90,6 +89,40 @@ public class Maps {
             cuboids.add(new Cuboid(loc1, loc2));
         }
         return cuboids;
+    }
+
+    public static String timersToString(HashMap<String, PlayerTimer> timers) {
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, PlayerTimer> entry : timers.entrySet()) {
+            String key = entry.getKey();
+            PlayerTimer pt = entry.getValue();
+            String part = key + "," +
+                    pt.getTimer().name() + "," +
+                    pt.getDuration() + "," +
+                    pt.isPaused();
+            sb.append(part).append(";");
+        }
+        if (!sb.isEmpty()) sb.setLength(sb.length() - 1);
+        return sb.toString();
+    }
+
+    public static HashMap<String, PlayerTimer> stringToTimers(String s) {
+        HashMap<String, PlayerTimer> timers = new HashMap<>();
+        if (s == null || s.isEmpty()) return timers;
+        String[] parts = s.split(";");
+        for (String part : parts) {
+            String[] data = part.split(",");
+            if (data.length != 4) continue;
+            String key = data[0];
+            Timer timer = Timer.valueOf(data[1]);
+            int duration = Integer.parseInt(data[2]);
+            boolean paused = Boolean.parseBoolean(data[3]);
+            PlayerTimer pt = new PlayerTimer(timer);
+            pt.setDuration(duration);
+            pt.setPaused(paused);
+            timers.put(key, pt);
+        }
+        return timers;
     }
 
 }
