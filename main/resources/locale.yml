@@ -24,6 +24,7 @@ claiming:
   cost: "&eClaim Cost: %cost%&e. &eCurrent size: (&f%sizeX%, %sizeZ%&e)"
   already: "&cYou are already claiming."
   inventory-full: "&cPlease ensure your inventory is not full."
+  have: "&cYour faction already has a claim."
   error:
     in-claim: "&cParts of this claim intersect with another claim."
     world: "&cYou cannot select this location, as your other selection is not in the same dimension."
@@ -36,6 +37,10 @@ claiming:
     two: "&eSet position 2"
 
 events:
+  movement:
+    deny:
+      pvp: "&cYou cannot enter this faction while having a PvP timer."
+      combat: "&cYou cannot enter this faction while in combat!"
   timer:
     expire:
       default: "&eYour &b%timer% &etimer has expired."
@@ -44,6 +49,18 @@ chat:
   public:
     no-faction: "&7[*] &r%player%&7: &r%message%"
     faction: "&7[%faction%&7] &r%player%&7: &r%message%"
+
+faction:
+  warzone: "&cWarzone"
+  wilderness: "&7Wilderness"
+  leaving: "&eNow leaving: %faction%"
+  entering: "&eNow entering: %faction%"
+  deathban: "&e(&cDeathban&e)"
+  non-deathban: "&e(&aNon-Deathban&e)"
+  teleport-cancelled: "&eTeleport cancelled."
+  warping: "&eWarping to &d%faction%&e's HQ."
+  cannot-build: "&eYou cannot build in %faction%&e's &eterritory."
+  cannot-use: "&eYou cannot do this in %faction%&e's &eterritory."
 
 commands:
   timer:
@@ -140,3 +157,12 @@ commands:
       message: "&c%player% has kicked you from the faction."
       success: "&eYou have kicked &b%player% &efrom the faction."
       bc: "&b%kicked% &ehas been kicked from the faction by &d%player%"
+    sethome:
+      claim: "&cYou must be in your claim in order to do this."
+      success: "&3%player% has updated the faction HQ."
+    home:
+      none: "&cYour faction does not have a home set."
+      waiting: "&eTeleporting to your faction's HQ in &d%time% seconds&e... Stay still and do not take damage."
+      pvp-timer: "&cYou cannot teleport to your Faction home whilst having PvP timer."
+      spawn-timer: "&cYou cannot teleport to your Faction home whilst having Spawn Tag."
+      end: "&cYou cannot teleport to your Faction home whilst in The End."

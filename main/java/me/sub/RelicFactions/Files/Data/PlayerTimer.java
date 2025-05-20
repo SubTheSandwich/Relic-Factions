@@ -1,10 +1,13 @@
 package me.sub.RelicFactions.Files.Data;
 
+import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Enums.Timer;
 import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Main.Main;
+import me.sub.RelicFactions.Utils.C;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -84,6 +87,14 @@ public class PlayerTimer {
         new BukkitRunnable() {
             @Override
             public void run() {
+                if (User.get(uuid) == null) {
+                    cancel();
+                    return;
+                }
+                if (!User.get(uuid).hasTimer(timer.name())) {
+                    cancel();
+                    return;
+                }
                 if (Bukkit.getPlayer(uuid) == null) {
                     cancel();
                     return;
@@ -92,7 +103,30 @@ public class PlayerTimer {
                 if (paused) return;
                 duration = duration.subtract(BigDecimal.valueOf(0.05));
                 if (duration.doubleValue() > 0) return;
-                Objects.requireNonNull(player).sendMessage(Objects.requireNonNull(Locale.get().getString("events.timer.expire." + timer.name().toLowerCase()) == null ? Objects.requireNonNull(Locale.get().getString("events.timer.expire.default")).replace("%timer%", timer.name()) : Locale.get().getString("events.timer.expire." + timer.name().toLowerCase())));
+                if (timer.name().equalsIgnoreCase("HOME")) {
+                    User user = User.get(uuid);
+                    if (!user.hasFaction()) {
+                        cancel();
+                        return;
+                    }
+                    Faction faction = Faction.get(user.getFaction());
+                    if (faction.getHome() == null) {
+                        cancel();
+                        return;
+                    }
+                    Location home = faction.getHome();
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            Objects.requireNonNull(player).teleport(home);
+                        }
+                    }.runTaskLater(Main.getInstance(), 1);
+                    Objects.requireNonNull(player).sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.warping")).replace("%faction%", faction.getName())));
+                    user.removeTimer(timer.name());
+                    cancel();
+                    return;
+                }
+                Objects.requireNonNull(player).sendMessage(Objects.requireNonNull(C.chat(Locale.get().getString("events.timer.expire." + timer.name().toLowerCase()) == null ? Objects.requireNonNull(Locale.get().getString("events.timer.expire.default")).replace("%timer%", timer.name()) : Objects.requireNonNull(Locale.get().getString("events.timer.expire." + timer.name().toLowerCase())))));
                 User user = User.get(player);
                 user.removeTimer(timer.name());
                 cancel();

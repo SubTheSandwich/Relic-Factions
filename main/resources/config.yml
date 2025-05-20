@@ -22,6 +22,10 @@ economy:
   default-balance: 500
 
 factions:
+  home:
+    nether: 20
+    end: 30
+    disable-in-end: false
   claim:
     buffer: RED_STAINED_GLASS
     price:
@@ -51,6 +55,7 @@ scoreboard:
   lines:
     - "&7&m-------------------------"
     - "&a&lStarting&7: &c%player_starting_timer%<display=%has_player_starting_timer%"
+    - "&9&lHome&7: &c%player_home_timer%<display=%has_player_home_timer%"
     - "&7&m-------------------------"
 
 features:

@@ -14,6 +14,7 @@ import java.util.UUID;
 
 public class User {
 
+    private boolean userDisconnected;
     private final UserData userData;
     private final UUID uuid;
     private String name;
@@ -27,6 +28,7 @@ public class User {
     private final HashMap<String, PlayerTimer> timers;
 
     public User(UserData userData) {
+        userDisconnected = true;
         this.userData = userData;
         this.uuid = userData.getUUID();
         this.name = userData.getName();
@@ -158,5 +160,16 @@ public class User {
 
     public boolean hasTimer(String name) {
         return getTimer(name) != null;
+    }
+
+    public boolean isDisconnected() {
+        return userDisconnected;
+    }
+
+    public void setDisconnected(boolean userDisconnected) {
+        this.userDisconnected = userDisconnected;
+        if (!userDisconnected && !timers.isEmpty()) {
+            timers.forEach((s, timer) -> timer.tick());
+        }
     }
 }

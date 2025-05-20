@@ -59,7 +59,13 @@ public class TimerCommand implements TabExecutor {
             return true;
         }
         if (args[0].equalsIgnoreCase("remove")) {
-            user.removeTimer(timer.name());
+            if (args.length == 4) {
+                if (user.hasTimer(timer.name())) {
+                    user.getTimer(timer.name()).setDuration(user.getTimer(timer.name()).getDuration().subtract(BigDecimal.valueOf(duration)));
+                }
+            } else {
+                user.removeTimer(timer.name());
+            }
             p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.timer.remove")).replace("%player%", user.getName()).replace("%timer%", timer.name())));
             return true;
         }

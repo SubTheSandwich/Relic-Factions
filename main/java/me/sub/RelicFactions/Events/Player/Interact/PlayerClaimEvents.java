@@ -139,7 +139,7 @@ public class PlayerClaimEvents implements Listener {
             p.getInventory().remove(Claim.getWand());
             return;
         }
-        if (faction.getClaims() != null || !faction.getClaims().isEmpty()) {
+        if (!faction.getClaims().isEmpty()) {
             p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("claiming.have"))));
             claim.setAttempting(false);
             return;
@@ -294,7 +294,7 @@ public class PlayerClaimEvents implements Listener {
     }
 
     private boolean isInvalid(Location location) {
-        return location.getBlockX() < Main.getInstance().getConfig().getInt("factions.sizes.worlds.default.warzone") && location.getBlockZ() < Main.getInstance().getConfig().getInt("factions.sizes.worlds.default.warzone");
+        return Math.abs(location.getBlockX()) < Main.getInstance().getConfig().getInt("factions.sizes.worlds.default.warzone") && Math.abs(location.getBlockZ()) < Main.getInstance().getConfig().getInt("factions.sizes.worlds.default.warzone");
     }
 
     public double getPrice(Cuboid cuboid) {

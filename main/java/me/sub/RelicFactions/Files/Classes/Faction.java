@@ -4,6 +4,7 @@ import me.sub.RelicFactions.Files.Data.Cuboid;
 import me.sub.RelicFactions.Files.Data.FactionData;
 import me.sub.RelicFactions.Files.Enums.Color;
 import me.sub.RelicFactions.Files.Enums.FactionType;
+import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
 import me.sub.RelicFactions.Utils.Maps;
@@ -34,6 +35,7 @@ public class Faction {
     private Location home;
     private final ArrayList<UUID> invites;
     private ArrayList<Cuboid> claims;
+    private boolean deathban;
 
     public Faction(FactionData factionData) {
         this.factionData = factionData;
@@ -53,7 +55,12 @@ public class Faction {
         home = factionData.get().getLocation("home") == null ? null : factionData.get().getLocation("home");
         invites = Maps.stringToUuidList(factionData.get().getString("invites"));
         claims = Maps.stringToCuboidList(factionData.get().getString("claims"));
+        deathban = factionData.get().getBoolean("deathban");
         modified = false;
+    }
+
+    public static boolean isInWilderness(Location location, int boundary) {
+        return Math.abs(location.getBlockX()) < boundary && Math.abs(location.getBlockZ()) < boundary;
     }
 
     public static Faction get(UUID uuid) {
@@ -61,6 +68,11 @@ public class Faction {
     }
     public static Faction get(String name) {
         return Main.getInstance().factionNameHolder.getOrDefault(name.toLowerCase(), null);
+    }
+
+    public void setDeathban(boolean deathban) {
+        modified = true;
+        this.deathban = deathban;
     }
 
     public FactionData getUserData() {
@@ -102,25 +114,37 @@ public class Faction {
         this.leader = leader;
     }
 
-    public String getValidName(Player p) {
+    public String getValidName(Player p, boolean includeDeathban) {
         User user = User.get(p);
+        String validName;
         if (factionType.equals(FactionType.PLAYER)) {
             if (!user.hasFaction()) {
-                return C.chat("&c" + name);
+                validName = C.chat("&c" + name);
             } else {
                 if (user.getFaction().equals(uuid)) {
-                    return C.chat("&a" + name);
+                    validName = C.chat("&a" + name);
                 } else {
-                    return C.chat("&c" + name);
+                    validName = C.chat("&c" + name);
                 }
             }
         } else if (factionType.equals(FactionType.KOTH)) {
-            return C.chat(color.toColorCode() + name + " KOTH");
+            validName = C.chat(color.toColorCode() + name + " KOTH");
         } else if (factionType.equals(FactionType.ROAD)) {
-            return C.chat(color.toColorCode() + name + " Road");
+            validName = C.chat(color.toColorCode() + name + " Road");
         } else {
-            return C.chat(color.toColorCode() + name);
+            validName = C.chat(color.toColorCode() + name);
         }
+        if (includeDeathban) {
+            validName += " ";
+            validName += isDeathban()
+                    ? Locale.get().getString("faction.deathban")
+                    : Locale.get().getString("faction.non-deathban");
+        }
+        return validName;
+    }
+
+    public boolean isDeathban() {
+        return deathban;
     }
 
     public Color getColor() {
@@ -264,7 +288,7 @@ public class Faction {
         for (Faction faction : Main.getInstance().factions.values()) {
             if (faction.getClaims().isEmpty()) continue;
             for (Cuboid cuboid : faction.getClaims()) {
-                if (cuboid.isIn(location)) return faction;
+                if (cuboid.isIn(clone)) return faction;
             }
         }
         return null;
@@ -281,5 +305,14 @@ public class Faction {
             }
         }
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "Faction{" +
+                "uuid=" + uuid +
+                ", name='" + name + '\'' +
+                ", factionType=" + factionType +
+                '}';
     }
 }

@@ -30,7 +30,7 @@ public class FormatChatEvent implements Listener {
             for (Player recipient : recipients) {
                 if (user.hasFaction()) {
                     Faction faction = Faction.get(user.getFaction());
-                    recipient.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("chat.public.faction")).replace("%faction%", faction.getValidName(recipient)).replace("%player%", p.getDisplayName()).replace("%message%", finalMessage)));
+                    recipient.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("chat.public.faction")).replace("%faction%", faction.getValidName(recipient, false)).replace("%player%", p.getDisplayName()).replace("%message%", finalMessage)));
                 } else {
                     recipient.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("chat.public.no-faction")).replace("%player%", p.getDisplayName()).replace("%message%", finalMessage)));
                 }

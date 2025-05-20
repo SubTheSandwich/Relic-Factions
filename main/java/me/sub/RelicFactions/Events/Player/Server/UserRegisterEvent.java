@@ -1,4 +1,4 @@
-package me.sub.RelicFactions.Events.Player;
+package me.sub.RelicFactions.Events.Player.Server;
 
 import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Data.PlayerTimer;
@@ -30,9 +30,11 @@ public class UserRegisterEvent implements Listener {
             userData.get().set("balance", Main.getInstance().getConfig().getDouble("economy.default-balance"));
             userData.save();
             user = new User(userData);
+            user.addTimer(new PlayerTimer(p.getUniqueId(), Timer.STARTING));
             Main.getInstance().users.put(p.getUniqueId(), user);
             Main.getInstance().userNameHolder.put(p.getName().toLowerCase(), user);
         }
+        user.setDisconnected(false);
         if (!p.getName().equals(user.getName())) {
             Main.getInstance().userNameHolder.remove(user.getName().toLowerCase());
             user.setName(p.getName());
@@ -44,7 +46,11 @@ public class UserRegisterEvent implements Listener {
             public void run() {
                 if (!Main.getInstance().getConfig().getBoolean("features.scoreboard.enabled")) return;
                 ArrayList<String> lines = new ArrayList<>();
-                FastBoard board = new FastBoard(p);
+                FastBoard board = Main.getInstance().boards.getOrDefault(p.getUniqueId(), null);
+                if (board == null) {
+                    board = new FastBoard(p);
+                    board.updateTitle(C.chat(Objects.requireNonNull(Main.getInstance().getConfig().getString("scoreboard.title"))));
+                }
                 if (!p.isOnline()) {
                     cancel();
                     board.delete();
@@ -66,8 +72,8 @@ public class UserRegisterEvent implements Listener {
 
                 if (lines.size() <= Main.getInstance().getConfig().getInt("features.scoreboard.line-limit")) {
                     board.delete();
+                    Main.getInstance().boards.remove(p.getUniqueId());
                 } else {
-                    board.updateTitle(C.chat(Objects.requireNonNull(Main.getInstance().getConfig().getString("scoreboard.title"))));
                     board.updateLines(lines);
                 }
             }

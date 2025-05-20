@@ -4,8 +4,10 @@ import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Data.Claim;
 import me.sub.RelicFactions.Files.Data.FactionData;
+import me.sub.RelicFactions.Files.Data.PlayerTimer;
 import me.sub.RelicFactions.Files.Enums.Color;
 import me.sub.RelicFactions.Files.Enums.FactionType;
+import me.sub.RelicFactions.Files.Enums.Timer;
 import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Files.Normal.Messages;
 import me.sub.RelicFactions.Main.Main;
@@ -14,6 +16,7 @@ import me.sub.RelicFactions.Utils.Calculate;
 import me.sub.RelicFactions.Utils.Maps;
 import me.sub.RelicFactions.Utils.Permission;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -164,6 +167,90 @@ public class FactionCommand implements TabExecutor {
                 p.sendMessage(C.chat(message));
                 return true;
             }
+            if (args[0].equalsIgnoreCase("sethome")) {
+                if (!user.hasFaction()) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
+                    return true;
+                }
+                Faction faction = Faction.get(user.getFaction());
+                if (faction.getRoleID(p.getUniqueId()) == 0) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.captain-above"))));
+                    return true;
+                }
+                if (Faction.getAt(p.getLocation()) == null || !Faction.getAt(p.getLocation()).getUUID().equals(faction.getUUID())) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.sethome.claim"))));
+                    return true;
+                }
+                faction.setHome(p.getLocation());
+                for (Player player : faction.getOnlineMembers()) {
+                    player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.sethome.success")).replace("%player%", p.getName())));
+                }
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("claim")) {
+                if (!user.hasFaction()) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
+                    return true;
+                }
+                Faction faction = Faction.get(user.getFaction());
+                if (faction.getRoleID(p.getUniqueId()) == 0) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.captain-above"))));
+                    return true;
+                }
+                if (!faction.getClaims().isEmpty()) {
+                    p.sendMessage(C.chat(Locale.get().getString("claiming.have")));
+                    return true;
+                }
+                if (user.getClaim() != null) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("claiming.already"))));
+                    return true;
+                }
+                if (p.getInventory().firstEmpty() == -1) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("claiming.inventory-full"))));
+                    return true;
+                }
+                Claim claim = new Claim(faction.getUUID());
+                user.setClaim(claim);
+                p.getInventory().addItem(Claim.getWand());
+                Messages.send(p, "faction.help.claiming");
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("home")) {
+                if (!user.hasFaction()) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
+                    return true;
+                }
+                Faction faction = Faction.get(user.getFaction());
+                if (faction.getHome() == null) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.home.none"))));
+                    return true;
+                }
+
+                if (user.hasTimer("pvp") || user.hasTimer("starting")) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.home.pvp-timer"))));
+                    return true;
+                }
+
+                if (user.hasTimer("combat")) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.home.spawn-timer"))));
+                    return true;
+                }
+
+                int duration = Main.getInstance().getConfig().getInt("timers.home");
+                if (p.getWorld().getEnvironment().equals(World.Environment.NETHER)) {
+                    duration = Main.getInstance().getConfig().getInt("factions.home.nether");
+                } else if (p.getWorld().getEnvironment().equals(World.Environment.THE_END)) {
+                    if (Main.getInstance().getConfig().getBoolean("factions.home.disable-in-end")) {
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.home.end"))));
+                        return true;
+                    }
+                    duration = Main.getInstance().getConfig().getInt("factions.home.end");
+                }
+                PlayerTimer timer = new PlayerTimer(p.getUniqueId(), Timer.HOME, BigDecimal.valueOf(duration));
+                user.addTimer(timer);
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.home.waiting")).replace("%time%", duration + "")));
+                return true;
+            }
             Messages.send(p, "faction.help.main", s);
             return true;
         }
@@ -286,6 +373,7 @@ public class FactionCommand implements TabExecutor {
                 factionData.get().set("name", args[1]);
                 factionData.get().set("type", FactionType.SYSTEM.name());
                 factionData.get().set("color", Color.WHITE.name());
+                factionData.get().set("deathban", false);
                 factionData.save();
                 faction = new Faction(factionData);
                 Main.getInstance().factions.put(uuid, faction);
@@ -383,6 +471,7 @@ public class FactionCommand implements TabExecutor {
                 factionData.get().set("points", 0);
                 factionData.get().set("invites", new ArrayList<>());
                 factionData.get().set("lives", 0);
+                factionData.get().set("deathban", true);
                 factionData.save();
                 user.setFaction(uuid);
                 faction = new Faction(factionData);
@@ -777,18 +866,19 @@ public class FactionCommand implements TabExecutor {
         if (!(sender instanceof Player p)) return new ArrayList<>();
         List<String> values = new ArrayList<>();
         if (args.length == 1) {
-            values.addAll(List.of("create", "open", "show", "deposit", "invite", "join", "withdraw", "subclaim", "captain", "coleader", "invites", "announcement", "uninvite", "leave", "kick"));
+            values.addAll(List.of("create", "open", "show", "deposit", "invite", "join", "withdraw",
+                    "subclaim", "captain", "coleader", "invites", "announcement", "uninvite", "leave", "kick",
+                    "sethome", "claim", "home"));
             if (Permission.has(p, "faction.createsystem")) values.add("createsystem");
             if (Permission.has(p, "faction.setcolor")) values.add("setcolor");
             if (Permission.has(p, "faction.settype")) values.add("settype");
             if (Permission.has(p, "faction.setlocation")) values.add("setlocation");
         }
         if (args.length == 2) {
-            if ((args[0].equalsIgnoreCase("createsystem") && Permission.has(p, "faction.createsystem"))
+            if ((args[0].equalsIgnoreCase("claimfor") && Permission.has(p, "faction.claimfor"))
                     || (args[0].equalsIgnoreCase("setcolor") && Permission.has(p, "faction.setcolor"))
                     || (args[0].equalsIgnoreCase("settype") && Permission.has(p, "faction.settype"))
-                    || (args[0].equalsIgnoreCase("setlocation") && Permission.has(p, "faction.setlocation"))
-                    || (args[0].equalsIgnoreCase("claimfor") && Permission.has(p, "faction.claimfor"))) {
+                    || (args[0].equalsIgnoreCase("setlocation") && Permission.has(p, "faction.setlocation"))) {
                 values.addAll(Main.getInstance().factionNameHolder.values().stream()
                         .filter(faction -> faction.getType() != FactionType.PLAYER)
                         .map(Faction::getName)
@@ -803,7 +893,7 @@ public class FactionCommand implements TabExecutor {
         User user = User.get(p);
         if (faction.getType().equals(FactionType.PLAYER)) {
             for (String s : Messages.get().getStringList("faction.show.player")) {
-                if (s.contains("%name%")) s = s.replace("%name%", faction.getValidName(p));
+                if (s.contains("%name%")) s = s.replace("%name%", faction.getValidName(p, false));
                 if (s.contains("%online%")) s = s.replace("%online%", faction.getOnlineMembers().size() + "");
                 if (s.contains("%players%")) s = s.replace("%players%", faction.getMembers().size() + "");
                 if (s.contains("%home%")) {
@@ -872,7 +962,7 @@ public class FactionCommand implements TabExecutor {
             }
         } else {
             for (String s : Messages.get().getStringList("faction.show.system")) {
-                if (s.contains("%name%")) s = s.replace("%name%", faction.getValidName(p));
+                if (s.contains("%name%")) s = s.replace("%name%", faction.getValidName(p, false));
                 if (s.contains("%home%")) {
                     if (faction.getHome() == null) {
                         s = s.replace("%home%", Objects.requireNonNull(Locale.get().getString("primary.none")));

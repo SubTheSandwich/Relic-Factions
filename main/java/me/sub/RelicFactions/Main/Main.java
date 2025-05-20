@@ -6,12 +6,16 @@ import me.sub.RelicFactions.Commands.User.BalanceCommand;
 import me.sub.RelicFactions.Commands.User.FactionCommand;
 import me.sub.RelicFactions.Events.Player.Chat.FormatChatEvent;
 import me.sub.RelicFactions.Events.Player.Interact.PlayerClaimEvents;
-import me.sub.RelicFactions.Events.Player.UserRegisterEvent;
+import me.sub.RelicFactions.Events.Player.Interact.UserInteractAtFactionEvent;
+import me.sub.RelicFactions.Events.Player.Movement.UserMoveEvent;
+import me.sub.RelicFactions.Events.Player.Server.UserDisconnectEvent;
+import me.sub.RelicFactions.Events.Player.Server.UserRegisterEvent;
 import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Data.FactionData;
 import me.sub.RelicFactions.Files.Data.UserData;
 import me.sub.RelicFactions.Utils.Econ;
+import me.sub.RelicFactions.Utils.Fastboard.FastBoard;
 import me.sub.RelicFactions.Utils.Maps;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -38,6 +42,7 @@ public class Main extends JavaPlugin {
     public HashMap<String, User> userNameHolder = new HashMap<>();
     public HashMap<UUID, Faction> factions = new HashMap<>();
     public HashMap<String, Faction> factionNameHolder = new HashMap<>();
+    public HashMap<UUID, FastBoard> boards = new HashMap<>();
 
     private static Main instance;
 
@@ -98,6 +103,9 @@ public class Main extends JavaPlugin {
         pm.registerEvents(new UserRegisterEvent(), this);
         pm.registerEvents(new FormatChatEvent(), this);
         pm.registerEvents(new PlayerClaimEvents(), this);
+        pm.registerEvents(new UserDisconnectEvent(), this);
+        pm.registerEvents(new UserMoveEvent(), this);
+        pm.registerEvents(new UserInteractAtFactionEvent(), this);
     }
 
     private void files() {
@@ -183,6 +191,7 @@ public class Main extends JavaPlugin {
             factionData.get().set("lives", faction.getLives());
             factionData.get().set("invites", Maps.uuidListToString(faction.getInvites()));
             factionData.get().set("claims", Maps.cuboidListToString(faction.getClaims()));
+            factionData.get().set("deathban", faction.isDeathban());
             factionData.save();
             faction.setModified(false);
             saved++;

@@ -83,6 +83,7 @@ public class Claim {
             if (Tag.CORAL_PLANTS.isTagged(material)) continue;
             if (Tag.WALL_CORALS.isTagged(material)) continue;
             if (Tag.BANNERS.isTagged(material)) continue;
+            if (Tag.WALLS.isTagged(material)) continue;
             if (material.equals(Material.FARMLAND)) continue;
             if (material.equals(Material.CAKE)) continue;
             if (material.equals(Material.DAYLIGHT_DETECTOR)) continue;
