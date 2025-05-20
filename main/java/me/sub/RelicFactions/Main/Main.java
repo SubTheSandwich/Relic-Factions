@@ -1,6 +1,7 @@
 package me.sub.RelicFactions.Main;
 
 import me.sub.RelicFactions.Admin.HCFCommand;
+import me.sub.RelicFactions.Admin.TimerCommand;
 import me.sub.RelicFactions.Commands.User.BalanceCommand;
 import me.sub.RelicFactions.Commands.User.FactionCommand;
 import me.sub.RelicFactions.Events.Player.Chat.FormatChatEvent;
@@ -83,6 +84,7 @@ public class Main extends JavaPlugin {
     private void commands() {
         // Admin
         Objects.requireNonNull(getCommand("hcf")).setExecutor(new HCFCommand()); Objects.requireNonNull(getCommand("hcf")).setTabCompleter(new HCFCommand());
+        Objects.requireNonNull(getCommand("timer")).setExecutor(new TimerCommand()); Objects.requireNonNull(getCommand("timer")).setTabCompleter(new TimerCommand());
 
         // User
         Objects.requireNonNull(getCommand("faction")).setExecutor(new FactionCommand()); Objects.requireNonNull(getCommand("faction")).setTabCompleter(new FactionCommand());

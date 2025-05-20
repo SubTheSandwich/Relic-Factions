@@ -6,6 +6,7 @@ import me.sub.RelicFactions.Files.Enums.Timer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -94,11 +95,11 @@ public class Maps {
     public static String timersToString(HashMap<String, PlayerTimer> timers) {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, PlayerTimer> entry : timers.entrySet()) {
-            String key = entry.getKey();
             PlayerTimer pt = entry.getValue();
-            String part = key + "," +
+            String part = entry.getKey() + "," +
+                    pt.getUUID().toString() + "," +
                     pt.getTimer().name() + "," +
-                    pt.getDuration() + "," +
+                    pt.getDuration().toPlainString() + "," +
                     pt.isPaused();
             sb.append(part).append(";");
         }
@@ -112,17 +113,17 @@ public class Maps {
         String[] parts = s.split(";");
         for (String part : parts) {
             String[] data = part.split(",");
-            if (data.length != 4) continue;
+            if (data.length != 5) continue;
             String key = data[0];
-            Timer timer = Timer.valueOf(data[1]);
-            int duration = Integer.parseInt(data[2]);
-            boolean paused = Boolean.parseBoolean(data[3]);
-            PlayerTimer pt = new PlayerTimer(timer);
-            pt.setDuration(duration);
-            pt.setPaused(paused);
+            UUID uuid = UUID.fromString(data[1]);
+            Timer timer = Timer.valueOf(data[2]);
+            BigDecimal duration = new BigDecimal(data[3]);
+            boolean paused = Boolean.parseBoolean(data[4]);
+            PlayerTimer pt = new PlayerTimer(uuid, timer, duration, paused);
             timers.put(key, pt);
         }
         return timers;
     }
+
 
 }

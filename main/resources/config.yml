@@ -45,3 +45,15 @@ factions:
       - "MINEHQ"
       - "VELTPVP"
       - "ARCANE"
+
+scoreboard:
+  title: "%primary%&l%servername% &7| &fMap %map-number%"
+  lines:
+    - "&7&m-------------------------"
+    - "&a&lStarting&7: &c%player_starting_timer%<display=%has_player_starting_timer%"
+    - "&7&m-------------------------"
+
+features:
+  scoreboard:
+    enabled: true
+    line-limit: 2

@@ -35,12 +35,22 @@ claiming:
     one: "&eSet position 1"
     two: "&eSet position 2"
 
+events:
+  timer:
+    expire:
+      default: "&eYour &b%timer% &etimer has expired."
+
 chat:
   public:
     no-faction: "&7[*] &r%player%&7: &r%message%"
     faction: "&7[%faction%&7] &r%player%&7: &r%message%"
 
 commands:
+  timer:
+    usage: "&cUsage: /timer <set/remove> <player> <timer> <time>"
+    not-valid: "&cThe specified timer is not valid. Valid timers: %timers%"
+    set: "&eYou have set the timer &d%timer% &efor &b%player% &eto &a%duration%"
+    remove: "&eYou have &cremoved &ethe timer &d%timer% &efrom &b%player%"
   hcf:
     usage: "&cUsage: /hcf <reload/save>"
     save:

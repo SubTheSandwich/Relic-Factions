@@ -17,3 +17,5 @@ commands:
       - bal
   hcf:
     description: Debug command
+  timer:
+    description: Timer command

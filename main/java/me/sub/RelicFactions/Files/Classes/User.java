@@ -144,6 +144,19 @@ public class User {
 
     public void addTimer(PlayerTimer timer) {
         modified = true;
-        timers.put(timer.getTimer().name(), timer);
+        timers.put(timer.getTimer().name().toUpperCase(), timer);
+    }
+
+    public void removeTimer(String name) {
+        modified = true;
+        timers.remove(name.toUpperCase());
+    }
+
+    public PlayerTimer getTimer(String name) {
+        return timers.getOrDefault(name.toUpperCase(), null);
+    }
+
+    public boolean hasTimer(String name) {
+        return getTimer(name) != null;
     }
 }
