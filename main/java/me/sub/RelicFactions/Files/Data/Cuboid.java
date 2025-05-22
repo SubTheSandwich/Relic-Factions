@@ -119,4 +119,28 @@ public class Cuboid {
         if (this.yMax < other.yMin || this.yMin > other.yMax) return false;
         return this.zMax >= other.zMin && this.zMin <= other.zMax;
     }
+
+    public int getXMin() {
+        return xMin;
+    }
+
+    public int getXMax() {
+        return xMax;
+    }
+
+    public int getYMin() {
+        return yMin;
+    }
+
+    public int getYMax() {
+        return yMax;
+    }
+
+    public int getZMin() {
+        return zMin;
+    }
+
+    public int getZMax() {
+        return zMax;
+    }
 }

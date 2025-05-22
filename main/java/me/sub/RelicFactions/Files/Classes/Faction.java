@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Faction {
 
@@ -314,5 +315,54 @@ public class Faction {
                 ", name='" + name + '\'' +
                 ", factionType=" + factionType +
                 '}';
+    }
+
+    public static ArrayList<Faction> getPage(int page) {
+        if (page < 1) return new ArrayList<>();
+        List<Faction> playerFactions = Main.getInstance().factions.values().stream()
+                .filter(f -> f.getType() == FactionType.PLAYER)
+                .sorted((f1, f2) -> Integer.compare(
+                        f2.getOnlineMembers().size(), f1.getOnlineMembers().size()
+                ))
+                .collect(Collectors.toList());
+        int fromIndex = (page - 1) * 10;
+        if (fromIndex >= playerFactions.size()) return new ArrayList<>();
+        int toIndex = Math.min(fromIndex + 10, playerFactions.size());
+        return new ArrayList<>(playerFactions.subList(fromIndex, toIndex));
+    }
+
+    public static int getMaxPages() {
+        long count = Main.getInstance().factions.values().stream()
+                .filter(f -> f.getType() == FactionType.PLAYER)
+                .count();
+        return (int) Math.ceil((double) count / 10);
+    }
+
+    public static Map<Faction, List<Cuboid>> getNearbyClaims(
+            Location playerLoc,
+            double radius
+    ) {
+        Map<Faction, List<Cuboid>> result = new HashMap<>();
+        double px = playerLoc.getX();
+        double pz = playerLoc.getZ();
+        ArrayList<Faction> allFactions = new ArrayList<>(Main.getInstance().factions.values());
+
+        for (Faction faction : allFactions) {
+            List<Cuboid> nearby = new ArrayList<>();
+            for (Cuboid claim : faction.getClaims()) {
+                double closestX = Math.max(claim.getXMin(), Math.min(px, claim.getXMax()));
+                double closestZ = Math.max(claim.getZMin(), Math.min(pz, claim.getZMax()));
+                double dx = px - closestX;
+                double dz = pz - closestZ;
+                double distSq = dx * dx + dz * dz;
+                if (distSq <= radius * radius) {
+                    nearby.add(claim);
+                }
+            }
+            if (!nearby.isEmpty()) {
+                result.put(faction, nearby);
+            }
+        }
+        return result;
     }
 }

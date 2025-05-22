@@ -1,11 +1,15 @@
 package me.sub.RelicFactions.Main;
 
-import me.sub.RelicFactions.Admin.HCFCommand;
-import me.sub.RelicFactions.Admin.TimerCommand;
+import me.sub.RelicFactions.Commands.Admin.EconomyCommand;
+import me.sub.RelicFactions.Commands.Admin.HCFCommand;
+import me.sub.RelicFactions.Commands.Admin.TimerCommand;
 import me.sub.RelicFactions.Commands.User.BalanceCommand;
 import me.sub.RelicFactions.Commands.User.FactionCommand;
+import me.sub.RelicFactions.Commands.User.FilterCommand;
+import me.sub.RelicFactions.Commands.User.HelpCommand;
 import me.sub.RelicFactions.Events.Player.Chat.FormatChatEvent;
-import me.sub.RelicFactions.Events.Player.Interact.PlayerClaimEvents;
+import me.sub.RelicFactions.Events.Player.Interact.UserClaimEvents;
+import me.sub.RelicFactions.Events.Player.Interact.UserFilterEvent;
 import me.sub.RelicFactions.Events.Player.Interact.UserInteractAtFactionEvent;
 import me.sub.RelicFactions.Events.Player.Movement.UserMoveEvent;
 import me.sub.RelicFactions.Events.Player.Server.UserDisconnectEvent;
@@ -14,6 +18,7 @@ import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Data.FactionData;
 import me.sub.RelicFactions.Files.Data.UserData;
+import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Utils.Econ;
 import me.sub.RelicFactions.Utils.Fastboard.FastBoard;
 import me.sub.RelicFactions.Utils.Maps;
@@ -90,10 +95,13 @@ public class Main extends JavaPlugin {
         // Admin
         Objects.requireNonNull(getCommand("hcf")).setExecutor(new HCFCommand()); Objects.requireNonNull(getCommand("hcf")).setTabCompleter(new HCFCommand());
         Objects.requireNonNull(getCommand("timer")).setExecutor(new TimerCommand()); Objects.requireNonNull(getCommand("timer")).setTabCompleter(new TimerCommand());
+        Objects.requireNonNull(getCommand("economy")).setExecutor(new EconomyCommand()); Objects.requireNonNull(getCommand("economy")).setTabCompleter(new EconomyCommand());
 
         // User
         Objects.requireNonNull(getCommand("faction")).setExecutor(new FactionCommand()); Objects.requireNonNull(getCommand("faction")).setTabCompleter(new FactionCommand());
         Objects.requireNonNull(getCommand("balance")).setExecutor(new BalanceCommand()); Objects.requireNonNull(getCommand("balance")).setTabCompleter(new BalanceCommand());
+        Objects.requireNonNull(getCommand("help")).setExecutor(new HelpCommand()); Objects.requireNonNull(getCommand("help")).setTabCompleter(new HelpCommand());
+        Objects.requireNonNull(getCommand("filter")).setExecutor(new FilterCommand()); Objects.requireNonNull(getCommand("filter")).setTabCompleter(new FilterCommand());
     }
 
     private void events() {
@@ -102,16 +110,18 @@ public class Main extends JavaPlugin {
         // User
         pm.registerEvents(new UserRegisterEvent(), this);
         pm.registerEvents(new FormatChatEvent(), this);
-        pm.registerEvents(new PlayerClaimEvents(), this);
+        pm.registerEvents(new UserClaimEvents(), this);
         pm.registerEvents(new UserDisconnectEvent(), this);
         pm.registerEvents(new UserMoveEvent(), this);
         pm.registerEvents(new UserInteractAtFactionEvent(), this);
+        pm.registerEvents(new UserFilterEvent(), this);
     }
 
     private void files() {
         saveResource("config.yml", false);
         saveResource("locale.yml", false);
         saveResource("messages.yml", false);
+        Locale.load();
     }
 
     private boolean setupEconomy() {
@@ -158,7 +168,7 @@ public class Main extends JavaPlugin {
             if (!user.isModified()) continue;
             UserData userData = user.getUserData();
             userData.get().set("name", user.getName());
-            userData.get().set("faction", user.getFaction().toString());
+            userData.get().set("faction", user.getFaction() == null ? null : user.getFaction().toString());
             userData.get().set("deathbanned", user.isDeathBanned());
             userData.get().set("kills", user.getKills());
             userData.get().set("deaths", user.getDeaths());

@@ -77,4 +77,11 @@ public class FactionData {
     public static File[] getAll() {
         return new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder().getPath() + "/data/factions").listFiles();
     }
+
+    public boolean delete() {
+        if (file.exists()) {
+            return file.delete();
+        }
+        return false;
+    }
 }

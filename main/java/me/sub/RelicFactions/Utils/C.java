@@ -12,6 +12,12 @@ public class C {
         if (s.contains("%secondary%")) s = s.replace("%secondary%", Objects.requireNonNull(C.convertFromName(Main.getInstance().getConfig().getString("server.color.secondary"))));
         if (s.contains("%servername%")) s = s.replace("%servername%", Objects.requireNonNull(Main.getInstance().getConfig().getString("server.name")));
         if (s.contains("%map-number%")) s = s.replace("%map-number%", Main.getInstance().getConfig().getInt("server.map.number") + "");
+        if (s.contains("%mapstartdate%")) s = s.replace("%mapstartdate%", Objects.requireNonNull(Main.getInstance().getConfig().getString("server.map.start-date")));
+        if (s.contains("%border%")) s = s.replace("%border%", Main.getInstance().getConfig().getInt("limiters.world-border") + "");
+        if (s.contains("%warzone%")) s = s.replace("%warzone%", Main.getInstance().getConfig().getInt("factions.sizes.worlds.default.warzone") + "");
+        if (s.contains("%discord%")) s = s.replace("%discord%", Objects.requireNonNull(Main.getInstance().getConfig().getString("server.discord")));
+        if (s.contains("%website%")) s = s.replace("%website%", Objects.requireNonNull(Main.getInstance().getConfig().getString("server.website")));
+        if (s.contains("%store%")) s = s.replace("%store%", Objects.requireNonNull(Main.getInstance().getConfig().getString("server.store")));
         return ChatColor.translateAlternateColorCodes('&', s);
     }
 

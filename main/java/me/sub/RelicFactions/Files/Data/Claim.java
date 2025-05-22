@@ -52,7 +52,7 @@ public class Claim {
         return pillar;
     }
 
-    private Material getPillarMaterial() {
+    public static Material getPillarMaterial() {
 
         ArrayList<Material> materials = new ArrayList<>();
         for (Material material : Material.values()) {

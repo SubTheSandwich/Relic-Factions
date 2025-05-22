@@ -1,12 +1,18 @@
 
 server:
   name: "Relic-Factions"
+  discord: "discord.gg/relic-factions"
+  website: "relic-factions.com"
+  store: "store.relic-factions.com"
   color:
     primary: GOLD
     secondary: YELLOW
   map:
     number: 1
     start-date: "5/16/25"
+
+limiters:
+  world-border: 2944
 
 timers:
   starting: 3600
@@ -22,6 +28,7 @@ economy:
   default-balance: 500
 
 factions:
+  map-radius: 64
   home:
     nether: 20
     end: 30

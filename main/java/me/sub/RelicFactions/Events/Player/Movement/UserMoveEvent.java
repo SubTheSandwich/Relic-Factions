@@ -106,6 +106,17 @@ public class UserMoveEvent implements Listener {
             if (factionFrom.getType().equals(FactionType.SAFEZONE)) setTimerPaused(user, false);
         } else {
             if (factionFrom == factionTo) return false;
+            if (factionTo.getType().equals(FactionType.PLAYER)) {
+                if (user.hasTimer("pvp") || user.hasTimer("starting")) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.movement.deny.pvp"))));
+                    return true;
+                }
+            } else if (factionTo.getType().equals(FactionType.SAFEZONE)) {
+                if (user.hasTimer("combat")) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.movement.deny.combat"))));
+                    return true;
+                }
+            }
             sendLeaveEnter(p, factionFrom.getValidName(p, true), factionTo.getValidName(p, true));
             setTimerPaused(user, factionTo.getType().equals(FactionType.SAFEZONE));
         }

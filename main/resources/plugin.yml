@@ -19,3 +19,10 @@ commands:
     description: Debug command
   timer:
     description: Timer command
+  economy:
+    aliases:
+      - eco
+  help:
+    description: Help
+  filter:
+    description: Filter

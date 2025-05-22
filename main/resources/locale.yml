@@ -3,6 +3,7 @@ primary:
   no-permission: "&cNo permission."
   no-player: "&cA player by this name does not exist."
   invalid-number: "&cThe specified number is invalid."
+  invalid-material: "&cThe specified material is invalid."
   faction:
     faction-only: "&cA faction by this name does not exist."
     doesnt-exist: "&cA faction or player by this name does not exist."
@@ -12,9 +13,12 @@ primary:
     leader: "&cYou must be the leader of the faction to execute this command."
     full: "&cThe specified faction is full."
     wrong-type: "&cYou may only perform this command on non-PLAYER factions."
+    player-only: "&cYou may only perform this command on PLAYER factions."
     not-in: "&cThe specified player is not a member of your faction."
   none: "None"
   error: "&cAn unknown error occurred."
+  enabled: "&aEnabled"
+  disabled: "&cDisabled"
 
 claiming:
   success: "&aSuccessfully claimed your selected area."
@@ -63,6 +67,18 @@ faction:
   cannot-use: "&eYou cannot do this in %faction%&e's &eterritory."
 
 commands:
+  filter:
+    clear: "&eYour filter has been &acleared&e."
+    toggle: "&6Filter Status&7: &r%status%"
+    list:
+      none: "&cYou have no items in your filter."
+      show: "&6Current Items in Filter &7: &r%items%"
+    add:
+      already: "&cThis material is already in your filter."
+      success: "&eYou have added &d%material% &eto your filter."
+    remove:
+      not: "&cThis material is not in your filter."
+      success: "&eYou have removed &d%material% &efrom your filter."
   timer:
     usage: "&cUsage: /timer <set/remove> <player> <timer> <time>"
     not-valid: "&cThe specified timer is not valid. Valid timers: %timers%"
@@ -166,3 +182,22 @@ commands:
       pvp-timer: "&cYou cannot teleport to your Faction home whilst having PvP timer."
       spawn-timer: "&cYou cannot teleport to your Faction home whilst having Spawn Tag."
       end: "&cYou cannot teleport to your Faction home whilst in The End."
+    bypass: "&6Bypass&7: %status%"
+    list:
+      none: "&cThere are no factions to list."
+    unclaim:
+      none: "&cYour faction does not have a claim."
+      success: "&3%player% has removed the faction claim."
+    rename: "&3%player% has renamed the faction to %faction%"
+    disband:
+      raidable: "&cYou cannot disband your faction while you are raidable."
+      success: "&c&l%player% has disbanded your faction."
+    map:
+      format: "&e%faction% &fis displayed with &b%material%"
+      none: "&cNo factions are near you."
+      disable: "&cClaim pillars have been hidden."
+    setbalance: "&eYou have set the balance of &b%faction% &eto &d%amount%&e."
+  economy:
+    set: "&eYou have set the balance of &b%player% &eto &d%amount%&e."
+    give: "&eYou have added &d%amount% &eto &b%player%&e's balance."
+    remove: "&eYou have removed &d%amount% &efrom &b%player%&e's balance."

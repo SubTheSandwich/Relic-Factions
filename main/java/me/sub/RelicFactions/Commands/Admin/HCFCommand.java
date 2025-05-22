@@ -1,4 +1,4 @@
-package me.sub.RelicFactions.Admin;
+package me.sub.RelicFactions.Commands.Admin;
 
 import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Main.Main;

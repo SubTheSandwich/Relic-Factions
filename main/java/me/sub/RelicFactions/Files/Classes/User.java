@@ -1,8 +1,6 @@
 package me.sub.RelicFactions.Files.Classes;
 
-import me.sub.RelicFactions.Files.Data.Claim;
-import me.sub.RelicFactions.Files.Data.PlayerTimer;
-import me.sub.RelicFactions.Files.Data.UserData;
+import me.sub.RelicFactions.Files.Data.*;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.Maps;
 import org.bukkit.OfflinePlayer;
@@ -10,6 +8,7 @@ import org.bukkit.entity.Player;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public class User {
@@ -26,6 +25,9 @@ public class User {
     private BigDecimal balance;
     private Claim claim;
     private final HashMap<String, PlayerTimer> timers;
+    private boolean factionBypass;
+    private HashMap<Faction, List<Cuboid>> map;
+    private final Filter filter;
 
     public User(UserData userData) {
         userDisconnected = true;
@@ -40,6 +42,17 @@ public class User {
         timers = Maps.stringToTimers(userData.get().getString("timers"));
         modified = false;
         claim = null;
+        factionBypass = false;
+        map = null;
+        filter = new Filter();
+    }
+
+    public boolean isFactionBypass() {
+        return factionBypass;
+    }
+
+    public void setFactionBypass(boolean factionBypass) {
+        this.factionBypass = factionBypass;
     }
 
     public static User get(UUID uuid) {
@@ -171,5 +184,17 @@ public class User {
         if (!userDisconnected && !timers.isEmpty()) {
             timers.forEach((s, timer) -> timer.tick());
         }
+    }
+
+    public HashMap<Faction, List<Cuboid>> getMap() {
+        return map;
+    }
+
+    public void setMap(HashMap<Faction, List<Cuboid>> map) {
+        this.map = map;
+    }
+
+    public Filter getFilter() {
+        return filter;
     }
 }

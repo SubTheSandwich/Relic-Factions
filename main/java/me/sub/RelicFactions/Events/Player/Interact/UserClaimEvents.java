@@ -20,9 +20,11 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
-public class PlayerClaimEvents implements Listener {
+public class UserClaimEvents implements Listener {
 
     @EventHandler
     public void onClaim(PlayerInteractEvent e) {
@@ -133,9 +135,11 @@ public class PlayerClaimEvents implements Listener {
             faction.setClaims(claims);
             p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("claiming.success"))));
             user.setClaim(null);
-
-            // TODO: Implement map
-
+            HashMap<Faction, List<Cuboid>> map = new HashMap<>();
+            List<Cuboid> c = new ArrayList<>();
+            c.add(area);
+            map.put(faction, c);
+            user.setMap(map);
             p.getInventory().remove(Claim.getWand());
             return;
         }
@@ -163,7 +167,11 @@ public class PlayerClaimEvents implements Listener {
         p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("claiming.success"))));
         user.setClaim(null);
 
-        // TODO: Implement map
+        HashMap<Faction, List<Cuboid>> map = new HashMap<>();
+        List<Cuboid> c = new ArrayList<>();
+        c.add(area);
+        map.put(faction, c);
+        user.setMap(map);
 
         p.getInventory().remove(Claim.getWand());
         faction.setBalance(faction.getBalance().subtract(BigDecimal.valueOf(cost)));

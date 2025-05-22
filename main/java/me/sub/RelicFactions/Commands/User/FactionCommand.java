@@ -3,6 +3,7 @@ package me.sub.RelicFactions.Commands.User;
 import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Data.Claim;
+import me.sub.RelicFactions.Files.Data.Cuboid;
 import me.sub.RelicFactions.Files.Data.FactionData;
 import me.sub.RelicFactions.Files.Data.PlayerTimer;
 import me.sub.RelicFactions.Files.Enums.Color;
@@ -16,7 +17,10 @@ import me.sub.RelicFactions.Utils.Calculate;
 import me.sub.RelicFactions.Utils.Maps;
 import me.sub.RelicFactions.Utils.Permission;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -56,6 +60,93 @@ public class FactionCommand implements TabExecutor {
             return true;
         }
         if (args.length == 1) {
+            if (args[0].equalsIgnoreCase("map")) {
+                if (user.getMap() == null) {
+                    Map<Faction, List<Cuboid>> nearbyClaims = Faction.getNearbyClaims(
+                            p.getLocation(),
+                            Main.getInstance().getConfig().getInt("factions.map-radius")
+                    );
+                    Map<Faction, Material> pillars = new HashMap<>();
+                    for (Map.Entry<Faction, List<Cuboid>> entry : nearbyClaims.entrySet()) {
+                        Faction faction = entry.getKey();
+                        List<Cuboid> claims = entry.getValue();
+                        if (claims.isEmpty()) continue;
+                        Material material = Claim.getPillarMaterial();
+                        pillars.put(faction, material);
+                    }
+                    if (pillars.isEmpty()) {
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.map.none"))));
+                        return true;
+                    }
+                    showMapPillars(p, nearbyClaims, pillars);
+                    p.sendMessage(C.chat("&7&m----------------------------------------------------"));
+                    for (Map.Entry<Faction,Material> entry : pillars.entrySet()) {
+                        Faction faction = entry.getKey();
+                        Material material = entry.getValue();
+                        p.sendMessage(C.chat(Objects.requireNonNull(Objects.requireNonNull(Locale.get().getString("commands.faction.map.format")).replace("%faction%", faction.getName()).replace("%material%", material.name()))));
+                    }
+                    p.sendMessage(C.chat("&7&m----------------------------------------------------"));
+                    user.setMap((HashMap<Faction, List<Cuboid>>) nearbyClaims);
+                } else {
+                    clearMapPillars(p, user.getMap());
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.map.disable"))));
+                    user.setMap(null);
+                }
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("disband")) {
+                if (!user.hasFaction()) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
+                    return true;
+                }
+                Faction faction = Faction.get(user.getFaction());
+                if (faction.getRoleID(p.getUniqueId()) != 3) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.leader"))));
+                    return true;
+                }
+                if (faction.getDTR().doubleValue() <= 0) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.disband.raidable"))));
+                    return true;
+                }
+                for (Player player : faction.getOnlineMembers()) {
+                    player.sendMessage(C.chat(Locale.get().getString("commands.faction.disband.success").replace("%player%", p.getName())));
+                }
+                for (UUID uuid : faction.getMembers().keySet()) {
+                    User member = User.get(uuid);
+                    member.setFaction(null);
+                }
+                faction.getFactionData().delete();
+                Main.getInstance().factionNameHolder.remove(faction.getName().toLowerCase());
+                Main.getInstance().factions.remove(faction.getUUID());
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("list")) {
+                ArrayList<Faction> factions = Faction.getPage(1);
+                if (factions.isEmpty()) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.list.none"))));
+                    return true;
+                }
+                int page = 1;
+                int maxPages = Faction.getMaxPages();
+                for (String message : Messages.get().getStringList("faction.list.show")) {
+                    if (message.contains("%page%")) message = message.replace("%page%", page + "");
+                    if (message.contains("%max-pages%")) message = message.replace("%max-pages%", maxPages + "");
+                    if (message.contains("%teams%")) {
+                        for (int i = 0; i < factions.size(); i++) {
+                            Faction faction = factions.get(i);
+                            String format = Messages.get().getString("faction.list.team-format");
+                            format = Objects.requireNonNull(format).replace("%number%", (i + 1) + "");
+                            format = format.replace("%faction-name%", faction.getName());
+                            format = format.replace("%online-members%", faction.getOnlineMembers().size() + "");
+                            format = format.replace("%members%", faction.getMembers().size() + "");
+                            p.sendMessage(C.chat(format, s));
+                        }
+                        continue;
+                    }
+                    p.sendMessage(C.chat(message, s));
+                }
+                return true;
+            }
             if (args[0].equalsIgnoreCase("leave")) {
                 if (!user.hasFaction()) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
@@ -100,6 +191,15 @@ public class FactionCommand implements TabExecutor {
                 show(p, Faction.get(user.getFaction()));
                 return true;
             }
+            if (args[0].equalsIgnoreCase("bypass")) {
+                if (!Permission.has(p, "faction.bypass")) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
+                    return true;
+                }
+                user.setFactionBypass(!user.isFactionBypass());
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.bypass")).replace("%status%", Objects.requireNonNull(user.isFactionBypass() ? Locale.get().getString("primary.enabled") : Locale.get().getString("primary.disabled")))));
+                return true;
+            }
             if (args[0].equalsIgnoreCase("open")) {
                 if (!user.hasFaction()) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
@@ -116,6 +216,26 @@ public class FactionCommand implements TabExecutor {
                 for (Player player : faction.getOnlineMembers()) {
                     player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.open.bc")).replace("%player%", p.getName()).replace("%status%", open ? Objects.requireNonNull(Locale.get().getString("commands.faction.open.open")).toLowerCase() : Objects.requireNonNull(Locale.get().getString("commands.faction.open.closed")).toLowerCase())));
                 }
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("unclaim")) {
+                if (!user.hasFaction()) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
+                    return true;
+                }
+                Faction faction = Faction.get(user.getFaction());
+                if (faction.getRoleID(p.getUniqueId()) < 2) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.coleader-above"))));
+                    return true;
+                }
+                if (faction.getClaims().isEmpty()) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.unclaim.none"))));
+                    return true;
+                }
+                for (Player player : faction.getOnlineMembers()) {
+                    player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.unclaim.success")).replace("%player%", p.getName())));
+                }
+                faction.setClaims(new ArrayList<>());
                 return true;
             }
             if (args[0].equalsIgnoreCase("captain")) {
@@ -177,7 +297,7 @@ public class FactionCommand implements TabExecutor {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.captain-above"))));
                     return true;
                 }
-                if (Faction.getAt(p.getLocation()) == null || !Faction.getAt(p.getLocation()).getUUID().equals(faction.getUUID())) {
+                if (Faction.getAt(p.getLocation()) == null || !Objects.requireNonNull(Faction.getAt(p.getLocation())).getUUID().equals(faction.getUUID())) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.sethome.claim"))));
                     return true;
                 }
@@ -198,7 +318,7 @@ public class FactionCommand implements TabExecutor {
                     return true;
                 }
                 if (!faction.getClaims().isEmpty()) {
-                    p.sendMessage(C.chat(Locale.get().getString("claiming.have")));
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("claiming.have"))));
                     return true;
                 }
                 if (user.getClaim() != null) {
@@ -251,10 +371,80 @@ public class FactionCommand implements TabExecutor {
                 p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.home.waiting")).replace("%time%", duration + "")));
                 return true;
             }
+
             Messages.send(p, "faction.help.main", s);
             return true;
         }
         if (args.length == 2) {
+            if (args[0].equalsIgnoreCase("rename")) {
+                if (!user.hasFaction()) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
+                    return true;
+                }
+                Faction faction = Faction.get(user.getFaction());
+                if (faction.getRoleID(p.getUniqueId()) != 3) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.leader"))));
+                    return true;
+                }
+                Faction other = Faction.get(args[1]);
+                if (other != null) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.exists"))));
+                    return true;
+                }
+                if (!args[1].matches("^[a-zA-Z0-9]+$")) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.not-alphanumeric"))));
+                    return true;
+                }
+
+                if (Main.getInstance().getConfig().getStringList("factions.name.blocked").contains(args[1].toUpperCase())) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.blocked"))));
+                    return true;
+                }
+                if (args[1].length() < Main.getInstance().getConfig().getInt("factions.name.min") || args[1].length() > Main.getInstance().getConfig().getInt("factions.name.max")) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.length")).replace("%min%",  Main.getInstance().getConfig().getInt("factions.name.min") + "").replace("%max%",  Main.getInstance().getConfig().getInt("factions.name.max") + "")));
+                    return true;
+                }
+                Main.getInstance().factionNameHolder.remove(faction.getName().toLowerCase());
+                faction.setName(args[1]);
+                Main.getInstance().factionNameHolder.put(args[1].toLowerCase(), faction);
+                for (Player player : faction.getOnlineMembers()) {
+                    player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.rename")).replace("%player%", p.getName()).replace("%faction%", args[1])));
+                }
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("list")) {
+                try {
+                    int ignored = Integer.parseInt(args[1]);
+                } catch (NumberFormatException ignored) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.invalid-number"))));
+                    return true;
+                }
+                int page = Integer.parseInt(args[1]);
+                ArrayList<Faction> factions = Faction.getPage(page);
+                if (factions.isEmpty()) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.list.none"))));
+                    return true;
+                }
+                int maxPages = Faction.getMaxPages();
+                for (String message : Messages.get().getStringList("faction.list.show")) {
+                    if (message.contains("%page%")) message = message.replace("%page%", page + "");
+                    if (message.contains("%max-pages%")) message = message.replace("%max-pages%", maxPages + "");
+                    if (message.contains("%teams%")) {
+                        for (int i = 0; i < factions.size(); i++) {
+                            Faction faction = factions.get(i);
+                            String format = Messages.get().getString("faction.list.team-format");
+                            format = Objects.requireNonNull(format).replace("%number%", (i + 1) + "");
+                            format = format.replace("%faction-name%", faction.getName());
+                            format = format.replace("%online-members%", faction.getOnlineMembers().size() + "");
+                            format = format.replace("%members%", faction.getMembers().size() + "");
+                            p.sendMessage(C.chat(format, s));
+                        }
+                        continue;
+                    }
+                    p.sendMessage(C.chat(message, s));
+                }
+                return true;
+            }
             if (args[0].equalsIgnoreCase("claimfor")) {
                 if (!Permission.has(p, "faction.claimfor")) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
@@ -807,6 +997,35 @@ public class FactionCommand implements TabExecutor {
                 Messages.send(p, "faction.help.coleader", s);
                 return true;
             }
+            if (args[0].equalsIgnoreCase("setbalance")) {
+                if (!Permission.has(p, "faction.setcolor")) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
+                    return true;
+                }
+                Faction faction = Faction.get(args[1]);
+                if (faction == null) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.faction-ony"))));
+                    return true;
+                }
+                if (!faction.getType().equals(FactionType.PLAYER)) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.player-only"))));
+                    return true;
+                }
+                try {
+                    double ignored = Double.parseDouble(args[2]);
+                } catch (NumberFormatException ignored) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.invalid-number"))));
+                    return true;
+                }
+                double balance = Double.parseDouble(args[2]);
+                if (balance < 0) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.invalid-number"))));
+                    return true;
+                }
+                faction.setBalance(BigDecimal.valueOf(balance));
+                p.sendMessage(C.chat(Objects.requireNonNull(Objects.requireNonNull(Locale.get().getString("commands.faction.setbalance")).replace("%amount%", Main.getEconomy().format(balance)).replace("%faction%", faction.getName()))));
+                return true;
+            }
             if (args[0].equalsIgnoreCase("setcolor")) {
                 if (!Permission.has(p, "faction.setcolor")) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
@@ -868,11 +1087,13 @@ public class FactionCommand implements TabExecutor {
         if (args.length == 1) {
             values.addAll(List.of("create", "open", "show", "deposit", "invite", "join", "withdraw",
                     "subclaim", "captain", "coleader", "invites", "announcement", "uninvite", "leave", "kick",
-                    "sethome", "claim", "home"));
+                    "sethome", "claim", "home", "list", "unclaim", "rename", "disband"));
             if (Permission.has(p, "faction.createsystem")) values.add("createsystem");
             if (Permission.has(p, "faction.setcolor")) values.add("setcolor");
             if (Permission.has(p, "faction.settype")) values.add("settype");
             if (Permission.has(p, "faction.setlocation")) values.add("setlocation");
+            if (Permission.has(p, "faction.bypass")) values.add("bypass");
+            if (Permission.has(p, "faction.setbalance")) values.add("setbalance");
         }
         if (args.length == 2) {
             if ((args[0].equalsIgnoreCase("claimfor") && Permission.has(p, "faction.claimfor"))
@@ -883,7 +1104,12 @@ public class FactionCommand implements TabExecutor {
                         .filter(faction -> faction.getType() != FactionType.PLAYER)
                         .map(Faction::getName)
                         .toList());
-
+            }
+            if ((args[0].equalsIgnoreCase("setbalance") && Permission.has(p, "faction.setbalance"))) {
+                values.addAll(Main.getInstance().factionNameHolder.values().stream()
+                        .filter(faction -> faction.getType() == FactionType.PLAYER)
+                        .map(Faction::getName)
+                        .toList());
             }
         }
         return values;
@@ -900,7 +1126,7 @@ public class FactionCommand implements TabExecutor {
                     if (faction.getHome() == null) {
                         s = s.replace("%home%", Objects.requireNonNull(Locale.get().getString("primary.none")));
                     } else {
-                        s = s.replace("%home%", "X: " + faction.getHome().getBlockX() + ", Z: " + faction.getHome().getBlockZ());
+                        s = s.replace("%home%", faction.getHome().getBlockX() + ", " + faction.getHome().getBlockZ());
                     }
                 }
                 if (s.contains("%leader%")) s = s.replace("%leader%", getName(faction.getLeader()));
@@ -987,5 +1213,77 @@ public class FactionCommand implements TabExecutor {
                 return C.chat("&a" + user.getName() + "&7[&c" + user.getKills() + "&7]");
             }
         }
+    }
+
+    private void showMapPillars(Player player, Map<Faction, List<Cuboid>> nearbyClaims, Map<Faction, Material> pillars) {
+        for (Map.Entry<Faction, List<Cuboid>> entry : nearbyClaims.entrySet()) {
+            Faction faction = entry.getKey();
+            List<Cuboid> claims = entry.getValue();
+            Material pillarMaterial = pillars.getOrDefault(faction, Material.WHITE_WOOL);
+
+            for (Cuboid cuboid : claims) {
+                List<Location> corners = getCuboidCorners(cuboid);
+                for (Location corner : corners) {
+                    showPillar(player, corner, pillarMaterial);
+                }
+            }
+        }
+    }
+
+    private void clearMapPillars(Player player, Map<Faction, List<Cuboid>> nearbyClaims) {
+        for (Map.Entry<Faction, List<Cuboid>> entry : nearbyClaims.entrySet()) {
+            Faction faction = entry.getKey();
+            List<Cuboid> claims = entry.getValue();
+            for (Cuboid cuboid : claims) {
+                List<Location> corners = getCuboidCorners(cuboid);
+                for (Location corner : corners) {
+                    clearPillar(player, corner);
+                }
+            }
+        }
+    }
+
+    private void clearPillar(Player player, Location base) {
+        World world = base.getWorld();
+        int minY = Objects.requireNonNull(world).getMinHeight();
+        int maxY = world.getMaxHeight();
+
+        for (int y = minY; y < maxY; y++) {
+            Location blockLoc = new Location(world, base.getBlockX(), y, base.getBlockZ());
+            Block block = world.getBlockAt(blockLoc);
+            if (!block.isEmpty()) continue;
+            player.sendBlockChange(blockLoc, Material.AIR.createBlockData());
+        }
+    }
+
+    private void showPillar(Player player, Location base, Material pillarMaterial) {
+        World world = base.getWorld();
+        int minY = Objects.requireNonNull(world).getMinHeight();
+        int maxY = world.getMaxHeight();
+
+        for (int y = minY; y < maxY; y++) {
+            Location blockLoc = new Location(world, base.getBlockX(), y, base.getBlockZ());
+            Block block = world.getBlockAt(blockLoc);
+            if (!block.isEmpty()) continue;
+            if (y % 4 == 0) {
+                player.sendBlockChange(blockLoc, pillarMaterial.createBlockData());
+            } else {
+                player.sendBlockChange(blockLoc, Material.GLASS.createBlockData());
+            }
+        }
+    }
+
+    private List<Location> getCuboidCorners(Cuboid cuboid) {
+        World world = cuboid.getPoint1().getWorld();
+        int x1 = cuboid.getXMin(), x2 = cuboid.getXMax();
+        int z1 = cuboid.getZMin(), z2 = cuboid.getZMax();
+        int y = cuboid.getYMin();
+
+        List<Location> corners = new ArrayList<>();
+        corners.add(new Location(world, x1, y, z1));
+        corners.add(new Location(world, x1, y, z2));
+        corners.add(new Location(world, x2, y, z1));
+        corners.add(new Location(world, x2, y, z2));
+        return corners;
     }
 }
