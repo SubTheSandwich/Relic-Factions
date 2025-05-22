@@ -16,7 +16,8 @@ public enum Timer {
     HOME(Main.getInstance().getConfig().getInt("timers.home")),
     ENDERPEARL(Main.getInstance().getConfig().getInt("timers.enderpearl")),
     APPLE(Main.getInstance().getConfig().getInt("timers.apple")),
-    GAPPLE(Main.getInstance().getConfig().getInt("timers.gapple"));
+    GAPPLE(Main.getInstance().getConfig().getInt("timers.gapple")),
+    LFF(Main.getInstance().getConfig().getInt("timers.lff"));
 
     private final int duration;
 

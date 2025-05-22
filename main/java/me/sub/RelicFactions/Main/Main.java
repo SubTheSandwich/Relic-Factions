@@ -2,12 +2,12 @@ package me.sub.RelicFactions.Main;
 
 import me.sub.RelicFactions.Commands.Admin.EconomyCommand;
 import me.sub.RelicFactions.Commands.Admin.HCFCommand;
+import me.sub.RelicFactions.Commands.Admin.LivesCommand;
 import me.sub.RelicFactions.Commands.Admin.TimerCommand;
-import me.sub.RelicFactions.Commands.User.BalanceCommand;
-import me.sub.RelicFactions.Commands.User.FactionCommand;
-import me.sub.RelicFactions.Commands.User.FilterCommand;
-import me.sub.RelicFactions.Commands.User.HelpCommand;
+import me.sub.RelicFactions.Commands.User.*;
+import me.sub.RelicFactions.Events.Player.Attack.UserDamageEvents;
 import me.sub.RelicFactions.Events.Player.Chat.FormatChatEvent;
+import me.sub.RelicFactions.Events.Player.Interact.ItemUseEvents;
 import me.sub.RelicFactions.Events.Player.Interact.UserClaimEvents;
 import me.sub.RelicFactions.Events.Player.Interact.UserFilterEvent;
 import me.sub.RelicFactions.Events.Player.Interact.UserInteractAtFactionEvent;
@@ -96,12 +96,14 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("hcf")).setExecutor(new HCFCommand()); Objects.requireNonNull(getCommand("hcf")).setTabCompleter(new HCFCommand());
         Objects.requireNonNull(getCommand("timer")).setExecutor(new TimerCommand()); Objects.requireNonNull(getCommand("timer")).setTabCompleter(new TimerCommand());
         Objects.requireNonNull(getCommand("economy")).setExecutor(new EconomyCommand()); Objects.requireNonNull(getCommand("economy")).setTabCompleter(new EconomyCommand());
+        Objects.requireNonNull(getCommand("lives")).setExecutor(new LivesCommand()); Objects.requireNonNull(getCommand("lives")).setTabCompleter(new LivesCommand());
 
         // User
         Objects.requireNonNull(getCommand("faction")).setExecutor(new FactionCommand()); Objects.requireNonNull(getCommand("faction")).setTabCompleter(new FactionCommand());
         Objects.requireNonNull(getCommand("balance")).setExecutor(new BalanceCommand()); Objects.requireNonNull(getCommand("balance")).setTabCompleter(new BalanceCommand());
         Objects.requireNonNull(getCommand("help")).setExecutor(new HelpCommand()); Objects.requireNonNull(getCommand("help")).setTabCompleter(new HelpCommand());
         Objects.requireNonNull(getCommand("filter")).setExecutor(new FilterCommand()); Objects.requireNonNull(getCommand("filter")).setTabCompleter(new FilterCommand());
+        Objects.requireNonNull(getCommand("lff")).setExecutor(new LFFCommand()); Objects.requireNonNull(getCommand("lff")).setTabCompleter(new LFFCommand());
     }
 
     private void events() {
@@ -115,6 +117,8 @@ public class Main extends JavaPlugin {
         pm.registerEvents(new UserMoveEvent(), this);
         pm.registerEvents(new UserInteractAtFactionEvent(), this);
         pm.registerEvents(new UserFilterEvent(), this);
+        pm.registerEvents(new ItemUseEvents(), this);
+        pm.registerEvents(new UserDamageEvents(), this);
     }
 
     private void files() {
@@ -173,6 +177,7 @@ public class Main extends JavaPlugin {
             userData.get().set("kills", user.getKills());
             userData.get().set("deaths", user.getDeaths());
             userData.get().set("balance", user.getBalance().doubleValue());
+            userData.get().set("lives", user.getLives());
             userData.get().set("timers", Maps.timersToString(user.getTimers()));
             userData.save();
             user.setModified(false);

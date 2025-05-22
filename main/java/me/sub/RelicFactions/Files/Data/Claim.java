@@ -102,6 +102,16 @@ public class Claim {
             if (material.name().toUpperCase().contains("PISTON")) continue;
             if (material.name().toUpperCase().contains("CHEST")) continue;
             if (material.equals(Material.ENCHANTING_TABLE)) continue;
+            if (Tag.CORAL_PLANTS.isTagged(material)) continue;
+            if (Tag.ANVIL.isTagged(material)) continue;
+            if (Tag.LEAVES.isTagged(material)) continue;
+            if (material.equals(Material.BARRIER)) continue;
+            if (material.equals(Material.HOPPER)) continue;
+            if (material.name().toUpperCase().contains("AMETHYST_BUD") || material.name().toUpperCase().contains("AMETHYST_CLUSTER")) continue;
+            if (material.equals(Material.DIRT_PATH)) continue;
+            if (material.name().toUpperCase().contains("INFESTED")) continue;
+            if (material.equals(Material.SNIFFER_EGG)) continue;
+            if (Tag.SHULKER_BOXES.isTagged(material)) continue;
             materials.add(material);
         }
         return materials.get(new Random().nextInt(materials.size()));

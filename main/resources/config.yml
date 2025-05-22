@@ -22,6 +22,7 @@ timers:
   enderpearl: 16
   apple: 10
   gapple: 21600
+  lff: 120
 
 economy:
   type: en-US
@@ -63,6 +64,10 @@ scoreboard:
     - "&7&m-------------------------"
     - "&a&lStarting&7: &c%player_starting_timer%<display=%has_player_starting_timer%"
     - "&9&lHome&7: &c%player_home_timer%<display=%has_player_home_timer%"
+    - "&5&lEnderpearl&7: &c%player_enderpearl_timer%<display=%has_player_enderpearl_timer%"
+    - "&6&lApple&7: &c%player_apple_timer%<display=%has_player_apple_timer%"
+    - "&6&lGApple&7: &c%player_gapple_timer%<display=%has_player_gapple_timer%"
+    - "&c&lSpawn Tag&7: &c%player_combat_timer%<display=%has_player_combat_timer%"
     - "&7&m-------------------------"
 
 features:

@@ -4,6 +4,9 @@ primary:
   no-player: "&cA player by this name does not exist."
   invalid-number: "&cThe specified number is invalid."
   invalid-material: "&cThe specified material is invalid."
+  lives:
+    not-enough: "&cYou do not have enough lives to do this."
+    not-deathbanned: "&cYou cannot revive a player that is not deathbanned."
   faction:
     faction-only: "&cA faction by this name does not exist."
     doesnt-exist: "&cA faction or player by this name does not exist."
@@ -46,8 +49,13 @@ events:
       pvp: "&cYou cannot enter this faction while having a PvP timer."
       combat: "&cYou cannot enter this faction while in combat!"
   timer:
+    cannot-claim: "&cYou cannot claim whilst having a PvP timer."
+    start: # no default
+      combat: "&eYou have been spawn-tagged for &c30 &eseconds!"
     expire:
       default: "&eYour &b%timer% &etimer has expired."
+    cooldown:
+      default: "&cYou cannot do this for &l%time%"
 
 chat:
   public:
@@ -65,6 +73,17 @@ faction:
   warping: "&eWarping to &d%faction%&e's HQ."
   cannot-build: "&eYou cannot build in %faction%&e's &eterritory."
   cannot-use: "&eYou cannot do this in %faction%&e's &eterritory."
+  cannot-attack-here: "&eYou cannot attack &c%player% &ewhile they are in a safezone."
+  cannot-attack-inside-safezone: "&eYou cannot attack &c%player% &ewhile you are in a safezone."
+  protected: "&cYou cannot attack other players while you have a PVP Timer."
+  attack-protected: "&cYou cannot attack this player as they currently have a PVP Timer."
+  member:
+    online: "&aMember Online: &f%player%"
+    offline: "&cMember Offline: &f%player%"
+    death:
+      - "&cMember Death: &f%name%"
+      - "&cDTR: &f%dtr%"
+    damage: "&eYou cannot damage &2%player%&e."
 
 commands:
   filter:
@@ -197,7 +216,19 @@ commands:
       none: "&cNo factions are near you."
       disable: "&cClaim pillars have been hidden."
     setbalance: "&eYou have set the balance of &b%faction% &eto &d%amount%&e."
+    lives:
+      amount: "&6Factions Lives&7: &c%lives%"
+      add: "&eYou have added &d%amount% lives &eto the faction's lives."
+    revive:
+      not-in: "&cYou cannot revive a player that is not in your faction."
+      success: "&eYou have revived &d%player%&e."
+    ff: "&3%player% has %status% &3your faction's friendly fire status."
   economy:
     set: "&eYou have set the balance of &b%player% &eto &d%amount%&e."
     give: "&eYou have added &d%amount% &eto &b%player%&e's balance."
     remove: "&eYou have removed &d%amount% &efrom &b%player%&e's balance."
+  lives:
+    check: "&6Lives&7: &c%amount%"
+    set: "&eYou have set the lives of &b%player% &eto &d%amount%"
+    add: "&eYou have added &d%amount% &elives to &b%player%"
+    take: "&eYou have taken &d%amount% &elives from &b%player%"

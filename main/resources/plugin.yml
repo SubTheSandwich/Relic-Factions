@@ -26,3 +26,7 @@ commands:
     description: Help
   filter:
     description: Filter
+  lives:
+    description: Lives
+  lff:
+    description: LFF

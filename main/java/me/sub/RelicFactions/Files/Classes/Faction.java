@@ -37,6 +37,7 @@ public class Faction {
     private final ArrayList<UUID> invites;
     private ArrayList<Cuboid> claims;
     private boolean deathban;
+    private boolean ff;
 
     public Faction(FactionData factionData) {
         this.factionData = factionData;
@@ -57,6 +58,7 @@ public class Faction {
         invites = Maps.stringToUuidList(factionData.get().getString("invites"));
         claims = Maps.stringToCuboidList(factionData.get().getString("claims"));
         deathban = factionData.get().getBoolean("deathban");
+        ff = false;
         modified = false;
     }
 
@@ -74,6 +76,14 @@ public class Faction {
     public void setDeathban(boolean deathban) {
         modified = true;
         this.deathban = deathban;
+    }
+
+    public boolean isFF() {
+        return ff;
+    }
+
+    public void setFF(boolean ff) {
+        this.ff = ff;
     }
 
     public FactionData getUserData() {

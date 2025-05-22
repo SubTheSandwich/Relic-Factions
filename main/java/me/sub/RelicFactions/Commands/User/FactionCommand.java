@@ -60,6 +60,10 @@ public class FactionCommand implements TabExecutor {
             return true;
         }
         if (args.length == 1) {
+            if (args[0].equalsIgnoreCase("lives")) {
+                Messages.send(p, "faction.help.lives", s);
+                return true;
+            }
             if (args[0].equalsIgnoreCase("map")) {
                 if (user.getMap() == null) {
                     Map<Faction, List<Cuboid>> nearbyClaims = Faction.getNearbyClaims(
@@ -79,13 +83,11 @@ public class FactionCommand implements TabExecutor {
                         return true;
                     }
                     showMapPillars(p, nearbyClaims, pillars);
-                    p.sendMessage(C.chat("&7&m----------------------------------------------------"));
                     for (Map.Entry<Faction,Material> entry : pillars.entrySet()) {
                         Faction faction = entry.getKey();
                         Material material = entry.getValue();
                         p.sendMessage(C.chat(Objects.requireNonNull(Objects.requireNonNull(Locale.get().getString("commands.faction.map.format")).replace("%faction%", faction.getName()).replace("%material%", material.name()))));
                     }
-                    p.sendMessage(C.chat("&7&m----------------------------------------------------"));
                     user.setMap((HashMap<Faction, List<Cuboid>>) nearbyClaims);
                 } else {
                     clearMapPillars(p, user.getMap());
@@ -109,7 +111,7 @@ public class FactionCommand implements TabExecutor {
                     return true;
                 }
                 for (Player player : faction.getOnlineMembers()) {
-                    player.sendMessage(C.chat(Locale.get().getString("commands.faction.disband.success").replace("%player%", p.getName())));
+                    player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.disband.success")).replace("%player%", p.getName())));
                 }
                 for (UUID uuid : faction.getMembers().keySet()) {
                     User member = User.get(uuid);
@@ -238,6 +240,23 @@ public class FactionCommand implements TabExecutor {
                 faction.setClaims(new ArrayList<>());
                 return true;
             }
+            if (args[0].equalsIgnoreCase("ff")) {
+                if (!user.hasFaction()) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
+                    return true;
+                }
+                Faction faction = Faction.get(user.getFaction());
+                if (faction.getRoleID(p.getUniqueId()) < 2) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.coleader-above"))));
+                    return true;
+                }
+                faction.setFF(!faction.isFF());
+                String status = faction.isFF() ? Objects.requireNonNull(Locale.get().getString("primary.enabled")).toLowerCase() : Objects.requireNonNull(Locale.get().getString("primary.disabled")).toLowerCase();
+                for (Player player : faction.getOnlineMembers()) {
+                    player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.ff")).replace("%player%", p.getName()).replace("%status%", status)));
+                }
+                return true;
+            }
             if (args[0].equalsIgnoreCase("captain")) {
                 if (!user.hasFaction()) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
@@ -312,6 +331,10 @@ public class FactionCommand implements TabExecutor {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
                     return true;
                 }
+                if (user.hasTimer("pvp") || user.hasTimer("starting")) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.timer.cannot-claim"))));
+                    return true;
+                }
                 Faction faction = Faction.get(user.getFaction());
                 if (faction.getRoleID(p.getUniqueId()) == 0) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.captain-above"))));
@@ -376,6 +399,34 @@ public class FactionCommand implements TabExecutor {
             return true;
         }
         if (args.length == 2) {
+            if (args[0].equalsIgnoreCase("lives")) {
+                Messages.send(p, "faction.help.lives", s);
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("revive")) {
+                if (!user.hasFaction()) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
+                    return true;
+                }
+                Faction faction = Faction.get(user.getFaction());
+                if (faction.getLives() == 0) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.lives.not-enough"))));
+                    return true;
+                }
+                User revived = User.get(args[1]);
+                if (!revived.isDeathBanned()) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.lives.not-deathbanned"))));
+                    return true;
+                }
+                if (!revived.hasFaction() || !revived.getFaction().equals(user.getFaction())) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.revive.not-in"))));
+                    return true;
+                }
+                faction.setLives(faction.getLives() - 1);
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.revive.success")).replace("%player%", revived.getName())));
+                revived.setDeathBanned(false);
+                return true;
+            }
             if (args[0].equalsIgnoreCase("rename")) {
                 if (!user.hasFaction()) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
@@ -906,6 +957,36 @@ public class FactionCommand implements TabExecutor {
             return true;
         }
         if (args.length == 3) {
+            if (args[0].equalsIgnoreCase("lives")) {
+                if (!user.hasFaction()) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
+                    return true;
+                }
+                Faction faction = Faction.get(user.getFaction());
+                if (args[1].equalsIgnoreCase("add")) {
+                    try {
+                        int ignored = Integer.parseInt(args[2]);
+                    } catch (NumberFormatException ignored) {
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.invalid-number"))));
+                        return true;
+                    }
+                    int amount = Integer.parseInt(args[2]);
+                    if (amount <= 0) {
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.invalid-number"))));
+                        return true;
+                    }
+                    if (user.getLives() < amount) {
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.lives.not-enough"))));
+                        return true;
+                    }
+                    faction.setLives(faction.getLives() + amount);
+                    user.setLives(user.getLives() - amount);
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.lives.add")).replace("%amount%", amount + "")));
+                    return true;
+                }
+                Messages.send(p, "faction.help.lives", s);
+                return true;
+            }
             if (args[0].equalsIgnoreCase("captain")) {
                 if (!user.hasFaction()) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
@@ -1087,7 +1168,7 @@ public class FactionCommand implements TabExecutor {
         if (args.length == 1) {
             values.addAll(List.of("create", "open", "show", "deposit", "invite", "join", "withdraw",
                     "subclaim", "captain", "coleader", "invites", "announcement", "uninvite", "leave", "kick",
-                    "sethome", "claim", "home", "list", "unclaim", "rename", "disband"));
+                    "sethome", "claim", "home", "list", "unclaim", "rename", "disband", "ff"));
             if (Permission.has(p, "faction.createsystem")) values.add("createsystem");
             if (Permission.has(p, "faction.setcolor")) values.add("setcolor");
             if (Permission.has(p, "faction.settype")) values.add("settype");
@@ -1232,7 +1313,6 @@ public class FactionCommand implements TabExecutor {
 
     private void clearMapPillars(Player player, Map<Faction, List<Cuboid>> nearbyClaims) {
         for (Map.Entry<Faction, List<Cuboid>> entry : nearbyClaims.entrySet()) {
-            Faction faction = entry.getKey();
             List<Cuboid> claims = entry.getValue();
             for (Cuboid cuboid : claims) {
                 List<Location> corners = getCuboidCorners(cuboid);

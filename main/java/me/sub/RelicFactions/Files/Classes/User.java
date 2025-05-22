@@ -28,6 +28,7 @@ public class User {
     private boolean factionBypass;
     private HashMap<Faction, List<Cuboid>> map;
     private final Filter filter;
+    private int lives;
 
     public User(UserData userData) {
         userDisconnected = true;
@@ -40,6 +41,7 @@ public class User {
         deaths = userData.get().getInt("deaths");
         balance = BigDecimal.valueOf(userData.get().getDouble("balance"));
         timers = Maps.stringToTimers(userData.get().getString("timers"));
+        lives = userData.get().getInt("lives");
         modified = false;
         claim = null;
         factionBypass = false;
@@ -196,5 +198,14 @@ public class User {
 
     public Filter getFilter() {
         return filter;
+    }
+
+    public int getLives() {
+        return lives;
+    }
+
+    public void setLives(int lives) {
+        modified = true;
+        this.lives = lives;
     }
 }
