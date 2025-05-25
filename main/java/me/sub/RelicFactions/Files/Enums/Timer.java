@@ -2,6 +2,7 @@ package me.sub.RelicFactions.Files.Enums;
 
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.Calculate;
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -85,5 +86,32 @@ public enum Timer {
             timer = Calculate.round(time, 1) + "s";
         }
         return timer;
+    }
+
+    public static String getMessageFormat(long diffMillis) {
+        long diff = diffMillis / 1000;
+        long hours = diff / 3600;
+        long minutes = (diff % 3600) / 60;
+        long seconds = diff % 60;
+        StringBuilder format = new StringBuilder();
+
+        if (hours > 0) {
+            format.append(hours)
+                    .append(" hour")
+                    .append(hours == 1 ? "" : "s");
+            if (minutes > 0 || seconds > 0) format.append(" ");
+        }
+        if (minutes > 0) {
+            format.append(minutes)
+                    .append(" minute")
+                    .append(minutes == 1 ? "" : "s");
+            if (seconds > 0) format.append(" ");
+        }
+        if (seconds > 0 || (hours == 0 && minutes == 0)) {
+            format.append(seconds)
+                    .append(" second")
+                    .append(seconds == 1 ? "" : "s");
+        }
+        return format.toString();
     }
 }

@@ -38,6 +38,8 @@ public class Faction {
     private ArrayList<Cuboid> claims;
     private boolean deathban;
     private boolean ff;
+    private long timeTilRegen;
+    private boolean isRegening;
 
     public Faction(FactionData factionData) {
         this.factionData = factionData;
@@ -58,6 +60,8 @@ public class Faction {
         invites = Maps.stringToUuidList(factionData.get().getString("invites"));
         claims = Maps.stringToCuboidList(factionData.get().getString("claims"));
         deathban = factionData.get().getBoolean("deathban");
+        timeTilRegen = factionData.get().getLong("timeTilRegen");
+        isRegening = factionData.get().getBoolean("regening");
         ff = false;
         modified = false;
     }
@@ -71,6 +75,16 @@ public class Faction {
     }
     public static Faction get(String name) {
         return Main.getInstance().factionNameHolder.getOrDefault(name.toLowerCase(), null);
+    }
+
+    public static String formatDTR(BigDecimal dtr) {
+        if (dtr.doubleValue() <= 0) {
+            return C.chat("&c" + dtr.doubleValue());
+        } else if (dtr.doubleValue() <= 0.99) {
+            return C.chat("&e" + dtr.doubleValue());
+        } else {
+            return C.chat("&a" + dtr.doubleValue());
+        }
     }
 
     public void setDeathban(boolean deathban) {
@@ -374,5 +388,31 @@ public class Faction {
             }
         }
         return result;
+    }
+
+    public long getTimeTilRegen() {
+        return timeTilRegen;
+    }
+
+    public void setTimeTilRegen(long timeTilRegen) {
+        modified = true;
+        this.timeTilRegen = timeTilRegen;
+    }
+
+    public boolean isRegening() {
+        return isRegening;
+    }
+
+    public void setRegening(boolean regening) {
+        modified = true;
+        isRegening = regening;
+    }
+
+    public boolean isOnDTRFreeze() {
+        return !isRegening && timeTilRegen != 0;
+    }
+
+    public double getMaxDTR() {
+        return Math.min(Main.getInstance().getConfig().getDouble("factions.dtr.max"), getMembers().size() * Main.getInstance().getConfig().getDouble("factions.dtr.multiple"));
     }
 }

@@ -496,6 +496,31 @@ public class FactionCommand implements TabExecutor {
                 }
                 return true;
             }
+            if (args[0].equalsIgnoreCase("setregening")) {
+                if (!Permission.has(p, "faction.setregening")) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
+                    return true;
+                }
+                Faction faction = Faction.get(args[1]);
+                if (faction == null) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.faction-ony"))));
+                    return true;
+                }
+                if (!faction.getType().equals(FactionType.PLAYER)) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.player-only"))));
+                    return true;
+                }
+                faction.setRegening(!faction.isRegening());
+                if (!faction.isRegening()) {
+                    Calendar regen = Calendar.getInstance();
+                    regen.add(Calendar.MINUTE, Main.getInstance().getConfig().getInt("factions.dtr.regen.start-delay"));
+                    faction.setTimeTilRegen(regen.getTimeInMillis());
+                }
+                String status = faction.isRegening() ? Locale.get().getString("primary.enabled") : Locale.get().getString("primary.disabled");
+                status = Objects.requireNonNull(status).toLowerCase();
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.setregening")).replace("%faction%", faction.getName()).replace("%status%", status)));
+                return true;
+            }
             if (args[0].equalsIgnoreCase("claimfor")) {
                 if (!Permission.has(p, "faction.claimfor")) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
@@ -895,6 +920,26 @@ public class FactionCommand implements TabExecutor {
                 }
                 return true;
             }
+            if (args[0].equalsIgnoreCase("setdeathban")) {
+                if (!Permission.has(p, "faction.setlocation")) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
+                    return true;
+                }
+                Faction faction = Faction.get(args[1]);
+                if (faction == null) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.faction-ony"))));
+                    return true;
+                }
+                if (faction.getType().equals(FactionType.PLAYER)) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.wrong-type"))));
+                    return true;
+                }
+                faction.setDeathban(!faction.isDeathban());
+                String status = faction.isDeathban() ? Locale.get().getString("primary.enabled") : Locale.get().getString("primary.disabled");
+                status = Objects.requireNonNull(status).toLowerCase();
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.setdeathban")).replace("%faction%", faction.getName()).replace("%status%", status)));
+                return true;
+            }
             if (args[0].equalsIgnoreCase("setlocation")) {
                 if (!Permission.has(p, "faction.setlocation")) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
@@ -1078,8 +1123,37 @@ public class FactionCommand implements TabExecutor {
                 Messages.send(p, "faction.help.coleader", s);
                 return true;
             }
+            if (args[0].equalsIgnoreCase("setdtr")) {
+                if (!Permission.has(p, "faction.setbalance")) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
+                    return true;
+                }
+                Faction faction = Faction.get(args[1]);
+                if (faction == null) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.faction-ony"))));
+                    return true;
+                }
+                if (!faction.getType().equals(FactionType.PLAYER)) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.player-only"))));
+                    return true;
+                }
+                try {
+                    double ignored = Double.parseDouble(args[2]);
+                } catch (NumberFormatException ignored) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.invalid-number"))));
+                    return true;
+                }
+                double dtr = Double.parseDouble(args[2]);
+                if (dtr < -0.99 || dtr > faction.getMaxDTR()) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.invalid-number"))));
+                    return true;
+                }
+                faction.setDTR(BigDecimal.valueOf(Calculate.round(dtr, 2)));
+                p.sendMessage(C.chat(Objects.requireNonNull(Objects.requireNonNull(Locale.get().getString("commands.faction.setdtr")).replace("%dtr%", faction.getDTR().doubleValue() + "").replace("%faction%", faction.getName()))));
+                return true;
+            }
             if (args[0].equalsIgnoreCase("setbalance")) {
-                if (!Permission.has(p, "faction.setcolor")) {
+                if (!Permission.has(p, "faction.setbalance")) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
                     return true;
                 }
@@ -1175,18 +1249,24 @@ public class FactionCommand implements TabExecutor {
             if (Permission.has(p, "faction.setlocation")) values.add("setlocation");
             if (Permission.has(p, "faction.bypass")) values.add("bypass");
             if (Permission.has(p, "faction.setbalance")) values.add("setbalance");
+            if (Permission.has(p, "faction.setdeathban")) values.add("setdeathban");
+            if (Permission.has(p, "faction.setregening")) values.add("setregening");
+            if (Permission.has(p, "faction.setdtr")) values.add("setdtr");
         }
         if (args.length == 2) {
             if ((args[0].equalsIgnoreCase("claimfor") && Permission.has(p, "faction.claimfor"))
                     || (args[0].equalsIgnoreCase("setcolor") && Permission.has(p, "faction.setcolor"))
                     || (args[0].equalsIgnoreCase("settype") && Permission.has(p, "faction.settype"))
-                    || (args[0].equalsIgnoreCase("setlocation") && Permission.has(p, "faction.setlocation"))) {
+                    || (args[0].equalsIgnoreCase("setlocation") && Permission.has(p, "faction.setlocation"))
+                    || (args[0].equalsIgnoreCase("setdeathban") && Permission.has(p, "faction.setdeathban"))) {
                 values.addAll(Main.getInstance().factionNameHolder.values().stream()
                         .filter(faction -> faction.getType() != FactionType.PLAYER)
                         .map(Faction::getName)
                         .toList());
             }
-            if ((args[0].equalsIgnoreCase("setbalance") && Permission.has(p, "faction.setbalance"))) {
+            if ((args[0].equalsIgnoreCase("setbalance") && Permission.has(p, "faction.setbalance"))
+            || (args[0].equalsIgnoreCase("setregening") && Permission.has(p, "faction.setregening"))
+                    || (args[0].equalsIgnoreCase("setdtr") && Permission.has(p, "faction.setdtr"))) {
                 values.addAll(Main.getInstance().factionNameHolder.values().stream()
                         .filter(faction -> faction.getType() == FactionType.PLAYER)
                         .map(Faction::getName)
@@ -1248,10 +1328,24 @@ public class FactionCommand implements TabExecutor {
                 if (s.contains("%points%")) s = s.replace("%points%", faction.getPoints() + "");
                 if (s.contains("%kothcaptures%")) s = s.replace("%kothcaptures%", faction.getKothCaptures() + "");
                 if (s.contains("%dtr%")) {
-                    // TODO: Implement
+                    s = s.replace("%dtr%", Faction.formatDTR(faction.getDTR()));
+                }
+                if (s.contains("%dtrsymbol%")) {
+                    if (faction.isOnDTRFreeze()) {
+                        s = s.replace("%dtrsymbol%", "■");
+                    } else if (faction.isRegening()) {
+                        s = s.replace("%dtrsymbol%", "▴");
+                    } else {
+                        s = s.replace("%dtrsymbol%", "");
+                    }
                 }
                 if (s.contains("%regen%")) {
-                    // TODO: Implement
+                    if (faction.getTimeTilRegen() == 0) continue;
+                    if (faction.isRegening()) continue;
+                    long storedTime = faction.getTimeTilRegen();
+                    long diffMillis = storedTime - System.currentTimeMillis();
+                    String format = Timer.getMessageFormat(diffMillis);
+                    s = s.replace("%regen%", format);
                 }
                 if (s.contains("%open%")) {
                     if (!faction.isOpen()) continue;

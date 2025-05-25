@@ -52,6 +52,22 @@ help:
     - "&e/lives add <target> <amount> - Give a player lives"
     - "&e/lives take <target> <amount> - Take lives from a player"
     - "&7&m----------------------------------------------------"
+  pvp:
+    - "&7&m----------------------------------------------------"
+    - "%primary%&lPvP %secondary%Help"
+    - "&7&m----------------------------------------------------"
+    - "&e/pvp enable - Enable pvp for yourself"
+    - "&e/pvp revive <target> - Revive a player with one of your own lives"
+    - "&e/pvp give <target> - Give a player a PvP timer"
+    - "&e/pvp set <target> <amount> - Set a player's PvP time"
+    - "&7&m----------------------------------------------------"
+  coords:
+    - "&7&m----------------------------------------------------"
+    - "%primary%&lCoords %secondary%Help"
+    - "&7&m----------------------------------------------------"
+    - "&aSpawn &7- &a0, 0"
+    - "&cYay KoTH &7- &a2500, 2500"
+    - "&7&m----------------------------------------------------"
 faction:
   list:
     team-format: "&7%number%. &e%faction-name% &a(%online-members%/%members%)"
@@ -160,7 +176,19 @@ faction:
       - "&eLives: &c%lives%"
       - "&eAnnouncement: &d%announcement%"
       - "&7&m----------------------------------------------------"
-
+join-message:
+  - "&f"
+  - " &fWelcome to &b&l%servername% &fMap &b%map-number%"
+  - "&f<display=%has_faction%"
+  - "&b&l%faction-name%<display=%has_faction%"
+  - " &fFaction DTR: &b%faction-dtr%<display=%has_faction%"
+  - " &fFaction Online: &b%faction-online-count%/%faction-total-count%<display=%has_faction%"
+  - "&f"
+first-join-message:
+  - "&b"
+  - " &fWelcome to &b&l%servername% &fMap &b%map-number%"
+  - " &fTo get started do &b/f create [name]"
+  - "&b"
 other:
   lff:
     - "&7&m----------------------------------------------------"

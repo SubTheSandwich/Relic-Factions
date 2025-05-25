@@ -30,3 +30,9 @@ commands:
     description: Lives
   lff:
     description: LFF
+  pvp:
+    description: PvP
+  coords:
+    description: Coords
+  ping:
+    description: Ping

@@ -6,15 +6,21 @@ import me.sub.RelicFactions.Files.Data.PlayerTimer;
 import me.sub.RelicFactions.Files.Enums.FactionType;
 import me.sub.RelicFactions.Files.Enums.Timer;
 import me.sub.RelicFactions.Files.Normal.Locale;
+import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
+import me.sub.RelicFactions.Utils.Calculate;
+import org.bukkit.Material;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByBlockEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.*;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.projectiles.ProjectileSource;
 
+import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.Objects;
+import java.util.UUID;
 
 public class UserDamageEvents implements Listener {
 
@@ -35,6 +41,7 @@ public class UserDamageEvents implements Listener {
 
         if ((hitUser.getFaction() != null && damagerUser.getFaction() != null) && (hitUser.getFaction().equals(damagerUser.getFaction()))) {
             if (!Faction.get(hitUser.getFaction()).isFF()) {
+                e.setCancelled(true);
                 damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.member.damage")).replace("%player%", hit.getName())));
                 return;
             }
@@ -97,6 +104,76 @@ public class UserDamageEvents implements Listener {
             e.setCancelled(true);
         }
     }
+    /*
+
+    Combat Logger Damage
+
+     */
+
+    @EventHandler
+    public void onDeath(EntityDeathEvent e) {
+        if (!(e.getEntity() instanceof Villager villager)) return;
+        EntityDamageEvent lastDamage = villager.getLastDamageCause();
+        if (lastDamage instanceof EntityDamageByEntityEvent entityDamage) {
+            Entity damager = entityDamage.getDamager();
+            if (damager instanceof Player player) {
+                
+            }
+        }
+    }
+
+    @EventHandler
+    public void onVillager(EntityDamageByEntityEvent e) {
+
+        if (!(e.getEntity() instanceof Villager villager)) return;
+        if (!(e.getDamager() instanceof Player damager)) return;
+
+        if (villager.getCustomName() == null) return;
+        UUID hit = UUID.fromString(villager.getCustomName());
+        User hitUser = User.get(hit);
+        if (hitUser == null) return;
+        User damagerUser = User.get(damager);
+
+        Faction hitIn = Faction.getAt(villager.getLocation());
+        Faction damagerIn = Faction.getAt(damager.getLocation());
+
+        if ((hitUser.getFaction() != null && damagerUser.getFaction() != null) && (hitUser.getFaction().equals(damagerUser.getFaction()))) {
+            if (!Faction.get(hitUser.getFaction()).isFF()) {
+                e.setCancelled(true);
+                damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.member.damage")).replace("%player%", hitUser.getName())));
+                return;
+            }
+            generateCombat(damager);
+            return;
+        }
+
+        if (damagerIn != null && damagerIn.getType().equals(FactionType.SAFEZONE)) {
+            e.setCancelled(true);
+            damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.cannot-attack-inside-safezone")).replace("%player%", hitUser.getName())));
+            return;
+        }
+
+        if (hitIn != null && hitIn.getType().equals(FactionType.SAFEZONE)) {
+            e.setCancelled(true);
+            damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.cannot-attack-here")).replace("%player%", hitUser.getName())));
+            return;
+        }
+
+        // TODO: Implement SOTW
+
+        if (damagerUser.hasTimer("pvp") || damagerUser.hasTimer("starting")) {
+            e.setCancelled(true);
+            damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.protected"))));
+            return;
+        }
+
+        if (hitUser.hasTimer("pvp") || hitUser.hasTimer("starting")) {
+            e.setCancelled(true);
+            damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.attack-protected"))));
+            return;
+        }
+        generateCombat(damager);
+    }
 
     /*
 
@@ -122,6 +199,7 @@ public class UserDamageEvents implements Listener {
 
         if ((hitUser.getFaction() != null && damagerUser.getFaction() != null) && (hitUser.getFaction().equals(damagerUser.getFaction()))) {
             if (!Faction.get(hitUser.getFaction()).isFF()) {
+                e.setCancelled(true);
                 damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.member.damage")).replace("%player%", hit.getName())));
                 return;
             }
@@ -157,6 +235,107 @@ public class UserDamageEvents implements Listener {
         generateCombat(hit, damager);
     }
 
+    @EventHandler
+    public void onDeath(PlayerDeathEvent e) {
+        Player p = e.getEntity();
+        User user = User.get(p);
+        user.setDeaths(user.getDeaths() + 1);
+        // TODO: EOTW
+        int time = User.getDeathbanTime(p);
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MINUTE, time);
+        long deathban = calendar.getTimeInMillis();
+        user.setDeathbannedTill(deathban);
+        user.setDeathBanned(true);
+        p.kickPlayer(C.chat(Objects.requireNonNull(Locale.get().getString("events.deathban.kick")).replace("%time%", Timer.getMessageFormat(deathban - System.currentTimeMillis()))));
+        user.getTimers().clear();
+        if (user.hasFaction()) {
+            Faction faction = Faction.get(user.getFaction());
+            faction.setDTR(BigDecimal.valueOf(Calculate.round(Math.max(-0.99, faction.getDTR().doubleValue() - Main.getInstance().getConfig().getDouble("factions.dtr.death")), 2)));
+            faction.setRegening(false);
+            Calendar regen = Calendar.getInstance();
+            regen.add(Calendar.MINUTE, Main.getInstance().getConfig().getInt("factions.dtr.regen.start-delay"));
+            faction.setTimeTilRegen(regen.getTimeInMillis());
+        }
+
+        Player killer = p.getKiller();
+        String deathMessage;
+        if (killer != null) {
+            User kill = User.get(killer);
+            kill.setKills(kill.getKills() + 1);
+            if (killer.getInventory().getItemInMainHand().getType() == Material.AIR) {
+                deathMessage = Locale.get().getString("deathmessage.entity-attack.player-noitem");
+            } else {
+                deathMessage = Objects.requireNonNull(Locale.get().getString("deathmessage.entity-attack.player"))
+                        .replace("%item%", killer.getInventory().getItemInMainHand().hasItemMeta() ?
+                                Objects.requireNonNull(killer.getInventory().getItemInMainHand().getItemMeta()).getDisplayName() :
+                                killer.getInventory().getItemInMainHand().getType().name());
+            }
+            deathMessage = fillInDead(p, deathMessage, killer);
+        } else {
+            EntityDamageEvent lastDamage = p.getLastDamageCause();
+            if (lastDamage instanceof EntityDamageByEntityEvent) {
+                Entity damager = ((EntityDamageByEntityEvent) lastDamage).getDamager();
+                if (damager instanceof Projectile projectile) {
+                    ProjectileSource shooter = projectile.getShooter();
+                    String projectileName = projectile.getType().name().toLowerCase().replace("_", " ");
+                    if (shooter instanceof Player shooterPlayer) {
+                        User kill = User.get(shooterPlayer);
+                        kill.setKills(kill.getKills() + 1);
+                        ItemStack held = shooterPlayer.getInventory().getItemInMainHand();
+                        if (held.getType() == Material.AIR) {
+                            deathMessage = Locale.get().getString("deathmessage.projectile.player-noitem");
+                        } else {
+                            deathMessage = Objects.requireNonNull(Locale.get().getString("deathmessage.projectile.player"))
+                                    .replace("%distance%", (int) p.getLocation().distance(shooterPlayer.getLocation()) + "")
+                                    .replace("%item%", held.hasItemMeta() && Objects.requireNonNull(held.getItemMeta()).hasDisplayName() ?
+                                            held.getItemMeta().getDisplayName() :
+                                            held.getType().name());
+                        }
+                        deathMessage = fillInDead(p, deathMessage, shooterPlayer);
+                    } else if (shooter instanceof LivingEntity) {
+                        deathMessage = Objects.requireNonNull(Locale.get().getString("deathmessage.projectile.entity"))
+                                .replace("%entity%", ((LivingEntity) shooter).getName());
+                    } else {
+                        deathMessage = Objects.requireNonNull(Locale.get().getString("deathmessage.projectile.entity"))
+                                .replace("%entity%", projectileName);
+                    }
+                } else if (damager instanceof LivingEntity) {
+                    deathMessage = Objects.requireNonNull(Locale.get().getString("deathmessage.entity-attack.entity"))
+                            .replace("%killer%", damager.getName());
+                } else {
+                    deathMessage = Objects.requireNonNull(Locale.get().getString("deathmessage.entity-attack.entity"))
+                            .replace("%killer%", damager.getType().name().toLowerCase().replace("_", " "));
+                }
+            } else if (lastDamage != null) {
+                // Environmental and other causes
+                deathMessage = Locale.get().getString("deathmessage." + lastDamage.getCause().name().toLowerCase());
+                deathMessage = fillInDead(p, deathMessage);
+            } else {
+                deathMessage = Locale.get().getString("deathmessage.custom");
+                deathMessage = fillInDead(p, deathMessage);
+            }
+        }
+        e.setDeathMessage(deathMessage);
+    }
+
+    private String fillInDead(Player dead, String deathMessage, Player killer) {
+        User user = User.get(dead);
+        User kill = User.get(killer);
+        deathMessage = deathMessage.replace("%dead%", user.getName());
+        deathMessage = deathMessage.replace("%dead-kills%", user.getKills() + "");
+        deathMessage = deathMessage.replace("%killer%", kill.getName());
+        deathMessage = deathMessage.replace("%killer-kills%", kill.getKills() + "");
+        return deathMessage;
+    }
+
+    private String fillInDead(Player dead, String deathMessage) {
+        User user = User.get(dead);
+        deathMessage = deathMessage.replace("%dead%", user.getName());
+        deathMessage = deathMessage.replace("%dead-kills%", user.getKills() + "");
+        return deathMessage;
+    }
+
     private void generateCombat(Player hit, Player damager) {
         User hitUser = User.get(hit);
         User damagerUser = User.get(damager);
@@ -175,6 +354,18 @@ public class UserDamageEvents implements Listener {
             damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.timer.start.combat"))));
             PlayerTimer combat = new PlayerTimer(damager.getUniqueId(), Timer.COMBAT);
             damagerUser.addTimer(combat);
+        }
+    }
+
+    private void generateCombat(Player hit) {
+        User hitUser = User.get(hit);
+
+        if (hitUser.hasTimer("combat")) {
+            hitUser.getTimer("combat").setDuration(Timer.COMBAT.getDuration());
+        } else {
+            hit.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.timer.start.combat"))));
+            PlayerTimer combat = new PlayerTimer(hit.getUniqueId(), Timer.COMBAT);
+            hitUser.addTimer(combat);
         }
     }
 

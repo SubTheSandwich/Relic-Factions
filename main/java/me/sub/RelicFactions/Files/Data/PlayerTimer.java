@@ -87,15 +87,17 @@ public class PlayerTimer {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (User.get(uuid) == null) {
+                User user = User.get(uuid);
+                if (user == null) {
                     cancel();
                     return;
                 }
-                if (!User.get(uuid).hasTimer(timer.name())) {
+                if (!user.hasTimer(timer.name())) {
                     cancel();
                     return;
                 }
                 if (Bukkit.getPlayer(uuid) == null) {
+                    user.removeTimer("home");
                     cancel();
                     return;
                 }
@@ -104,13 +106,14 @@ public class PlayerTimer {
                 duration = duration.subtract(BigDecimal.valueOf(0.05));
                 if (duration.doubleValue() > 0) return;
                 if (timer.name().equalsIgnoreCase("HOME")) {
-                    User user = User.get(uuid);
                     if (!user.hasFaction()) {
+                        user.removeTimer("home");
                         cancel();
                         return;
                     }
                     Faction faction = Faction.get(user.getFaction());
                     if (faction.getHome() == null) {
+                        user.removeTimer("home");
                         cancel();
                         return;
                     }
@@ -127,7 +130,6 @@ public class PlayerTimer {
                     return;
                 }
                 Objects.requireNonNull(player).sendMessage(Objects.requireNonNull(C.chat(Locale.get().getString("events.timer.expire." + timer.name().toLowerCase()) == null ? Objects.requireNonNull(Locale.get().getString("events.timer.expire.default")).replace("%timer%", timer.name()) : Objects.requireNonNull(Locale.get().getString("events.timer.expire." + timer.name().toLowerCase())))));
-                User user = User.get(player);
                 user.removeTimer(timer.name());
                 cancel();
             }

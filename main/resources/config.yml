@@ -28,7 +28,22 @@ economy:
   type: en-US
   default-balance: 500
 
+deathban:
+  default-time: 120
+  times:
+    DonatorOne: 90
+    DonatorTwo: 75
+    DonatorThree: 60
+
 factions:
+  dtr:
+    max: 5.5
+    multiple: 1.01
+    death: 1.0
+    regen: # time in minutes
+      start-delay: 60
+      delay: 3
+      increment: 0.03
   map-radius: 64
   home:
     nether: 20
@@ -63,6 +78,7 @@ scoreboard:
   lines:
     - "&7&m-------------------------"
     - "&a&lStarting&7: &c%player_starting_timer%<display=%has_player_starting_timer%"
+    - "&a&lPvP Timer&7: &c%player_pvp_timer%<display=%has_player_pvp_timer%"
     - "&9&lHome&7: &c%player_home_timer%<display=%has_player_home_timer%"
     - "&5&lEnderpearl&7: &c%player_enderpearl_timer%<display=%has_player_enderpearl_timer%"
     - "&6&lApple&7: &c%player_apple_timer%<display=%has_player_apple_timer%"

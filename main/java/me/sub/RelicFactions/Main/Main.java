@@ -18,6 +18,7 @@ import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Data.FactionData;
 import me.sub.RelicFactions.Files.Data.UserData;
+import me.sub.RelicFactions.Files.Enums.FactionType;
 import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Utils.Econ;
 import me.sub.RelicFactions.Utils.Fastboard.FastBoard;
@@ -32,11 +33,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class Main extends JavaPlugin {
 
@@ -83,6 +83,7 @@ public class Main extends JavaPlugin {
                 saveFactions();
             }
         }.runTaskTimer(this, 5 * 60 * 20L, 5 * 60 * 20L);
+        handleDTR();
     }
 
     @Override
@@ -104,6 +105,9 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("help")).setExecutor(new HelpCommand()); Objects.requireNonNull(getCommand("help")).setTabCompleter(new HelpCommand());
         Objects.requireNonNull(getCommand("filter")).setExecutor(new FilterCommand()); Objects.requireNonNull(getCommand("filter")).setTabCompleter(new FilterCommand());
         Objects.requireNonNull(getCommand("lff")).setExecutor(new LFFCommand()); Objects.requireNonNull(getCommand("lff")).setTabCompleter(new LFFCommand());
+        Objects.requireNonNull(getCommand("pvp")).setExecutor(new PvPCommand()); Objects.requireNonNull(getCommand("pvp")).setTabCompleter(new PvPCommand());
+        Objects.requireNonNull(getCommand("coords")).setExecutor(new CoordsCommand()); Objects.requireNonNull(getCommand("coords")).setTabCompleter(new CoordsCommand());
+        Objects.requireNonNull(getCommand("ping")).setExecutor(new PingCommand()); Objects.requireNonNull(getCommand("ping")).setTabCompleter(new PingCommand());
     }
 
     private void events() {
@@ -137,7 +141,78 @@ public class Main extends JavaPlugin {
             return false;
         }
         econ = rsp.getProvider();
-        return econ != null;
+        return true;
+    }
+
+    private final Map<UUID, Integer> factionRegenDelay = new HashMap<>();
+
+    private void handleDTR() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (Faction faction : factions.values().stream()
+                        .filter(f -> f.getType() == FactionType.PLAYER)
+                        .collect(Collectors.toSet())) {
+
+                    if (faction.getDTR().doubleValue() <= 0 && !faction.isOnDTRFreeze()) {
+                        Calendar regen = Calendar.getInstance();
+                        regen.add(Calendar.MINUTE, Main.getInstance().getConfig().getInt("factions.dtr.regen.start-delay"));
+                        faction.setTimeTilRegen(regen.getTimeInMillis());
+                        continue;
+                    }
+
+                    // Handle DTR freeze
+                    if (faction.isOnDTRFreeze()) {
+                        if (faction.getTimeTilRegen() - System.currentTimeMillis() <= 0) {
+                            faction.setTimeTilRegen(0);
+                            faction.setRegening(true);
+                        }
+                        if (faction.getMaxDTR() == faction.getDTR().doubleValue() && faction.getTimeTilRegen() != 0) {
+                            faction.setTimeTilRegen(0);
+                            factionRegenDelay.remove(faction.getUUID());
+                        }
+                        continue;
+                    }
+
+                    if (faction.getMaxDTR() == faction.getDTR().doubleValue() && faction.getTimeTilRegen() != 0) {
+                        faction.setTimeTilRegen(0);
+                        factionRegenDelay.remove(faction.getUUID());
+                        continue;
+                    }
+
+                    // Only regen if flagged
+                    if (!faction.isRegening()) continue;
+
+                    // Stop if at max DTR
+                    if (faction.getMaxDTR() == faction.getDTR().doubleValue()) {
+                        faction.setRegening(false);
+                        faction.setTimeTilRegen(0);
+                        factionRegenDelay.remove(faction.getUUID());
+                        continue;
+                    }
+
+                    // Handle regen delay
+                    int time = factionRegenDelay.getOrDefault(faction.getUUID(), 0);
+                    int delay = Main.getInstance().getConfig().getInt("factions.dtr.regen.delay") * 60;
+                    if (time < delay) {
+                        factionRegenDelay.put(faction.getUUID(), time + 1);
+                        continue;
+                    }
+
+                    // Regen DTR
+                    double increment = Main.getInstance().getConfig().getDouble("factions.dtr.regen.increment");
+                    double newDTR = Math.min(faction.getDTR().doubleValue() + increment, faction.getMaxDTR());
+                    faction.setDTR(BigDecimal.valueOf(newDTR));
+
+                    // If at max, stop regening and reset delay
+                    if (faction.getDTR().doubleValue() == faction.getMaxDTR()) {
+                        faction.setRegening(false);
+                        faction.setTimeTilRegen(0);
+                        factionRegenDelay.remove(faction.getUUID());
+                    }
+                }
+            }
+        }.runTaskTimer(Main.getInstance(), 0, 20);
     }
 
     private void loadUsers() {
@@ -173,7 +248,8 @@ public class Main extends JavaPlugin {
             UserData userData = user.getUserData();
             userData.get().set("name", user.getName());
             userData.get().set("faction", user.getFaction() == null ? null : user.getFaction().toString());
-            userData.get().set("deathbanned", user.isDeathBanned());
+            userData.get().set("deathban.has", user.isDeathBanned());
+            userData.get().set("deathban.ends", user.getDeathbannedTill());
             userData.get().set("kills", user.getKills());
             userData.get().set("deaths", user.getDeaths());
             userData.get().set("balance", user.getBalance().doubleValue());
@@ -207,6 +283,8 @@ public class Main extends JavaPlugin {
             factionData.get().set("invites", Maps.uuidListToString(faction.getInvites()));
             factionData.get().set("claims", Maps.cuboidListToString(faction.getClaims()));
             factionData.get().set("deathban", faction.isDeathban());
+            factionData.get().set("timeTilRegen", faction.getTimeTilRegen());
+            factionData.get().set("regening", faction.isRegening());
             factionData.save();
             faction.setModified(false);
             saved++;
@@ -222,5 +300,10 @@ public class Main extends JavaPlugin {
     public void saveFiles() {
         saveUsers();
         saveFactions();
+    }
+
+    public void loadFiles() {
+        loadUsers();
+        loadFactions();
     }
 }

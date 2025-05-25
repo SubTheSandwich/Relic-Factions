@@ -31,6 +31,18 @@ public class HCFCommand implements TabExecutor {
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.hcf.save.success"))));
             return true;
         }
+        if (args[0].equalsIgnoreCase("reload")) {
+            sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.hcf.reload.attempt"))));
+            Main.getInstance().saveFiles();
+            Main.getInstance().factions.clear();
+            Main.getInstance().factionNameHolder.clear();
+            Main.getInstance().users.clear();
+            Main.getInstance().userNameHolder.clear();
+            Main.getInstance().loadFiles();
+            Locale.load();
+            sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.hcf.reload.success"))));
+            return true;
+        }
         return false;
     }
 

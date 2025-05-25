@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class User {
@@ -20,6 +21,7 @@ public class User {
     private UUID faction;
     private boolean modified;
     private boolean deathbanned;
+    private long deathbannedTill;
     private int kills;
     private int deaths;
     private BigDecimal balance;
@@ -29,14 +31,16 @@ public class User {
     private HashMap<Faction, List<Cuboid>> map;
     private final Filter filter;
     private int lives;
+    private UUID loggerUUID;
 
     public User(UserData userData) {
         userDisconnected = true;
         this.userData = userData;
         this.uuid = userData.getUUID();
         this.name = userData.getName();
-        this.faction = userData.get().getString("faction") == null ? null : UUID.fromString(userData.get().getString("faction"));
+        this.faction = userData.get().getString("faction") == null ? null : UUID.fromString(Objects.requireNonNull(userData.get().getString("faction")));
         deathbanned = userData.get().getBoolean("deathban.has");
+        deathbannedTill = userData.get().getLong("deathban.ends");
         kills = userData.get().getInt("kills");
         deaths = userData.get().getInt("deaths");
         balance = BigDecimal.valueOf(userData.get().getDouble("balance"));
@@ -47,6 +51,16 @@ public class User {
         factionBypass = false;
         map = null;
         filter = new Filter();
+        loggerUUID = userData.get().getString("loggerUUID") == null ? null : UUID.fromString(Objects.requireNonNull(userData.get().getString("loggerUUID")));
+    }
+
+    public UUID getLoggerUUID() {
+        return loggerUUID;
+    }
+
+    public void setLoggerUUID(UUID loggerUUID) {
+        modified = true;
+        this.loggerUUID = loggerUUID;
     }
 
     public boolean isFactionBypass() {
@@ -207,5 +221,22 @@ public class User {
     public void setLives(int lives) {
         modified = true;
         this.lives = lives;
+    }
+
+    public static int getDeathbanTime(Player player) {
+        int time = Main.getInstance().getConfig().getInt("deathban.default-time");
+        for (String rank : Objects.requireNonNull(Main.getInstance().getConfig().getConfigurationSection("deathban.times")).getKeys(false)) {
+            if (!player.hasPermission("relic-factions.deathban." + rank.toLowerCase())) return time;
+            time = Main.getInstance().getConfig().getInt("deathban.times." + rank);
+        }
+        return time;
+    }
+
+    public long getDeathbannedTill() {
+        return deathbannedTill;
+    }
+
+    public void setDeathbannedTill(long deathbannedTill) {
+        this.deathbannedTill = deathbannedTill;
     }
 }

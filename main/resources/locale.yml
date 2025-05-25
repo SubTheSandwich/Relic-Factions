@@ -7,6 +7,7 @@ primary:
   lives:
     not-enough: "&cYou do not have enough lives to do this."
     not-deathbanned: "&cYou cannot revive a player that is not deathbanned."
+    revive: "&eYou have revived &d%player%&e."
   faction:
     faction-only: "&cA faction by this name does not exist."
     doesnt-exist: "&cA faction or player by this name does not exist."
@@ -44,6 +45,9 @@ claiming:
     two: "&eSet position 2"
 
 events:
+  deathban:
+    kick: "&cYou are currently deathbanned. \nYour deathban will expire in %time% \nBuy lives @ %store%"
+    used-life: "&aYou have used a life to remove your deathban."
   movement:
     deny:
       pvp: "&cYou cannot enter this faction while having a PvP timer."
@@ -86,6 +90,17 @@ faction:
     damage: "&eYou cannot damage &2%player%&e."
 
 commands:
+  ping:
+    self: "&eYour ping: &b%ping%ms"
+    other: "&e%player%'s ping: &b%ping%ms"
+  pvp:
+    usage: "&cUsage: /pvp <revive/enable> <player>"
+    set: "&aSet %player%'s PvP timer to %time%."
+    given: "&aSuccessfully gave %player% a PvP timer."
+    removed: "&aRemoved %player%'s PvP timer."
+    enabled: "&aYour PvP has been enabled."
+    no-timer: "&cYou do not have an active PvP timer."
+    already-has: "&cThis player already has a PvP timer."
   filter:
     clear: "&eYour filter has been &acleared&e."
     toggle: "&6Filter Status&7: &r%status%"
@@ -108,6 +123,9 @@ commands:
     save:
       attempt: "&cAttempting to save..."
       success: "&aSuccessfully saved all files!"
+    reload:
+      attempt: "&cAttempting to reload files..."
+      success: "&aSuccessfully reloaded all files!"
   balance:
     self: "&eBalance: &b%balance%"
     other: "&d%player%&e's Balance: &b%balance%"
@@ -221,8 +239,11 @@ commands:
       add: "&eYou have added &d%amount% lives &eto the faction's lives."
     revive:
       not-in: "&cYou cannot revive a player that is not in your faction."
-      success: "&eYou have revived &d%player%&e."
+      success: "&eYou have used one of your faction lives to revive &d%player%&e."
     ff: "&3%player% has %status% &3your faction's friendly fire status."
+    setdeathban: "&eYou have %status% &ethe deathban of &b%faction%"
+    setregening: "&eYou have %status% &ethe regening status of &b%faction%"
+    setdtr: "&eYou have set the DTR of &b%faction% &eto &d%dtr%"
   economy:
     set: "&eYou have set the balance of &b%player% &eto &d%amount%&e."
     give: "&eYou have added &d%amount% &eto &b%player%&e's balance."
@@ -232,3 +253,49 @@ commands:
     set: "&eYou have set the lives of &b%player% &eto &d%amount%"
     add: "&eYou have added &d%amount% &elives to &b%player%"
     take: "&eYou have taken &d%amount% &elives from &b%player%"
+
+
+deathmessage:
+  contact: "&c%dead%&4[%dead-kills%] &elost a battle with a Cactus"
+  custom: "&c%dead%&4[%dead-kills%] &ehas died"
+  drowning: "&c%dead%&4[%dead-kills%] &ethought he could swim"
+  logger:
+    player: "&7(Combat-Logger) &c%dead%&4[%dead-kills%] &ewas killed by &c%killer%&4[%killer-kills%]"
+    unknown: "&7(Combat-Logger) &c%dead%&4[%dead-kills%] &ehas died"
+  entity-attack:
+    entity: "&c%dead%&4[%dead-kills%] &ewas slain by a &c%killer%"
+    player: "&c%dead%&4[%dead-kills%] &ewas slain by &c%killer%&4[%killer-kills%] &eusing &c%item%"
+    player-noitem: "&c%dead%&4[%dead-kills%] &ewas fisted by &c%killer%&4[%killer-kills%]"
+  projectile:
+    entity: "&c%dead%&4[%dead-kills%] &edied to a &c%entity%"
+    player: "&c%dead%&4[%dead-kills%] &ewas shot by &c%killer%&4[%killer-kills%] &eusing &c%item% &efrom &9&l%distance% blocks"
+    player-noitem: "&c%dead%&4[%dead-kills%] &ewas shot by &c%killer%&4[%killer-kills%]"
+  lock_explosion: "&c%dead%&4[%dead-kills%] &eblew up"
+  entity_explosion: "&c%dead%&4[%dead-kills%] &eblew up"
+  fall: "&c%dead%&4[%dead-kills%] &ehit the ground too hard"
+  falling_block: "&c%dead%&4[%dead-kills%] &edied to a falling block"
+  fire: "&c%dead%-4[%dead-kills%] &ethought he was a firefighter"
+  fire_tick: "&c%dead%&4[%dead-kills%] &ethought he was a firefighter"
+  lava: "&c%dead%&4[%dead-kills%] &etried to swim in lava"
+  lightning: "&c%dead%&4[%dead-kills%] &ehas been electrocuted"
+  magic: "&c%dead%&4[%dead-kills%] &ethought he was a wizaard"
+  melting: "&c%dead%&4[%dead-kills%] &etried to make some smores"
+  poison: "&c%dead%&4[%dead-kills%] &ehas died from poison"
+  starvation: "&c%dead%&4[%dead-kills%] &edied of starvation"
+  suffocation: "&c%dead%&4[%dead-kills%] &ehas suffocated in a wall"
+  suicide: "&c%dead%&4[%dead-kills%] &ehas committed suicide"
+  thorns: "&c%dead%&4[%dead-kills%] &edied to a prickly little thang"
+  void: "&c%dead%&4[%dead-kills%] &efell into the void"
+  wither: "&c%dead%&4[%dead-kills%] &ehas withered away"
+  entity_sweep_attack: "&c%dead%&4[%dead-kills%] &ewas swept away"
+  dragon_breath: "&c%dead%&4[%dead-kills%] &ewas incinerated by dragon's breath"
+  fly_into_wall: "&c%dead%&4[%dead-kills%] &ecrashed while flying"
+  hot_floor: "&c%dead%&4[%dead-kills%] &eburned their feet on magma"
+  cramming: "&c%dead%&4[%dead-kills%] &ewas squished"
+  dryout: "&c%dead%&4[%dead-kills%] &edried out"
+  freeze: "&c%dead%&4[%dead-kills%] &efroze to death"
+  sonic_boom: "&c%dead%&4[%dead-kills%] &ewas obliterated by a warden"
+  campfire: "&c%dead%&4[%dead-kills%] &eburned on a campfire"
+  world_border: "&c%dead%&4[%dead-kills%] &etried to escape the world border"
+
+
