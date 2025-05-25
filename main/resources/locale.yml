@@ -45,6 +45,8 @@ claiming:
     two: "&eSet position 2"
 
 events:
+  command:
+    combat: "&cYou cannot do this while in combat!"
   deathban:
     kick: "&cYou are currently deathbanned. \nYour deathban will expire in %time% \nBuy lives @ %store%"
     used-life: "&aYou have used a life to remove your deathban."
@@ -53,13 +55,17 @@ events:
       pvp: "&cYou cannot enter this faction while having a PvP timer."
       combat: "&cYou cannot enter this faction while in combat!"
   timer:
-    cannot-claim: "&cYou cannot claim whilst having a PvP timer."
-    start: # no default
-      combat: "&eYou have been spawn-tagged for &c30 &eseconds!"
-    expire:
-      default: "&eYour &b%timer% &etimer has expired."
-    cooldown:
-      default: "&cYou cannot do this for &l%time%"
+    server:
+      expire:
+        sotw: "&cThe SOTW period has ended!"
+    player:
+      cannot-claim: "&cYou cannot claim whilst having a PvP timer."
+      start: # no default
+        combat: "&eYou have been spawn-tagged for &c30 &eseconds!"
+      expire:
+        default: "&eYour &b%timer% &etimer has expired."
+      cooldown:
+        default: "&cYou cannot do this for &l%time%"
 
 chat:
   public:
@@ -81,6 +87,8 @@ faction:
   cannot-attack-inside-safezone: "&eYou cannot attack &c%player% &ewhile you are in a safezone."
   protected: "&cYou cannot attack other players while you have a PVP Timer."
   attack-protected: "&cYou cannot attack this player as they currently have a PVP Timer."
+  sotw-protected: "&cYou cannot attack other players while you are not SOTW enabled."
+  sotw-attack-protected: "&cYou cannot attack this player as they currently are not SOTW enabled."
   member:
     online: "&aMember Online: &f%player%"
     offline: "&cMember Offline: &f%player%"
@@ -90,6 +98,17 @@ faction:
     damage: "&eYou cannot damage &2%player%&e."
 
 commands:
+  sotw:
+    usage: "&cUsage: /sotw <start;extend;stop;pause> <time>"
+    running: "&cSOTW is already runnning."
+    not-running: "&cSOTW is not runnning."
+    started: "&aThe SOTW period has started."
+    stopped: "&aSOTW has been stopped."
+    extended: "&aSOTW has been extended."
+    paused: "&aThe SOTW period has been paused."
+    unpaused: "&aThe SOTW period has been unpaused."
+    pvp-enabled: "&aYour own PvP status has now been enabled during the SOTW."
+    pvp-disabled: "&aYour own PvP status has now been disabled during the SOTW."
   ping:
     self: "&eYour ping: &b%ping%ms"
     other: "&e%player%'s ping: &b%ping%ms"

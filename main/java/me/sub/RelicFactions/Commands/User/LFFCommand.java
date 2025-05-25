@@ -26,7 +26,7 @@ public class LFFCommand implements TabExecutor {
         }
         User user = User.get(p);
         if (user.hasTimer("lff")) {
-            String message = Locale.get().getString("events.timer.cooldown.lff") == null ? Locale.get().getString("events.timer.cooldown.default") : Locale.get().getString("events.timer.cooldown.lff");
+            String message = Locale.get().getString("events.timer.player.cooldown.lff") == null ? Locale.get().getString("events.timer.player.cooldown.default") : Locale.get().getString("events.timer.cooldown.lff");
             message = Objects.requireNonNull(message).replace("%time%", Timer.format(user.getTimer("lff").getDuration()));
             p.sendMessage(C.chat(message));
             return true;

@@ -28,7 +28,7 @@ public class ItemUseEvents implements Listener {
         User user = User.get(p);
         if (user.hasTimer("enderpearl")) {
             e.setCancelled(true);
-            String message = Locale.get().getString("events.timer.cooldown.enderpearl") == null ? Locale.get().getString("events.timer.cooldown.default") : Locale.get().getString("events.timer.cooldown.enderpearl");
+            String message = Locale.get().getString("events.timer.player.cooldown.enderpearl") == null ? Locale.get().getString("events.timer.player.cooldown.default") : Locale.get().getString("events.timer.cooldown.enderpearl");
             message = Objects.requireNonNull(message).replace("%time%", Timer.format(user.getTimer("enderpearl").getDuration()));
             p.sendMessage(C.chat(message));
             return;
@@ -45,7 +45,7 @@ public class ItemUseEvents implements Listener {
         if (item.getType().equals(Material.GOLDEN_APPLE)) {
             if (user.hasTimer("apple")) {
                 e.setCancelled(true);
-                String message = Locale.get().getString("events.timer.cooldown.apple") == null ? Locale.get().getString("events.timer.cooldown.default") : Locale.get().getString("events.timer.cooldown.apple");
+                String message = Locale.get().getString("events.timer.player.cooldown.apple") == null ? Locale.get().getString("events.timer.player.cooldown.default") : Locale.get().getString("events.timer.cooldown.apple");
                 message = Objects.requireNonNull(message).replace("%time%", Timer.format(user.getTimer("apple").getDuration()));
                 p.sendMessage(C.chat(message));
                 return;
@@ -57,7 +57,7 @@ public class ItemUseEvents implements Listener {
         if (item.getType().equals(Material.ENCHANTED_GOLDEN_APPLE)) {
             if (user.hasTimer("gapple")) {
                 e.setCancelled(true);
-                String message = Locale.get().getString("events.timer.cooldown.gapple") == null ? Locale.get().getString("events.timer.cooldown.default") : Locale.get().getString("events.timer.cooldown.gapple");
+                String message = Locale.get().getString("events.timer.player.cooldown.gapple") == null ? Locale.get().getString("events.timer.player.cooldown.default") : Locale.get().getString("events.timer.cooldown.gapple");
                 message = Objects.requireNonNull(message).replace("%time%", Timer.format(user.getTimer("gapple").getDuration()));
                 p.sendMessage(C.chat(message));
                 return;

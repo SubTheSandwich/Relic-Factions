@@ -53,4 +53,30 @@ public class C {
         if (s.contains("&")) s = C.chat(s);
         return ChatColor.stripColor(s);
     }
+
+    public static String strikethrough(String input) {
+        StringBuilder sb = new StringBuilder();
+        boolean lastWasColor = false;
+
+        sb.append("&m");
+
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            if (lastWasColor) {
+                sb.append(c);
+                // After every color code, re-apply strikethrough
+                if (("0123456789abcdefklmnor").indexOf(Character.toLowerCase(c)) != -1 && Character.toLowerCase(c) != 'm' && Character.toLowerCase(c) != 'r') {
+                    sb.append("&m");
+                }
+                lastWasColor = false;
+            } else if (c == '&') {
+                sb.append(c);
+                lastWasColor = true;
+            } else {
+                sb.append(c);
+            }
+        }
+        sb.append("&r");  // Reset at the end
+        return sb.toString();
+    }
 }

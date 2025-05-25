@@ -332,7 +332,7 @@ public class FactionCommand implements TabExecutor {
                     return true;
                 }
                 if (user.hasTimer("pvp") || user.hasTimer("starting")) {
-                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.timer.cannot-claim"))));
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.timer.player.cannot-claim"))));
                     return true;
                 }
                 Faction faction = Faction.get(user.getFaction());

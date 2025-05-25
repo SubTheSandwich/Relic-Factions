@@ -1,9 +1,6 @@
 package me.sub.RelicFactions.Main;
 
-import me.sub.RelicFactions.Commands.Admin.EconomyCommand;
-import me.sub.RelicFactions.Commands.Admin.HCFCommand;
-import me.sub.RelicFactions.Commands.Admin.LivesCommand;
-import me.sub.RelicFactions.Commands.Admin.TimerCommand;
+import me.sub.RelicFactions.Commands.Admin.*;
 import me.sub.RelicFactions.Commands.User.*;
 import me.sub.RelicFactions.Events.Player.Attack.UserDamageEvents;
 import me.sub.RelicFactions.Events.Player.Chat.FormatChatEvent;
@@ -17,6 +14,7 @@ import me.sub.RelicFactions.Events.Player.Server.UserRegisterEvent;
 import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Data.FactionData;
+import me.sub.RelicFactions.Files.Data.ServerTimer;
 import me.sub.RelicFactions.Files.Data.UserData;
 import me.sub.RelicFactions.Files.Enums.FactionType;
 import me.sub.RelicFactions.Files.Normal.Locale;
@@ -48,6 +46,9 @@ public class Main extends JavaPlugin {
     public HashMap<UUID, Faction> factions = new HashMap<>();
     public HashMap<String, Faction> factionNameHolder = new HashMap<>();
     public HashMap<UUID, FastBoard> boards = new HashMap<>();
+
+    public final HashMap<String, ServerTimer> serverTimers = new HashMap<>();
+    public Set<UUID> sotwEnabled = new HashSet<>();
 
     private static Main instance;
 
@@ -98,6 +99,7 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("timer")).setExecutor(new TimerCommand()); Objects.requireNonNull(getCommand("timer")).setTabCompleter(new TimerCommand());
         Objects.requireNonNull(getCommand("economy")).setExecutor(new EconomyCommand()); Objects.requireNonNull(getCommand("economy")).setTabCompleter(new EconomyCommand());
         Objects.requireNonNull(getCommand("lives")).setExecutor(new LivesCommand()); Objects.requireNonNull(getCommand("lives")).setTabCompleter(new LivesCommand());
+        Objects.requireNonNull(getCommand("sotw")).setExecutor(new SOTWCommand()); Objects.requireNonNull(getCommand("sotw")).setTabCompleter(new SOTWCommand());
 
         // User
         Objects.requireNonNull(getCommand("faction")).setExecutor(new FactionCommand()); Objects.requireNonNull(getCommand("faction")).setTabCompleter(new FactionCommand());

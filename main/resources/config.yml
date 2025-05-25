@@ -84,6 +84,7 @@ scoreboard:
     - "&6&lApple&7: &c%player_apple_timer%<display=%has_player_apple_timer%"
     - "&6&lGApple&7: &c%player_gapple_timer%<display=%has_player_gapple_timer%"
     - "&c&lSpawn Tag&7: &c%player_combat_timer%<display=%has_player_combat_timer%"
+    - "&a&lSOTW&7: &c%server_sotw_timer%<display=%has_server_sotw_timer%"
     - "&7&m-------------------------"
 
 features:

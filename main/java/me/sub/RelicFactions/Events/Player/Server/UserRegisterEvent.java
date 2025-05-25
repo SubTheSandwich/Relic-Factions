@@ -3,6 +3,7 @@ package me.sub.RelicFactions.Events.Player.Server;
 import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Data.PlayerTimer;
+import me.sub.RelicFactions.Files.Data.ServerTimer;
 import me.sub.RelicFactions.Files.Data.UserData;
 import me.sub.RelicFactions.Files.Enums.Timer;
 import me.sub.RelicFactions.Files.Normal.Locale;
@@ -12,7 +13,6 @@ import me.sub.RelicFactions.Utils.C;
 import me.sub.RelicFactions.Utils.Calculate;
 import me.sub.RelicFactions.Utils.Fastboard.FastBoard;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
@@ -29,6 +29,7 @@ public class UserRegisterEvent implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
+        e.setJoinMessage(null);
         Player p = e.getPlayer();
         User user = User.get(p);
         if (user == null) {
@@ -131,6 +132,19 @@ public class UserRegisterEvent implements Listener {
                         PlayerTimer time = finalUser.getTimer(timer);
                         s = s.replace("<display=%has_player_" + timer + "_timer%", "");
                         s = s.replace("%player_" + timer + "_timer%", Timer.format(time.getDuration()));
+                    }
+
+                    if (s.contains("<display=%has_server")) {
+                        String[] split = s.split("<display=%has_server_");
+                        String timer = split[1];
+                        timer = timer.replace("_timer%", "");
+                        if (!ServerTimer.has(timer)) continue;
+                        ServerTimer time = ServerTimer.get(timer);
+                        s = s.replace("<display=%has_server_" + timer + "_timer%", "");
+                        s = s.replace("%server_" + timer + "_timer%", Timer.format(time.getDuration()));
+                        if (timer.equalsIgnoreCase("sotw") && Main.getInstance().sotwEnabled.contains(p.getUniqueId())) {
+                            s = C.strikethrough(s);
+                        }
                     }
 
                     lines.add(C.chat(s));

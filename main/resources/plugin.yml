@@ -36,3 +36,5 @@ commands:
     description: Coords
   ping:
     description: Ping
+  sotw:
+    description: SOTW

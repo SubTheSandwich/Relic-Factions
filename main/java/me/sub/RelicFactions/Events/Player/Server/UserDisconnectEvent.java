@@ -16,6 +16,7 @@ public class UserDisconnectEvent implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
+        e.setQuitMessage(null);
         Player p = e.getPlayer();
         User user = User.get(p);
         user.setDisconnected(true);

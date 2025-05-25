@@ -3,6 +3,7 @@ package me.sub.RelicFactions.Events.Player.Attack;
 import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Data.PlayerTimer;
+import me.sub.RelicFactions.Files.Data.ServerTimer;
 import me.sub.RelicFactions.Files.Enums.FactionType;
 import me.sub.RelicFactions.Files.Enums.Timer;
 import me.sub.RelicFactions.Files.Normal.Locale;
@@ -64,7 +65,18 @@ public class UserDamageEvents implements Listener {
             return;
         }
 
-        // TODO: Implement SOTW
+        if (ServerTimer.has("sotw")) {
+            if (!Main.getInstance().sotwEnabled.contains(damager.getUniqueId())) {
+                e.setCancelled(true);
+                damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.sotw-protected"))));
+                return;
+            }
+            if (!Main.getInstance().sotwEnabled.contains(hit.getUniqueId())) {
+                e.setCancelled(true);
+                damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.sotw-attack-protected"))));
+                return;
+            }
+        }
 
         if (damagerUser.hasTimer("pvp") || damagerUser.hasTimer("starting")) {
             e.setCancelled(true);
@@ -213,7 +225,18 @@ public class UserDamageEvents implements Listener {
             return;
         }
 
-        // TODO: Implement SOTW
+        if (ServerTimer.has("sotw")) {
+            if (!Main.getInstance().sotwEnabled.contains(damager.getUniqueId())) {
+                e.setCancelled(true);
+                damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.sotw-protected"))));
+                return;
+            }
+            if (!Main.getInstance().sotwEnabled.contains(hitUser.getUUID())) {
+                e.setCancelled(true);
+                damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.sotw-attack-protected"))));
+                return;
+            }
+        }
 
         if (damagerUser.hasTimer("pvp") || damagerUser.hasTimer("starting")) {
             e.setCancelled(true);
@@ -273,7 +296,18 @@ public class UserDamageEvents implements Listener {
             return;
         }
 
-        // TODO: Implement SOTW
+        if (ServerTimer.has("sotw")) {
+            if (!Main.getInstance().sotwEnabled.contains(damager.getUniqueId())) {
+                e.setCancelled(true);
+                damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.sotw-protected"))));
+                return;
+            }
+            if (!Main.getInstance().sotwEnabled.contains(hit.getUniqueId())) {
+                e.setCancelled(true);
+                damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.sotw-attack-protected"))));
+                return;
+            }
+        }
 
         if (damagerUser.hasTimer("pvp") || damagerUser.hasTimer("starting")) {
             e.setCancelled(true);
