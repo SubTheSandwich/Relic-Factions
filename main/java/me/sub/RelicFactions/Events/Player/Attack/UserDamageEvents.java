@@ -9,12 +9,15 @@ import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
 import me.sub.RelicFactions.Utils.Calculate;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.projectiles.ProjectileSource;
 
 import java.math.BigDecimal;
@@ -113,23 +116,74 @@ public class UserDamageEvents implements Listener {
     @EventHandler
     public void onDeath(EntityDeathEvent e) {
         if (!(e.getEntity() instanceof Villager villager)) return;
+
+        // Get the UUID from PersistentDataContainer
+        NamespacedKey key = new NamespacedKey(Main.getInstance(), "logger_uuid");
+        String uuidString = villager.getPersistentDataContainer().get(key, PersistentDataType.STRING);
+        if (uuidString == null) return;
+
+        UUID hit;
+        try {
+            hit = UUID.fromString(uuidString);
+        } catch (IllegalArgumentException ex) {
+            return; // Not a valid UUID
+        }
+
+        User hitUser = User.get(hit);
+        if (hitUser == null) return;
+
         EntityDamageEvent lastDamage = villager.getLastDamageCause();
         if (lastDamage instanceof EntityDamageByEntityEvent entityDamage) {
             Entity damager = entityDamage.getDamager();
+
+            // Drop items
+            if (hitUser.getLastInventoryContents() != null) {
+                for (ItemStack itemStack : hitUser.getLastInventoryContents()) {
+                    if (itemStack == null) continue;
+                    damager.getWorld().dropItemNaturally(villager.getLocation(), itemStack);
+                }
+            }
+
+            // Broadcast message
             if (damager instanceof Player player) {
-                
+                User damagerUser = User.get(player);
+                damagerUser.setKills(damagerUser.getKills() + 1);
+                String msg = Locale.get().getString("deathmessage.logger.player");
+                if (msg != null) {
+                    msg = msg.replace("%killer%", damagerUser.getName())
+                            .replace("%killer-kills%", String.valueOf(damagerUser.getKills()))
+                            .replace("%dead%", hitUser.getName())
+                            .replace("%dead-kills%", String.valueOf(hitUser.getKills()));
+                    Bukkit.broadcastMessage(C.chat(msg));
+                }
+            } else {
+                String msg = Locale.get().getString("deathmessage.logger.unknown");
+                if (msg != null) {
+                    msg = msg.replace("%dead%", hitUser.getName())
+                            .replace("%dead-kills%", String.valueOf(hitUser.getKills()));
+                    Bukkit.broadcastMessage(C.chat(msg));
+                }
             }
         }
     }
 
     @EventHandler
     public void onVillager(EntityDamageByEntityEvent e) {
-
         if (!(e.getEntity() instanceof Villager villager)) return;
         if (!(e.getDamager() instanceof Player damager)) return;
 
-        if (villager.getCustomName() == null) return;
-        UUID hit = UUID.fromString(villager.getCustomName());
+        // Get the UUID from PersistentDataContainer
+        NamespacedKey key = new NamespacedKey(Main.getInstance(), "logger_uuid");
+        String uuidString = villager.getPersistentDataContainer().get(key, PersistentDataType.STRING);
+        if (uuidString == null) return;
+
+        UUID hit;
+        try {
+            hit = UUID.fromString(uuidString);
+        } catch (IllegalArgumentException ex) {
+            return; // Not a valid UUID
+        }
+
         User hitUser = User.get(hit);
         if (hitUser == null) return;
         User damagerUser = User.get(damager);
@@ -239,6 +293,7 @@ public class UserDamageEvents implements Listener {
     public void onDeath(PlayerDeathEvent e) {
         Player p = e.getEntity();
         User user = User.get(p);
+        user.setLastInventoryContents(p.getInventory().getContents());
         user.setDeaths(user.getDeaths() + 1);
         // TODO: EOTW
         int time = User.getDeathbanTime(p);
@@ -247,8 +302,8 @@ public class UserDamageEvents implements Listener {
         long deathban = calendar.getTimeInMillis();
         user.setDeathbannedTill(deathban);
         user.setDeathBanned(true);
-        p.kickPlayer(C.chat(Objects.requireNonNull(Locale.get().getString("events.deathban.kick")).replace("%time%", Timer.getMessageFormat(deathban - System.currentTimeMillis()))));
         user.getTimers().clear();
+        p.kickPlayer(C.chat(Objects.requireNonNull(Locale.get().getString("events.deathban.kick")).replace("%time%", Timer.getMessageFormat(deathban - System.currentTimeMillis()))));
         if (user.hasFaction()) {
             Faction faction = Faction.get(user.getFaction());
             faction.setDTR(BigDecimal.valueOf(Calculate.round(Math.max(-0.99, faction.getDTR().doubleValue() - Main.getInstance().getConfig().getDouble("factions.dtr.death")), 2)));
@@ -316,7 +371,7 @@ public class UserDamageEvents implements Listener {
                 deathMessage = fillInDead(p, deathMessage);
             }
         }
-        e.setDeathMessage(deathMessage);
+        e.setDeathMessage(C.chat(deathMessage));
     }
 
     private String fillInDead(Player dead, String deathMessage, Player killer) {

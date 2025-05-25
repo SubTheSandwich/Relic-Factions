@@ -255,6 +255,7 @@ public class Main extends JavaPlugin {
             userData.get().set("balance", user.getBalance().doubleValue());
             userData.get().set("lives", user.getLives());
             userData.get().set("timers", Maps.timersToString(user.getTimers()));
+            userData.get().set("lastInventoryContents", Maps.toBase64(user.getLastInventoryContents()));
             userData.save();
             user.setModified(false);
             saved++;

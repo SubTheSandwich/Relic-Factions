@@ -5,6 +5,7 @@ import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.Maps;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ public class User {
     private final Filter filter;
     private int lives;
     private UUID loggerUUID;
+    private ItemStack[] lastInventoryContents;
 
     public User(UserData userData) {
         userDisconnected = true;
@@ -52,6 +54,7 @@ public class User {
         map = null;
         filter = new Filter();
         loggerUUID = userData.get().getString("loggerUUID") == null ? null : UUID.fromString(Objects.requireNonNull(userData.get().getString("loggerUUID")));
+        lastInventoryContents = userData.get().getString("lastInventoryContents") == null ? null : Maps.fromBase64(userData.get().getString("lastInventoryContents"));
     }
 
     public UUID getLoggerUUID() {
@@ -237,6 +240,16 @@ public class User {
     }
 
     public void setDeathbannedTill(long deathbannedTill) {
+        modified = true;
         this.deathbannedTill = deathbannedTill;
+    }
+
+    public ItemStack[] getLastInventoryContents() {
+        return lastInventoryContents;
+    }
+
+    public void setLastInventoryContents(ItemStack[] lastInventoryContents) {
+        modified = true;
+        this.lastInventoryContents = lastInventoryContents;
     }
 }
