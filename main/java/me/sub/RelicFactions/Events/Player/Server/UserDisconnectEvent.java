@@ -1,6 +1,8 @@
 package me.sub.RelicFactions.Events.Player.Server;
 
+import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.User;
+import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
 import org.bukkit.NamespacedKey;
@@ -12,6 +14,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.Objects;
+
 public class UserDisconnectEvent implements Listener {
 
     @EventHandler
@@ -19,6 +23,12 @@ public class UserDisconnectEvent implements Listener {
         e.setQuitMessage(null);
         Player p = e.getPlayer();
         User user = User.get(p);
+        if (user.hasFaction()) {
+            Faction faction = Faction.get(user.getFaction());
+            for (Player player : faction.getOnlineMembers()) {
+                player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.member.offline")).replace("%player%", p.getName())));
+            }
+        }
         user.setDisconnected(true);
         if (user.hasTimer("combat")) {
             Villager villager = p.getWorld().spawn(p.getLocation(), Villager.class);

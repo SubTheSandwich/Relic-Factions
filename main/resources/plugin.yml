@@ -38,3 +38,32 @@ commands:
     description: Ping
   sotw:
     description: SOTW
+  gamemode:
+    aliases:
+      - gm
+      - gma
+      - gmc
+      - gmsp
+      - gms
+  teleport:
+    aliases:
+      - tp
+  tphere:
+    description: TPHere
+  staffchat:
+    aliases:
+      - sc
+      - staff-chat
+  vanish:
+    aliases:
+      - v
+  modmode:
+    aliases:
+      - h
+  invsee:
+    aliases:
+      - inspect
+  freeze:
+    description: Freeze
+  fly:
+    description: Fly

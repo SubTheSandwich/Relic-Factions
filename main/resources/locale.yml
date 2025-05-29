@@ -4,6 +4,7 @@ primary:
   no-player: "&cA player by this name does not exist."
   invalid-number: "&cThe specified number is invalid."
   invalid-material: "&cThe specified material is invalid."
+  cannot-do: "&cYou cannot do this to %player% at this time/"
   lives:
     not-enough: "&cYou do not have enough lives to do this."
     not-deathbanned: "&cYou cannot revive a player that is not deathbanned."
@@ -23,6 +24,7 @@ primary:
   error: "&cAn unknown error occurred."
   enabled: "&aEnabled"
   disabled: "&cDisabled"
+  feature-disabled: "&cThis feature is disabled."
 
 claiming:
   success: "&aSuccessfully claimed your selected area."
@@ -45,6 +47,10 @@ claiming:
     two: "&eSet position 2"
 
 events:
+  mod-mode:
+    in: "&cYou cannot do this to someone while they are in Mod Mode."
+    cant: "&cYou cannot do this while in Mod Mode."
+    online-staff: "&6Online Staff&7: &r%players%"
   command:
     combat: "&cYou cannot do this while in combat!"
   deathban:
@@ -71,6 +77,8 @@ chat:
   public:
     no-faction: "&7[*] &r%player%&7: &r%message%"
     faction: "&7[%faction%&7] &r%player%&7: &r%message%"
+  faction: "&a(Faction) &r%player%&7: &r%message%"
+  ally: "&3(Ally) &r%player%&7: &r%message%"
 
 faction:
   warzone: "&cWarzone"
@@ -93,11 +101,61 @@ faction:
     online: "&aMember Online: &f%player%"
     offline: "&cMember Offline: &f%player%"
     death:
-      - "&cMember Death: &f%name%"
+      - "&cMember Death: &f%player%"
       - "&cDTR: &f%dtr%"
     damage: "&eYou cannot damage &2%player%&e."
 
 commands:
+  panic:
+    initiated: "&cYou have initiated your panic sequence."
+    broadcast: "&c%player% has initiated their panic sequence!"
+    fine: "&eYou have stopped your panic sequence."
+  fly:
+    enabled: "&eYou have &aenabled &eflight mode!"
+    disabled: "&eYou have &cdisabled &eflight mode!"
+    enabled-other: "&eYou have &aenabled &f%player%'s &eflight mode!"
+    disabled-other: "&eYou have &cdisabled &f%player%'s &eflight mode!"
+    enabled-other-target: "&eYour flight was &aenabled &eby &f%player%&e!"
+    disabled-other-target: "&eYour flight was &cdisabled &eby &f%player%&e!"
+  freeze:
+    usage: "&cUsage: /freeze <all/player>"
+    froze-player: "&eYou have frozen %player%."
+    unfrozen: "&eYou have been unfrozen."
+    unfroze-player: "&eYou have unfrozen %player%."
+    cannot: "&cYou cannot do that while you're frozen."
+    cannot-attack: "&cThat player is currently frozen."
+    server-frozen: "&eThe server is now frozen."
+    server-unfrozen: "&eThe server is now unfrozen."
+    disconnect: "&4&l%player% &c&ldisconnected while frozen!"
+  invsee:
+    usage: "&cUsage: /%alias% <player>"
+    success: "&eOpening the inventory of &b%player%&e..."
+  mod-mode:
+    toggle: "&6Mod Mode: %status%"
+    not-in: "&cYou must be in Mod Mode to perform this."
+    bypass: "&6Mod Mode Bypass: %status%"
+  vanish: "&6Vanish: %status%"
+  staffchat:
+    message: "&9(Staff) &b%player%&7: &r%message%"
+    toggle: "&6Staff Chat: %status%"
+  tphere:
+    usage: "&cUsage: /tphere <player>"
+  teleport:
+    usage: "&cUsage: /%alias% <player>"
+    location:
+      self: "&eTeleporting to %x%, %y%, %z%."
+      online: "&eTeleporting %player% to %x%, %y%, %z%."
+    top: "&eTeleporting to the top..."
+    player:
+      here: "&eTeleporting %player% to you."
+      online: "&eTeleporting to player %player%."
+      online-other: "&eTeleporting %player% to %other%."
+    all: "&eTeleporting the server to you..."
+  gamemode:
+    usage: "&cUsage: /%alias% <gamemode>"
+    switched: "&eSwitched gamemode to &d%gamemode%&e."
+    other: "&eSet &b%player%&e's gamemode to &d%gamemode%&e."
+    for-other: "&eYour gamemode was set to &d%gamemode% &eby &b%player%"
   sotw:
     usage: "&cUsage: /sotw <start;extend;stop;pause> <time>"
     running: "&cSOTW is already runnning."
@@ -259,6 +317,9 @@ commands:
     revive:
       not-in: "&cYou cannot revive a player that is not in your faction."
       success: "&eYou have used one of your faction lives to revive &d%player%&e."
+    chat:
+      invalid: "&c%type% is an invalid chat type."
+      changed: "&eYou are now chatting in &d%type%&e."
     ff: "&3%player% has %status% &3your faction's friendly fire status."
     setdeathban: "&eYou have %status% &ethe deathban of &b%faction%"
     setregening: "&eYou have %status% &ethe regening status of &b%faction%"

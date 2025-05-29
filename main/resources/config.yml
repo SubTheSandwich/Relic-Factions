@@ -85,7 +85,14 @@ scoreboard:
     - "&6&lGApple&7: &c%player_gapple_timer%<display=%has_player_gapple_timer%"
     - "&c&lSpawn Tag&7: &c%player_combat_timer%<display=%has_player_combat_timer%"
     - "&a&lSOTW&7: &c%server_sotw_timer%<display=%has_server_sotw_timer%"
+    - "%mod-lines%"
     - "&7&m-------------------------"
+  mod-mode:
+    - "&6&lStaff Mode"
+    - " &7* &eVanished: &c%vanished%"
+    - " &7* &eGamemode: &c%gamemode%"
+    - " &7* &eBypass: &c%modmode-bypass%<display=%has_permission_relic.command.mod.bypass%"
+    - " &7* &eOnline: &f%online%"
 
 features:
   scoreboard:

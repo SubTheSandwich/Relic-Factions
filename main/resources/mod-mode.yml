@@ -1,0 +1,61 @@
+mod-mode:
+  enabled: true
+  on-join-enabled: true
+  mod-bypass-also-works-in-vanish: true
+  items:
+    compass:
+      name: "%primary%Teleportation Compass"
+      permission: ""
+      slot: 0
+      item: COMPASS
+      action: "UNHANDLED"
+      lore: []
+    inspector:
+      name: "%primary%Inspection Book"
+      permission: ""
+      slot: 1
+      item: BOOK
+      action: "INSPECTOR"
+      lore: []
+    worldedit-wand:
+      name: "%primary%WorldEdit Wand"
+      permission: "worldedit.wand"
+      slot: 2
+      item: WOODEN_AXE
+      action: "UNHANDLED"
+      lore: []
+    random-tp:
+      name: "%primary%Random TP"
+      permission: ""
+      slot: 6
+      item: CLOCK
+      action: "RANDOM_TP"
+      lore: []
+    freeze:
+      name: "%primary%Freeze"
+      permission: ""
+      slot: 4
+      item: ICE
+      action: "FREEZE"
+      lore: []
+    online-staff:
+      name: "%primary%Online Staff"
+      permission: ""
+      slot: 7
+      item: PLAYER_HEAD
+      action: "ONLINE_STAFF"
+      lore: []
+    vanish-hidden:
+      name: "%primary%Become Visible"
+      permission: ""
+      slot: 8
+      item: GRAY_DYE
+      action: "VANISH"
+      lore: []
+    vanish-visible:
+      name: "%primary%Become Hidden"
+      permission: ""
+      slot: 8
+      item: LIME_DYE
+      action: "VANISH"
+      lore: []

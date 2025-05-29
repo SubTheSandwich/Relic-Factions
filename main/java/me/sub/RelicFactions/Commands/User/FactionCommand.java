@@ -6,6 +6,7 @@ import me.sub.RelicFactions.Files.Data.Claim;
 import me.sub.RelicFactions.Files.Data.Cuboid;
 import me.sub.RelicFactions.Files.Data.FactionData;
 import me.sub.RelicFactions.Files.Data.PlayerTimer;
+import me.sub.RelicFactions.Files.Enums.ChatType;
 import me.sub.RelicFactions.Files.Enums.Color;
 import me.sub.RelicFactions.Files.Enums.FactionType;
 import me.sub.RelicFactions.Files.Enums.Timer;
@@ -399,6 +400,20 @@ public class FactionCommand implements TabExecutor {
             return true;
         }
         if (args.length == 2) {
+            if (args[0].equalsIgnoreCase("chat")) {
+                if (!user.hasFaction()) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
+                    return true;
+                }
+                if (!ChatType.isValid(args[1])) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.chat.invalid")).replace("%type%", args[1].toUpperCase())));
+                    return true;
+                }
+                user.setChatType(ChatType.valueOf(args[1].toUpperCase()));
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.chat.changed")).replace("%type%", args[1].toUpperCase())));
+                if (user.isStaffChat()) user.setStaffChat(false);
+                return true;
+            }
             if (args[0].equalsIgnoreCase("lives")) {
                 Messages.send(p, "faction.help.lives", s);
                 return true;
@@ -1242,7 +1257,7 @@ public class FactionCommand implements TabExecutor {
         if (args.length == 1) {
             values.addAll(List.of("create", "open", "show", "deposit", "invite", "join", "withdraw",
                     "subclaim", "captain", "coleader", "invites", "announcement", "uninvite", "leave", "kick",
-                    "sethome", "claim", "home", "list", "unclaim", "rename", "disband", "ff"));
+                    "sethome", "claim", "home", "list", "unclaim", "rename", "disband", "ff", "chat"));
             if (Permission.has(p, "faction.createsystem")) values.add("createsystem");
             if (Permission.has(p, "faction.setcolor")) values.add("setcolor");
             if (Permission.has(p, "faction.settype")) values.add("settype");

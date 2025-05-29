@@ -1,13 +1,12 @@
 package me.sub.RelicFactions.Main;
 
 import me.sub.RelicFactions.Commands.Admin.*;
+import me.sub.RelicFactions.Commands.Staff.*;
 import me.sub.RelicFactions.Commands.User.*;
 import me.sub.RelicFactions.Events.Player.Attack.UserDamageEvents;
 import me.sub.RelicFactions.Events.Player.Chat.FormatChatEvent;
-import me.sub.RelicFactions.Events.Player.Interact.ItemUseEvents;
-import me.sub.RelicFactions.Events.Player.Interact.UserClaimEvents;
-import me.sub.RelicFactions.Events.Player.Interact.UserFilterEvent;
-import me.sub.RelicFactions.Events.Player.Interact.UserInteractAtFactionEvent;
+import me.sub.RelicFactions.Events.Player.Interact.*;
+import me.sub.RelicFactions.Events.Player.Movement.FreezeMovementEvent;
 import me.sub.RelicFactions.Events.Player.Movement.UserMoveEvent;
 import me.sub.RelicFactions.Events.Player.Server.UserDisconnectEvent;
 import me.sub.RelicFactions.Events.Player.Server.UserRegisterEvent;
@@ -18,12 +17,15 @@ import me.sub.RelicFactions.Files.Data.ServerTimer;
 import me.sub.RelicFactions.Files.Data.UserData;
 import me.sub.RelicFactions.Files.Enums.FactionType;
 import me.sub.RelicFactions.Files.Normal.Locale;
+import me.sub.RelicFactions.Files.Normal.ModModeFile;
 import me.sub.RelicFactions.Utils.Econ;
 import me.sub.RelicFactions.Utils.Fastboard.FastBoard;
 import me.sub.RelicFactions.Utils.Maps;
+import me.sub.RelicFactions.Utils.Permission;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
@@ -49,6 +51,8 @@ public class Main extends JavaPlugin {
 
     public final HashMap<String, ServerTimer> serverTimers = new HashMap<>();
     public Set<UUID> sotwEnabled = new HashSet<>();
+
+    private boolean isServerFrozen;
 
     private static Main instance;
 
@@ -85,6 +89,7 @@ public class Main extends JavaPlugin {
             }
         }.runTaskTimer(this, 5 * 60 * 20L, 5 * 60 * 20L);
         handleDTR();
+        isServerFrozen = false;
     }
 
     @Override
@@ -100,6 +105,17 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("economy")).setExecutor(new EconomyCommand()); Objects.requireNonNull(getCommand("economy")).setTabCompleter(new EconomyCommand());
         Objects.requireNonNull(getCommand("lives")).setExecutor(new LivesCommand()); Objects.requireNonNull(getCommand("lives")).setTabCompleter(new LivesCommand());
         Objects.requireNonNull(getCommand("sotw")).setExecutor(new SOTWCommand()); Objects.requireNonNull(getCommand("sotw")).setTabCompleter(new SOTWCommand());
+        Objects.requireNonNull(getCommand("gamemode")).setExecutor(new GamemodeCommand()); Objects.requireNonNull(getCommand("gamemode")).setTabCompleter(new GamemodeCommand());
+        Objects.requireNonNull(getCommand("teleport")).setExecutor(new TeleportCommand()); Objects.requireNonNull(getCommand("teleport")).setTabCompleter(new TeleportCommand());
+        Objects.requireNonNull(getCommand("tphere")).setExecutor(new TPHereCommand()); Objects.requireNonNull(getCommand("tphere")).setTabCompleter(new TPHereCommand());
+
+        // Staff
+        Objects.requireNonNull(getCommand("staffchat")).setExecutor(new StaffChatCommand()); Objects.requireNonNull(getCommand("staffchat")).setTabCompleter(new StaffChatCommand());
+        Objects.requireNonNull(getCommand("vanish")).setExecutor(new VanishCommand()); Objects.requireNonNull(getCommand("vanish")).setTabCompleter(new VanishCommand());
+        Objects.requireNonNull(getCommand("modmode")).setExecutor(new ModModeCommand()); Objects.requireNonNull(getCommand("modmode")).setTabCompleter(new ModModeCommand());
+        Objects.requireNonNull(getCommand("invsee")).setExecutor(new InvseeCommand()); Objects.requireNonNull(getCommand("invsee")).setTabCompleter(new InvseeCommand());
+        Objects.requireNonNull(getCommand("freeze")).setExecutor(new FreezeCommand()); Objects.requireNonNull(getCommand("freeze")).setTabCompleter(new FreezeCommand());
+        Objects.requireNonNull(getCommand("fly")).setExecutor(new FlyCommand()); Objects.requireNonNull(getCommand("fly")).setTabCompleter(new FlyCommand());
 
         // User
         Objects.requireNonNull(getCommand("faction")).setExecutor(new FactionCommand()); Objects.requireNonNull(getCommand("faction")).setTabCompleter(new FactionCommand());
@@ -125,6 +141,8 @@ public class Main extends JavaPlugin {
         pm.registerEvents(new UserFilterEvent(), this);
         pm.registerEvents(new ItemUseEvents(), this);
         pm.registerEvents(new UserDamageEvents(), this);
+        pm.registerEvents(new ModModeEvents(), this);
+        pm.registerEvents(new FreezeMovementEvent(), this);
     }
 
     private void files() {
@@ -132,6 +150,7 @@ public class Main extends JavaPlugin {
         saveResource("locale.yml", false);
         saveResource("messages.yml", false);
         Locale.load();
+        ModModeFile.save();
     }
 
     private boolean setupEconomy() {
@@ -308,5 +327,19 @@ public class Main extends JavaPlugin {
     public void loadFiles() {
         loadUsers();
         loadFactions();
+    }
+
+    public boolean isServerFrozen() {
+        return isServerFrozen;
+    }
+
+    public void setServerFrozen(boolean serverFrozen) {
+        isServerFrozen = serverFrozen;
+    }
+
+    public static List<Player> getOnlineStaff() {
+        return Bukkit.getOnlinePlayers().stream()
+                .filter(p -> Permission.has(p, "staff") || Permission.has(p, "admin"))
+                .collect(Collectors.toList());
     }
 }

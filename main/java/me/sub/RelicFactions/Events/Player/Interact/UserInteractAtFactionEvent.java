@@ -2,6 +2,7 @@ package me.sub.RelicFactions.Events.Player.Interact;
 
 import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.User;
+import me.sub.RelicFactions.Files.Data.ModMode;
 import me.sub.RelicFactions.Files.Enums.FactionType;
 import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Main.Main;
@@ -27,6 +28,7 @@ public class UserInteractAtFactionEvent implements Listener {
 
     private void combined(Player player, Location location, boolean isUse) {
         User user = User.get(player);
+        if (rejectedModifierType(user, location) == null) return;
         if (Objects.requireNonNull(rejectedModifierType(user, location)).equalsIgnoreCase("WARZONE")) {
             if (isUse) {
                 player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.cannot-use")).replace("%faction%", Objects.requireNonNull(Locale.get().getString("faction.warzone")))));
@@ -40,9 +42,13 @@ public class UserInteractAtFactionEvent implements Listener {
                 player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.cannot-build")).replace("%faction%", Objects.requireNonNull(Locale.get().getString("faction.wilderness")))));
             }
         } else if (Objects.requireNonNull(rejectedModifierType(user, location)).equalsIgnoreCase("FROZEN")) {
-            player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.frozen.player.other"))));
+            player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.freeze.cannot"))));
         } else if (Objects.requireNonNull(rejectedModifierType(user, location)).equalsIgnoreCase("FROZEN_SERVER")) {
-            player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.frozen.server"))));
+            player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.freeze.cannot"))));
+        } else if (Objects.requireNonNull(rejectedModifierType(user, location)).equalsIgnoreCase("MOD-MODE")) {
+            player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.mod-mode.cant"))));
+        } else if (Objects.requireNonNull(rejectedModifierType(user, location)).equalsIgnoreCase("NONE")) {
+            return;
         } else {
             if (isUse) {
                 player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.cannot-use")).replace("%faction%", Objects.requireNonNull(Faction.getAt(location)).getValidName(player, false))));
@@ -54,6 +60,10 @@ public class UserInteractAtFactionEvent implements Listener {
 
     private boolean cannotModify(User user, Location location) {
         if (user.isFactionBypass()) return false;
+        if (user.getModMode() != null) {
+            ModMode modMode = user.getModMode();
+            return !modMode.isInBypass();
+        }
         if (Faction.getAt(location) == null) {
             switch (Objects.requireNonNull(location.getWorld()).getEnvironment()) {
                 case NORMAL, CUSTOM -> {
@@ -89,7 +99,11 @@ public class UserInteractAtFactionEvent implements Listener {
                     return "WILDERNESS";
                 }
             }
-            // TODO: Implement frozen
+            if (user.getModMode() != null) {
+                if (!user.getModMode().isInBypass()) return "MOD-MODE";
+            }
+            if (Main.getInstance().isServerFrozen()) return "FROZEN_SERVER";
+            if (user.isFrozen() || user.isPanic()) return "FROZEN";
             return null;
         }
         return "FACTION";
@@ -102,7 +116,7 @@ public class UserInteractAtFactionEvent implements Listener {
         Location location = e.getBlock().getLocation();
         if (cannotModify(user, location)) {
             if (Objects.requireNonNull(rejectedModifierType(user, location)).equalsIgnoreCase("FROZEN_SERVER")) {
-                if (!p.hasPermission("relic.bypass.server-freeze")) {
+                if (!p.hasPermission("relic.bypass.freeze")) {
                     e.setCancelled(true);
                     combined(p, location, false);
                     return;
@@ -120,7 +134,7 @@ public class UserInteractAtFactionEvent implements Listener {
         Location location = e.getBlock().getLocation();
         if (cannotModify(user, location)) {
             if (Objects.requireNonNull(rejectedModifierType(user, location)).equalsIgnoreCase("FROZEN_SERVER")) {
-                if (!p.hasPermission("relic.bypass.server-freeze")) {
+                if (!p.hasPermission("relic.bypass.freeze")) {
                     e.setCancelled(true);
                     combined(p, location, false);
                     return;
@@ -138,7 +152,7 @@ public class UserInteractAtFactionEvent implements Listener {
         Location location = e.getRightClicked().getLocation();
         if (cannotModify(user, location)) {
             if (Objects.requireNonNull(rejectedModifierType(user, location)).equalsIgnoreCase("FROZEN_SERVER")) {
-                if (!p.hasPermission("relic.bypass.server-freeze")) {
+                if (!p.hasPermission("relic.bypass.freeze")) {
                     e.setCancelled(true);
                     combined(p, location, true);
                     return;
@@ -156,7 +170,7 @@ public class UserInteractAtFactionEvent implements Listener {
         Location location = e.getBed().getLocation();
         if (cannotModify(user, location)) {
             if (Objects.requireNonNull(rejectedModifierType(user, location)).equalsIgnoreCase("FROZEN_SERVER")) {
-                if (!p.hasPermission("relic.bypass.server-freeze")) {
+                if (!p.hasPermission("relic.bypass.freeze")) {
                     e.setCancelled(true);
                     combined(p, location, true);
                     return;
@@ -174,7 +188,7 @@ public class UserInteractAtFactionEvent implements Listener {
         Location location = e.getBlock().getLocation();
         if (cannotModify(user, location)) {
             if (Objects.requireNonNull(rejectedModifierType(user, location)).equalsIgnoreCase("FROZEN_SERVER")) {
-                if (!p.hasPermission("relic.bypass.server-freeze")) {
+                if (!p.hasPermission("relic.bypass.freeze")) {
                     e.setCancelled(true);
                     combined(p, location, true);
                     return;
@@ -192,7 +206,7 @@ public class UserInteractAtFactionEvent implements Listener {
         Location location = e.getEntity().getLocation();
         if (cannotModify(user, location)) {
             if (Objects.requireNonNull(rejectedModifierType(user, location)).equalsIgnoreCase("FROZEN_SERVER")) {
-                if (!p.hasPermission("relic.bypass.server-freeze")) {
+                if (!p.hasPermission("relic.bypass.freeze")) {
                     e.setCancelled(true);
                     combined(p, location, true);
                     return;
@@ -210,7 +224,7 @@ public class UserInteractAtFactionEvent implements Listener {
         Location location = e.getHarvestedBlock().getLocation();
         if (cannotModify(user, location)) {
             if (Objects.requireNonNull(rejectedModifierType(user, location)).equalsIgnoreCase("FROZEN_SERVER")) {
-                if (!p.hasPermission("relic.bypass.server-freeze")) {
+                if (!p.hasPermission("relic.bypass.freeze")) {
                     e.setCancelled(true);
                     combined(p, location, false);
                     return;
@@ -228,7 +242,7 @@ public class UserInteractAtFactionEvent implements Listener {
         Location location = e.getEntity().getLocation();
         if (cannotModify(user, location)) {
             if (Objects.requireNonNull(rejectedModifierType(user, location)).equalsIgnoreCase("FROZEN_SERVER")) {
-                if (!p.hasPermission("relic.bypass.server-freeze")) {
+                if (!p.hasPermission("relic.bypass.freeze")) {
                     e.setCancelled(true);
                     combined(p, location, true);
                     return;
@@ -246,7 +260,7 @@ public class UserInteractAtFactionEvent implements Listener {
         Location location = e.getSign().getLocation();
         if (cannotModify(user, location)) {
             if (Objects.requireNonNull(rejectedModifierType(user, location)).equalsIgnoreCase("FROZEN_SERVER")) {
-                if (!p.hasPermission("relic.bypass.server-freeze")) {
+                if (!p.hasPermission("relic.bypass.freeze")) {
                     e.setCancelled(true);
                     combined(p, location, true);
                     return;
@@ -264,7 +278,7 @@ public class UserInteractAtFactionEvent implements Listener {
         Location location = e.getLectern().getLocation();
         if (cannotModify(user, location)) {
             if (Objects.requireNonNull(rejectedModifierType(user, location)).equalsIgnoreCase("FROZEN_SERVER")) {
-                if (!p.hasPermission("relic.bypass.server-freeze")) {
+                if (!p.hasPermission("relic.bypass.freeze")) {
                     e.setCancelled(true);
                     combined(p, location, false);
                     return;
@@ -282,7 +296,7 @@ public class UserInteractAtFactionEvent implements Listener {
         Location location = e.getEntity().getLocation();
         if (cannotModify(user, location)) {
             if (Objects.requireNonNull(rejectedModifierType(user, location)).equalsIgnoreCase("FROZEN_SERVER")) {
-                if (!p.hasPermission("relic.bypass.server-freeze")) {
+                if (!p.hasPermission("relic.bypass.freeze")) {
                     e.setCancelled(true);
                     combined(p, location, true);
                     return;
@@ -310,7 +324,7 @@ public class UserInteractAtFactionEvent implements Listener {
                     || type.equals(Material.TNT_MINECART) || type.equals(Material.BREWING_STAND) || type.equals(Material.FLOWER_POT) || type.equals(Material.DECORATED_POT)) {
                 if (cannotModify(user, block.getLocation())) {
                     if (Objects.requireNonNull(rejectedModifierType(user, block.getLocation())).equalsIgnoreCase("FROZEN_SERVER")) {
-                        if (!p.hasPermission("relic.bypass.server-freeze")) {
+                        if (!p.hasPermission("relic.bypass.freeze")) {
                             e.setCancelled(true);
                             combined(p, block.getLocation(), true);
                             return;
@@ -348,7 +362,7 @@ public class UserInteractAtFactionEvent implements Listener {
         Entity block = e.getRightClicked();
         if (cannotModify(user, block.getLocation())) {
             if (Objects.requireNonNull(rejectedModifierType(user, e.getRightClicked().getLocation())).equalsIgnoreCase("FROZEN_SERVER")) {
-                if (!p.hasPermission("relic.bypass.server-freeze")) {
+                if (!p.hasPermission("relic.bypass.freeze")) {
                     e.setCancelled(true);
                     combined(p, e.getRightClicked().getLocation(), true);
                     return;
@@ -368,7 +382,7 @@ public class UserInteractAtFactionEvent implements Listener {
         User user = User.get(p);
         if (cannotModify(user, block.getLocation())) {
             if (Objects.requireNonNull(rejectedModifierType(user, e.getEntity().getLocation())).equalsIgnoreCase("FROZEN_SERVER")) {
-                if (!p.hasPermission("relic.bypass.server-freeze")) {
+                if (!p.hasPermission("relic.bypass.freeze")) {
                     e.setCancelled(true);
                     combined(p, e.getEntity().getLocation(), false);
                     return;

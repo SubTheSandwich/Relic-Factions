@@ -17,7 +17,6 @@ help:
     - "&9Chat Commands:"
     - "&eGlobal Chat: &7Prefix your message with '&d!&7' or type &7'&d/gc&7' to set."
     - "&eFaction Chat: &7Prefix your message with '&d@&7' or type &7'&d/tc&7' to set."
-    - "&eOfficer Chat: &7Prefix your message with '&d^&7' or type &7'&d/oc&7' to set."
     - "&eGlobal Chat: &7Type '&d/tgc&7' to toggle chat visibility."
     - " "
     - "&9Other Information:"
@@ -194,3 +193,23 @@ other:
     - "&7&m----------------------------------------------------"
     - "%primary%%player% &eis looking for a &6faction&e!"
     - "&7&m----------------------------------------------------"
+
+staff:
+  frozen:
+    - "&f█–ˆ█–ˆ█–ˆ█–ˆ&c█–ˆ&f█–ˆ█–ˆ█–ˆ█–ˆ"
+    - "&f█–ˆ█–ˆ█–ˆ&c█–ˆ&6█–ˆ&c█–ˆ&f█–ˆ█–ˆ█–ˆ"
+    - "&f█–ˆ█–ˆ&c█–ˆ&6█–ˆ&0█–ˆ&6█–ˆ&c█–ˆ&f█–ˆ█–ˆ &4&lDo NOT log out!"
+    - "&f█–ˆ█–ˆ&c█–ˆ&6█–ˆ&0█–ˆ&6█–ˆ&c█–ˆ&f█–ˆ█–ˆ &cIf you do, you will be banned!"
+    - "&f█–ˆ&c█–ˆ&6█–ˆ█–ˆ&0█–ˆ&6█–ˆ█–ˆ&c█–ˆ&f█–ˆ &ePlease download &e&lDiscord &eand join"
+    - "&f█–ˆ&c█–ˆ&6█–ˆ█–ˆ█–ˆ█–ˆ█–ˆ&c█–ˆ&f█–ˆ &e%discord%"
+    - "&c█–ˆ&6█–ˆ█–ˆ█–ˆ&0█–ˆ&6█–ˆ█–ˆ█–ˆ&c█–ˆ"
+    - "&c█–ˆ█–ˆ█–ˆ█–ˆ█–ˆ█–ˆ█–ˆ█–ˆ█–ˆ"
+  panic:
+    - "&f█–ˆ█–ˆ█–ˆ█–ˆ&c█–ˆ&f█–ˆ█–ˆ█–ˆ█–ˆ"
+    - "&f█–ˆ█–ˆ█–ˆ&c█–ˆ&6█–ˆ&c█–ˆ&f█–ˆ█–ˆ█–ˆ &c&lYou are in a panic!"
+    - "&f█–ˆ█–ˆ&c█–ˆ&6█–ˆ&0█–ˆ&6█–ˆ&c█–ˆ&f█–ˆ█–ˆ"
+    - "&f█–ˆ█–ˆ&c█–ˆ&6█–ˆ&0█–ˆ&6█–ˆ&c█–ˆ&f█–ˆ█–ˆ &ePlease wait for a staff"
+    - "&f█–ˆ&c█–ˆ&6█–ˆ█–ˆ&0█–ˆ&6█–ˆ█–ˆ&c█–ˆ&f█–ˆ &amember to contact you!"
+    - "&f█–ˆ&c█–ˆ&6█–ˆ█–ˆ█–ˆ█–ˆ█–ˆ&c█–ˆ&f█–ˆ"
+    - "&f█–ˆ&c█–ˆ&6█–ˆ█–ˆ█–ˆ█–ˆ█–ˆ&c█–ˆ&f█–ˆ &e%discord%"
+    - "&c█–ˆ█–ˆ█–ˆ█–ˆ█–ˆ█–ˆ█–ˆ█–ˆ█–ˆ"

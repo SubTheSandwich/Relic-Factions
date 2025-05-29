@@ -2,16 +2,19 @@ package me.sub.RelicFactions.Events.Player.Server;
 
 import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.User;
+import me.sub.RelicFactions.Files.Data.ModMode;
 import me.sub.RelicFactions.Files.Data.PlayerTimer;
 import me.sub.RelicFactions.Files.Data.ServerTimer;
 import me.sub.RelicFactions.Files.Data.UserData;
 import me.sub.RelicFactions.Files.Enums.Timer;
 import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Files.Normal.Messages;
+import me.sub.RelicFactions.Files.Normal.ModModeFile;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
 import me.sub.RelicFactions.Utils.Calculate;
 import me.sub.RelicFactions.Utils.Fastboard.FastBoard;
+import me.sub.RelicFactions.Utils.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
@@ -89,6 +92,28 @@ public class UserRegisterEvent implements Listener {
                 }
             }
         }
+
+        if (user.hasFaction()) {
+            Faction faction = Faction.get(user.getFaction());
+            for (Player player : faction.getOnlineMembers()) {
+                player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.member.online")).replace("%player%", p.getName())));
+            }
+        }
+
+        if (!Permission.has(p, "staff") && !Permission.has(p, "admin")) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                User play = User.get(player);
+                if (play.getModMode() != null && play.getModMode().isInVanish()) {
+                    p.hidePlayer(Main.getInstance(), player);
+                }
+            }
+        } else {
+            if (ModModeFile.get().getBoolean("mod-mode.enabled") && ModModeFile.get().getBoolean("mod-mode.on-join-enabled")) {
+                p.performCommand("h");
+            }
+        }
+
+
         for (String s : Messages.get().getStringList("join-message")) {
             if (s.contains("<display=%has_faction%")) {
                 if (!user.hasFaction()) continue;
@@ -145,6 +170,33 @@ public class UserRegisterEvent implements Listener {
                         if (timer.equalsIgnoreCase("sotw") && Main.getInstance().sotwEnabled.contains(p.getUniqueId())) {
                             s = C.strikethrough(s);
                         }
+                    }
+                    if (s.contains("%mod-lines%")) {
+                        ModMode modMode = finalUser.getModMode();
+                        if (modMode == null) continue;
+                        for (String line : Main.getInstance().getConfig().getStringList("scoreboard.mod-mode")) {
+                            if (line.contains("%vanished%")) {
+                                line = Objects.requireNonNull(line).replace("%vanished%", Objects.requireNonNull(modMode.isInVanish() ? Locale.get().getString("primary.enabled") : Locale.get().getString("primary.disabled")));
+                            }
+                            if (line.contains("%gamemode%")) {
+                                line = line.replace("%gamemode%", p.getGameMode().name().toUpperCase().charAt(0) + p.getGameMode().name().toLowerCase().substring(1));
+                            }
+                            if (line.contains("<display=%has_permission")) {
+                                String[] split = line.split("<display=%has_permission_");
+                                String permission = split[1];
+                                permission = permission.replace("%", "");
+                                if (!p.hasPermission(permission)) continue;
+                                line = line.replace("<display=%has_permission_" + permission + "%", "");
+                                if (line.contains("%modmode-bypass%")) {
+                                    line = Objects.requireNonNull(line).replace("%modmode-bypass%", Objects.requireNonNull(modMode.isInBypass() ? Locale.get().getString("primary.enabled") : Locale.get().getString("primary.disabled")));
+                                }
+                            }
+                            if (line.contains("%online%")) {
+                                line = line.replace("%online%", Bukkit.getOnlinePlayers().size() + "");
+                            }
+                            lines.add(C.chat(line));
+                        }
+                        continue;
                     }
 
                     lines.add(C.chat(s));

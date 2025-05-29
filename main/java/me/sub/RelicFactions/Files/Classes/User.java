@@ -1,6 +1,7 @@
 package me.sub.RelicFactions.Files.Classes;
 
 import me.sub.RelicFactions.Files.Data.*;
+import me.sub.RelicFactions.Files.Enums.ChatType;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.Maps;
 import org.bukkit.OfflinePlayer;
@@ -34,6 +35,11 @@ public class User {
     private int lives;
     private UUID loggerUUID;
     private ItemStack[] lastInventoryContents;
+    private ChatType chatType;
+    private boolean isStaffChat;
+    private ModMode modMode;
+    private boolean isFrozen;
+    private boolean isPanic;
 
     public User(UserData userData) {
         userDisconnected = true;
@@ -55,6 +61,11 @@ public class User {
         filter = new Filter();
         loggerUUID = userData.get().getString("loggerUUID") == null ? null : UUID.fromString(Objects.requireNonNull(userData.get().getString("loggerUUID")));
         lastInventoryContents = userData.get().getString("lastInventoryContents") == null ? null : Maps.fromBase64(userData.get().getString("lastInventoryContents"));
+        chatType = ChatType.PUBLIC;
+        isStaffChat = false;
+        modMode = null;
+        isFrozen = false;
+        isPanic = false;
     }
 
     public UUID getLoggerUUID() {
@@ -251,5 +262,45 @@ public class User {
     public void setLastInventoryContents(ItemStack[] lastInventoryContents) {
         modified = true;
         this.lastInventoryContents = lastInventoryContents;
+    }
+
+    public ChatType getChatType() {
+        return chatType;
+    }
+
+    public void setChatType(ChatType chatType) {
+        this.chatType = chatType;
+    }
+
+    public boolean isStaffChat() {
+        return isStaffChat;
+    }
+
+    public void setStaffChat(boolean staffChat) {
+        isStaffChat = staffChat;
+    }
+
+    public ModMode getModMode() {
+        return modMode;
+    }
+
+    public void setModMode(ModMode modMode) {
+        this.modMode = modMode;
+    }
+
+    public boolean isFrozen() {
+        return isFrozen;
+    }
+
+    public void setFrozen(boolean frozen) {
+        isFrozen = frozen;
+    }
+
+    public boolean isPanic() {
+        return isPanic;
+    }
+
+    public void setPanic(boolean panic) {
+        isPanic = panic;
     }
 }

@@ -13,7 +13,7 @@ public class Permission {
         return p.hasPermission("*") || p.hasPermission("relic.*") || p.hasPermission("relic." + type) || p.hasPermission("relic.command." + command);
     }
 
-    public static boolean has(Player p, String command) {
-        return p.hasPermission("*") || p.hasPermission("relic.*") || p.hasPermission("relic.command." + command);
+    public static boolean has(Player p, String type) {
+        return p.hasPermission("*") || p.hasPermission("relic.*") || p.hasPermission("relic." + type);
     }
 }
