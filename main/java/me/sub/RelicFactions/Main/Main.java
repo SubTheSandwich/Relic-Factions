@@ -127,6 +127,8 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("pvp")).setExecutor(new PvPCommand()); Objects.requireNonNull(getCommand("pvp")).setTabCompleter(new PvPCommand());
         Objects.requireNonNull(getCommand("coords")).setExecutor(new CoordsCommand()); Objects.requireNonNull(getCommand("coords")).setTabCompleter(new CoordsCommand());
         Objects.requireNonNull(getCommand("ping")).setExecutor(new PingCommand()); Objects.requireNonNull(getCommand("ping")).setTabCompleter(new PingCommand());
+        Objects.requireNonNull(getCommand("request")).setExecutor(new RequestCommand()); Objects.requireNonNull(getCommand("request")).setTabCompleter(new RequestCommand());
+        Objects.requireNonNull(getCommand("report")).setExecutor(new ReportCommand()); Objects.requireNonNull(getCommand("report")).setTabCompleter(new ReportCommand());
     }
 
     private void events() {

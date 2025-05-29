@@ -106,6 +106,17 @@ faction:
     damage: "&eYou cannot damage &2%player%&e."
 
 commands:
+  report:
+    usage: "&cUsage: /report <player> <reason>"
+    self: "&cYou cannot report yourself."
+    cooldown: "&cPlease wait before using /report again."
+    broadcast: "&6[Report] &e%reported% &7was reported by &e%reporter% &7for &e%reason%"
+    success: "&aThank you for your report. A staff member will look into this soon."
+  request:
+    usage: "&cUsage: /request <message>"
+    cooldown: "&cPlease wait before using /request again."
+    broadcast: "&6[Request] &e%sender% &7requested assistance: &e%message%"
+    success: "&aThank you for your request. A staff member will be with you shortly."
   panic:
     initiated: "&cYou have initiated your panic sequence."
     broadcast: "&c%player% has initiated their panic sequence!"

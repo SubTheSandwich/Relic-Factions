@@ -23,6 +23,8 @@ timers:
   apple: 10
   gapple: 21600
   lff: 120
+  request: 300
+  report: 300
 
 economy:
   type: en-US
