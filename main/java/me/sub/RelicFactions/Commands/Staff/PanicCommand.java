@@ -32,7 +32,7 @@ public class PanicCommand implements TabExecutor {
 
         User user = User.get(p);
         user.setPanic(!user.isPanic());
-        String message = user.isFrozen() ? Locale.get().getString("commands.panic.initiated") : Locale.get().getString("commands.panic.fine");
+        String message = user.isPanic() ? Locale.get().getString("commands.panic.initiated") : Locale.get().getString("commands.panic.fine");
         p.sendMessage(C.chat(Objects.requireNonNull(message)));
         if (user.isPanic()) {
             for (Player player : Main.getOnlineStaff()) {
