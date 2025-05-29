@@ -67,3 +67,5 @@ commands:
     description: Freeze
   fly:
     description: Fly
+  panic:
+    description: Panic

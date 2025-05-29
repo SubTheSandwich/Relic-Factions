@@ -116,6 +116,7 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("invsee")).setExecutor(new InvseeCommand()); Objects.requireNonNull(getCommand("invsee")).setTabCompleter(new InvseeCommand());
         Objects.requireNonNull(getCommand("freeze")).setExecutor(new FreezeCommand()); Objects.requireNonNull(getCommand("freeze")).setTabCompleter(new FreezeCommand());
         Objects.requireNonNull(getCommand("fly")).setExecutor(new FlyCommand()); Objects.requireNonNull(getCommand("fly")).setTabCompleter(new FlyCommand());
+        Objects.requireNonNull(getCommand("panic")).setExecutor(new PanicCommand()); Objects.requireNonNull(getCommand("panic")).setTabCompleter(new PanicCommand());
 
         // User
         Objects.requireNonNull(getCommand("faction")).setExecutor(new FactionCommand()); Objects.requireNonNull(getCommand("faction")).setTabCompleter(new FactionCommand());
