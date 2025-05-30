@@ -30,6 +30,10 @@ public class UserDisconnectEvent implements Listener {
             }
         }
         user.setDisconnected(true);
+        if (user.getLastLoginTimestamp() != 0) {
+            user.setStoredPlaytime(user.getStoredPlaytime() + (System.currentTimeMillis() - user.getLastLoginTimestamp()));
+            user.setLastLoginTimestamp(0);
+        }
         if (user.hasTimer("combat")) {
             Villager villager = p.getWorld().spawn(p.getLocation(), Villager.class);
             villager.setRemoveWhenFarAway(false);

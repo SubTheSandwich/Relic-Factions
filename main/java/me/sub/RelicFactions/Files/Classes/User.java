@@ -40,6 +40,12 @@ public class User {
     private ModMode modMode;
     private boolean isFrozen;
     private boolean isPanic;
+    private long storedPlaytime;
+    private long lastLoginTimestamp;
+    private boolean globalChat;
+    private boolean messages;
+    private boolean messageSounds;
+    private UUID lastMessaged;
 
     public User(UserData userData) {
         userDisconnected = true;
@@ -66,6 +72,12 @@ public class User {
         modMode = null;
         isFrozen = false;
         isPanic = false;
+        storedPlaytime = userData.get().getLong("playtime");
+        lastLoginTimestamp = 0;
+        globalChat = true;
+        messages = userData.get().getBoolean("settings.messages.enabled");
+        messageSounds = userData.get().getBoolean("settings.messages.sounds");
+        lastMessaged = null;
     }
 
     public UUID getLoggerUUID() {
@@ -302,5 +314,63 @@ public class User {
 
     public void setPanic(boolean panic) {
         isPanic = panic;
+    }
+
+    public long getLastLoginTimestamp() {
+        return lastLoginTimestamp;
+    }
+
+    public void setLastLoginTimestamp(long lastLoginTimestamp) {
+        this.lastLoginTimestamp = lastLoginTimestamp;
+    }
+
+    public long getStoredPlaytime() {
+        return storedPlaytime;
+    }
+
+    public void setStoredPlaytime(long storedPlaytime) {
+        modified = true;
+        this.storedPlaytime = storedPlaytime;
+    }
+
+    public long getCurrentPlaytime() {
+        if (lastLoginTimestamp == 0) {
+            return storedPlaytime;
+        }
+        return storedPlaytime + (System.currentTimeMillis() - lastLoginTimestamp);
+    }
+
+    public boolean isGlobalChat() {
+        return globalChat;
+    }
+
+    public void setGlobalChat(boolean globalChat) {
+        this.globalChat = globalChat;
+    }
+
+    public boolean isMessages() {
+        return messages;
+    }
+
+    public void setMessages(boolean messages) {
+        modified = true;
+        this.messages = messages;
+    }
+
+    public boolean isMessageSounds() {
+        return messageSounds;
+    }
+
+    public void setMessageSounds(boolean messageSounds) {
+        modified = true;
+        this.messageSounds = messageSounds;
+    }
+
+    public UUID getLastMessaged() {
+        return lastMessaged;
+    }
+
+    public void setLastMessaged(UUID lastMessaged) {
+        this.lastMessaged = lastMessaged;
     }
 }

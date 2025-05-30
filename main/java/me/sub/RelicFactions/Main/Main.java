@@ -42,7 +42,7 @@ public class Main extends JavaPlugin {
 
     /*
 
-    TODO: Profile, Settings, Mapkit, Global Chat, Clear Inventory, Custom Timer, Revive,
+    TODO: Profile (ores mined, etc), Settings, Mapkit, Clear Inventory, Custom Timer, Revive,
     TODO: End Set Spawn & Exit, and Nether Set Spawn & Exit commands, as well as Crowbar Command & Functionality
 
     TODO: Holograms (Probably through invisible armor stands with custom names)
@@ -143,6 +143,10 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("report")).setExecutor(new ReportCommand()); Objects.requireNonNull(getCommand("report")).setTabCompleter(new ReportCommand());
         Objects.requireNonNull(getCommand("logout")).setExecutor(new LogoutCommand()); Objects.requireNonNull(getCommand("logout")).setTabCompleter(new LogoutCommand());
         Objects.requireNonNull(getCommand("pay")).setExecutor(new PayCommand()); Objects.requireNonNull(getCommand("pay")).setTabCompleter(new PayCommand());
+        Objects.requireNonNull(getCommand("playtime")).setExecutor(new PlaytimeCommand()); Objects.requireNonNull(getCommand("playtime")).setTabCompleter(new PlaytimeCommand());
+        Objects.requireNonNull(getCommand("toggleglobalchat")).setExecutor(new ToggleGlobalChatCommand()); Objects.requireNonNull(getCommand("toggleglobalchat")).setTabCompleter(new ToggleGlobalChatCommand());
+        Objects.requireNonNull(getCommand("message")).setExecutor(new MessageCommand()); Objects.requireNonNull(getCommand("message")).setTabCompleter(new MessageCommand());
+        Objects.requireNonNull(getCommand("reply")).setExecutor(new ReplyCommand()); Objects.requireNonNull(getCommand("reply")).setTabCompleter(new ReplyCommand());
     }
 
     private void events() {
@@ -294,6 +298,7 @@ public class Main extends JavaPlugin {
             userData.get().set("lives", user.getLives());
             userData.get().set("timers", Maps.timersToString(user.getTimers()));
             userData.get().set("lastInventoryContents", Maps.toBase64(user.getLastInventoryContents()));
+            userData.get().set("playtime", user.getStoredPlaytime());
             userData.save();
             user.setModified(false);
             saved++;

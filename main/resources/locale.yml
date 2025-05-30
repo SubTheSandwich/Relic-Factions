@@ -47,6 +47,11 @@ claiming:
     two: "&eSet position 2"
 
 events:
+  message:
+    self-disabled: "&cYou have your messages disabled."
+    disabled: "&c%player% has their messages disabled."
+    to: "&7(To &f%player%&7) %message%"
+    from: "&7(From &f%player%&7) %message%"
   mod-mode:
     in: "&cYou cannot do this to someone while they are in Mod Mode."
     cant: "&cYou cannot do this while in Mod Mode."
@@ -106,6 +111,17 @@ faction:
     damage: "&eYou cannot damage &2%player%&e."
 
 commands:
+  reply:
+    usage: "&cUsage: /%alias% <message>"
+    none: "&cYou have no one to reply to."
+    offline: "&cThe player you were speaking with logged off."
+  message:
+    usage: "&cUsage: /%alias% <player> <message>"
+    self: "&cYou cannot message yourself."
+  toggleglobalchat: "&6Global Chat&7: &r%status%"
+  playtime:
+    self: "&ePlaytime&7: &r%playtime%"
+    other: "&b%player%&e's Playtime&7: &r%playtime%"
   world:
     usage: "&cUsage: /world <world>"
     success: "&eYou have been teleported to &b%world%"

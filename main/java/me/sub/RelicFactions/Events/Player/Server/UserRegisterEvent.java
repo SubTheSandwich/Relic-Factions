@@ -41,6 +41,8 @@ public class UserRegisterEvent implements Listener {
             userData.get().set("uuid", p.getUniqueId().toString());
             userData.get().set("name", p.getName());
             userData.get().set("balance", Main.getInstance().getConfig().getDouble("economy.default-balance"));
+            userData.get().set("settings.messages.enabled", true);
+            userData.get().set("settings.messages.sounds", true);
             userData.save();
             user = new User(userData);
             user.addTimer(new PlayerTimer(p.getUniqueId(), Timer.STARTING));
@@ -99,6 +101,8 @@ public class UserRegisterEvent implements Listener {
                 player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.member.online")).replace("%player%", p.getName())));
             }
         }
+
+        user.setLastLoginTimestamp(System.currentTimeMillis());
 
         if (!Permission.has(p, "staff") && !Permission.has(p, "admin")) {
             for (Player player : Bukkit.getOnlinePlayers()) {

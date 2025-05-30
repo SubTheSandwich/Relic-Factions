@@ -92,11 +92,18 @@ public enum Timer {
 
     public static String getMessageFormat(long diffMillis) {
         long diff = diffMillis / 1000;
-        long hours = diff / 3600;
+        long days = diff / (24 * 3600);
+        long hours = (diff % (24 * 3600)) / 3600;
         long minutes = (diff % 3600) / 60;
         long seconds = diff % 60;
         StringBuilder format = new StringBuilder();
 
+        if (days > 0) {
+            format.append(days)
+                    .append(" day")
+                    .append(days == 1 ? "" : "s");
+            if (hours > 0 || minutes > 0 || seconds > 0) format.append(" ");
+        }
         if (hours > 0) {
             format.append(hours)
                     .append(" hour")
@@ -109,7 +116,7 @@ public enum Timer {
                     .append(minutes == 1 ? "" : "s");
             if (seconds > 0) format.append(" ");
         }
-        if (seconds > 0 || (hours == 0 && minutes == 0)) {
+        if (seconds > 0 || (days == 0 && hours == 0 && minutes == 0)) {
             format.append(seconds)
                     .append(" second")
                     .append(seconds == 1 ? "" : "s");

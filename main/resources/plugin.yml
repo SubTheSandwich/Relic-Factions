@@ -85,3 +85,18 @@ commands:
     description: Spawner
   world:
     description: World
+  playtime:
+    description: Playtime
+  toggleglobalchat:
+    aliases:
+      - tgc
+  reply:
+    aliases:
+      - r
+  message:
+    aliases:
+      - msg
+      - pm
+      - tell
+      - whisper
+      - w

@@ -43,6 +43,7 @@ public class FormatChatEvent implements Listener {
             String finalMessage1 = finalMessage;
             Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
                 for (Player recipient : recipients) {
+                    if (!User.get(recipient).isGlobalChat()) continue;
                     if (user.hasFaction()) {
                         Faction faction = Faction.get(user.getFaction());
                         recipient.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("chat.public.faction")).replace("%faction%", faction.getValidName(recipient, false)).replace("%player%", p.getDisplayName()).replace("%message%", finalMessage1)));
@@ -73,6 +74,7 @@ public class FormatChatEvent implements Listener {
             String finalMessage2 = finalMessage;
             Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
                 for (Player recipient : recipients) {
+                    if (!User.get(recipient).isGlobalChat()) continue;
                     if (user.hasFaction()) {
                         Faction faction = Faction.get(user.getFaction());
                         recipient.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("chat.public.faction")).replace("%faction%", faction.getValidName(recipient, false)).replace("%player%", p.getDisplayName()).replace("%message%", finalMessage2)));

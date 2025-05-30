@@ -50,6 +50,7 @@ public class C {
     }
 
     public static String strip(String s) {
+        if (s.contains("%")) s = C.chat(s);
         if (s.contains("&")) s = C.chat(s);
         return ChatColor.stripColor(s);
     }
