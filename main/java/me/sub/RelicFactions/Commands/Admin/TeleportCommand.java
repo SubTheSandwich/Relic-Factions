@@ -165,37 +165,45 @@ public class TeleportCommand implements TabExecutor {
         }
 
         Player player = Bukkit.getPlayer(args[0]);
+        if (args[0].equalsIgnoreCase("@p") || args[0].equalsIgnoreCase("@s")) {
+            if (!(sender instanceof Player p)) {
+                sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.not-player"))));
+                return true;
+            }
+            player = p;
+        }
         if (player == null) {
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-player"))));
             return true;
         }
 
-        boolean ignoreOne = args[0].equalsIgnoreCase("~");
-        boolean ignoreTwo = args[1].equalsIgnoreCase("~");
-        boolean ignoreThree = args[2].equalsIgnoreCase("~");
+        boolean ignoreOne = args[1].equalsIgnoreCase("~");
+        boolean ignoreTwo = args[2].equalsIgnoreCase("~");
+        boolean ignoreThree = args[3].equalsIgnoreCase("~");
         try {
             if (!ignoreOne) {
-                double ignored = Double.parseDouble(args[0]);
-            }
-            if (!ignoreTwo) {
                 double ignored = Double.parseDouble(args[1]);
             }
-            if (!ignoreThree) {
+            if (!ignoreTwo) {
                 double ignored = Double.parseDouble(args[2]);
+            }
+            if (!ignoreThree) {
+                double ignored = Double.parseDouble(args[3]);
             }
         } catch (NumberFormatException ignored) {
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.invalid-number"))));
             return true;
         }
 
-        double x = ignoreOne ? player.getLocation().getX() : Double.parseDouble(args[0]);
-        double y = ignoreTwo ? player.getLocation().getY() : Double.parseDouble(args[1]);
-        double z = ignoreThree ? player.getLocation().getZ() : Double.parseDouble(args[2]);
+        double x = ignoreOne ? player.getLocation().getX() : Double.parseDouble(args[1]);
+        double y = ignoreTwo ? player.getLocation().getY() : Double.parseDouble(args[2]);
+        double z = ignoreThree ? player.getLocation().getZ() : Double.parseDouble(args[3]);
         Location location = new Location(player.getWorld(), x, y, z);
+        Player finalPlayer = player;
         new BukkitRunnable() {
             @Override
             public void run() {
-                player.teleport(location);
+                finalPlayer.teleport(location);
             }
         }.runTaskLater(Main.getInstance(), 1);
         sender.sendMessage(

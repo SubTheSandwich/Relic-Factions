@@ -62,7 +62,7 @@ public class UserInteractAtFactionEvent implements Listener {
         if (user.isFactionBypass()) return false;
         if (user.getModMode() != null) {
             ModMode modMode = user.getModMode();
-            return !modMode.isInBypass();
+            if (!modMode.isInBypass()) return true;
         }
         if (Faction.getAt(location) == null) {
             switch (Objects.requireNonNull(location.getWorld()).getEnvironment()) {
@@ -83,6 +83,11 @@ public class UserInteractAtFactionEvent implements Listener {
         return !user.getFaction().equals(faction.getUUID());
     }
     private String rejectedModifierType(User user, Location location) {
+        if (user.getModMode() != null) {
+            if (!user.getModMode().isInBypass()) return "MOD-MODE";
+        }
+        if (Main.getInstance().isServerFrozen()) return "FROZEN_SERVER";
+        if (user.isFrozen() || user.isPanic()) return "FROZEN";
         if (Faction.getAt(location) == null) {
             switch (Objects.requireNonNull(location.getWorld()).getEnvironment()) {
                 case NORMAL, CUSTOM -> {
@@ -99,11 +104,6 @@ public class UserInteractAtFactionEvent implements Listener {
                     return "WILDERNESS";
                 }
             }
-            if (user.getModMode() != null) {
-                if (!user.getModMode().isInBypass()) return "MOD-MODE";
-            }
-            if (Main.getInstance().isServerFrozen()) return "FROZEN_SERVER";
-            if (user.isFrozen() || user.isPanic()) return "FROZEN";
             return null;
         }
         return "FACTION";
