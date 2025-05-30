@@ -95,6 +95,17 @@ public class UserRegisterEvent implements Listener {
             }
         }
 
+        if (user.isRevived()) {
+            user.setRevived(false);
+            if (user.getLastInventoryContents() != null) {
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.revive.items"))));
+                p.getInventory().setContents(user.getLastInventoryContents());
+                user.setLastInventoryContents(null);
+            } else {
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.revive.no-items"))));
+            }
+        }
+
         if (user.hasFaction()) {
             Faction faction = Faction.get(user.getFaction());
             for (Player player : faction.getOnlineMembers()) {

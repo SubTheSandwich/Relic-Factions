@@ -100,3 +100,5 @@ commands:
       - tell
       - whisper
       - w
+  revive:
+    description: Revive

@@ -469,16 +469,20 @@ public class UserDamageEvents implements Listener {
                     } else if (shooter instanceof LivingEntity) {
                         deathMessage = Objects.requireNonNull(Locale.get().getString("deathmessage.projectile.entity"))
                                 .replace("%entity%", ((LivingEntity) shooter).getName());
+                        deathMessage = fillInDead(p, deathMessage);
                     } else {
                         deathMessage = Objects.requireNonNull(Locale.get().getString("deathmessage.projectile.entity"))
                                 .replace("%entity%", projectileName);
+                        deathMessage = fillInDead(p, deathMessage);
                     }
                 } else if (damager instanceof LivingEntity) {
                     deathMessage = Objects.requireNonNull(Locale.get().getString("deathmessage.entity-attack.entity"))
                             .replace("%killer%", damager.getName());
+                    deathMessage = fillInDead(p, deathMessage);
                 } else {
                     deathMessage = Objects.requireNonNull(Locale.get().getString("deathmessage.entity-attack.entity"))
                             .replace("%killer%", damager.getType().name().toLowerCase().replace("_", " "));
+                    deathMessage = fillInDead(p, deathMessage);
                 }
             } else if (lastDamage != null) {
                 // Environmental and other causes

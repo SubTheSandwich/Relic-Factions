@@ -46,6 +46,7 @@ public class User {
     private boolean messages;
     private boolean messageSounds;
     private UUID lastMessaged;
+    private boolean revived;
 
     public User(UserData userData) {
         userDisconnected = true;
@@ -78,6 +79,7 @@ public class User {
         messages = userData.get().getBoolean("settings.messages.enabled");
         messageSounds = userData.get().getBoolean("settings.messages.sounds");
         lastMessaged = null;
+        revived = false;
     }
 
     public UUID getLoggerUUID() {
@@ -372,5 +374,13 @@ public class User {
 
     public void setLastMessaged(UUID lastMessaged) {
         this.lastMessaged = lastMessaged;
+    }
+
+    public boolean isRevived() {
+        return revived;
+    }
+
+    public void setRevived(boolean revived) {
+        this.revived = revived;
     }
 }
