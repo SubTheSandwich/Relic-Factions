@@ -60,7 +60,7 @@ public class VanishCommand implements TabExecutor {
         if (ModModeFile.has("vanish-hidden", p) || ModModeFile.has("vanish-visible", p)) {
             ModModeFile.setItems(p);
         }
-        return false;
+        return true;
     }
 
     @Override

@@ -83,7 +83,7 @@ public class FilterCommand implements TabExecutor {
             }
         }
         Messages.send(p, "help.filter");
-        return false;
+        return true;
     }
 
     @Override

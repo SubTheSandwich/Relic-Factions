@@ -119,7 +119,7 @@ public class SOTWCommand implements TabExecutor {
             }
         }
         sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.sotw.usage"))));
-        return false;
+        return true;
     }
 
     @Override

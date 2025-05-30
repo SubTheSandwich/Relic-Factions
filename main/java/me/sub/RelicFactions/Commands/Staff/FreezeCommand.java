@@ -83,7 +83,7 @@ public class FreezeCommand implements TabExecutor {
         }
         message = Objects.requireNonNull(message).replace("%player%", user.getName());
         sender.sendMessage(C.chat(message));
-        return false;
+        return true;
     }
 
     @Override

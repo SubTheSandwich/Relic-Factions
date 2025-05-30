@@ -34,7 +34,7 @@ public class BalanceCommand implements TabExecutor {
         } else {
             p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.balance.self")).replace("%balance%", Main.getEconomy().format(user.getBalance().doubleValue()))));
         }
-        return false;
+        return true;
     }
 
 

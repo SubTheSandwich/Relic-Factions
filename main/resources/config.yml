@@ -25,6 +25,7 @@ timers:
   lff: 120
   request: 300
   report: 300
+  logout: 30
 
 economy:
   type: en-US
@@ -87,6 +88,7 @@ scoreboard:
     - "&6&lGApple&7: &c%player_gapple_timer%<display=%has_player_gapple_timer%"
     - "&c&lSpawn Tag&7: &c%player_combat_timer%<display=%has_player_combat_timer%"
     - "&a&lSOTW&7: &c%server_sotw_timer%<display=%has_server_sotw_timer%"
+    - "&4&lLogout&7: &c%player_logout_timer%<display=%has_player_logout_timer%"
     - "%mod-lines%"
     - "&7&m-------------------------"
   mod-mode:

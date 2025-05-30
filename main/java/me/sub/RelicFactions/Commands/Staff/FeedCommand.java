@@ -14,19 +14,20 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Objects;
 
-public class FlyCommand implements TabExecutor {
+public class FeedCommand implements TabExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
         if (!(sender instanceof Player p)) {
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.not-player"))));
             return true;
         }
-        if (!Permission.has(p, "fly", "staff")) {
+        if (!Permission.has(p, "feed", "staff")) {
             p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
             return true;
         }
+
         if (args.length == 1) {
-            if (!Permission.has(p, "fly.others", "admin")) {
+            if (!Permission.has(p, "feed.others", "admin")) {
                 p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
                 return true;
             }
@@ -35,29 +36,24 @@ public class FlyCommand implements TabExecutor {
                 p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-player"))));
                 return true;
             }
-            player.setAllowFlight(!player.getAllowFlight());
-            player.setFlying(player.isFlying());
-            String message = player.getAllowFlight() ? Locale.get().getString("commands.fly.enabled-other") : Locale.get().getString("commands.fly.disabled-other");
-            String play = player.getAllowFlight() ? Locale.get().getString("commands.fly.enabled-other-target") : Locale.get().getString("commands.fly.disabled-other-target");
-            message = Objects.requireNonNull(message).replace("%player%", player.getName());
-            play = Objects.requireNonNull(play).replace("%player%", p.getName());
-            p.sendMessage(C.chat(message));
-            player.sendMessage(C.chat(play));
+            player.setFoodLevel(20);
+            player.setSaturation(20F);
+            p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.feed.other")).replace("%player%", player.getName())));
+            player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.feed.target")).replace("%player%", p.getName())));
             return true;
         }
-
-        p.setAllowFlight(!p.getAllowFlight());
-        p.setFlying(p.isFlying());
-        String message = p.getAllowFlight() ? Locale.get().getString("commands.fly.enabled") : Locale.get().getString("commands.fly.disabled");
-        p.sendMessage(C.chat(Objects.requireNonNull(message)));
+        p.setFoodLevel(20);
+        p.setSaturation(20F);
+        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.feed.success"))));
         return true;
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
-        if (!(sender instanceof Player)) return List.of();
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
+        if (!(commandSender instanceof Player)) return List.of();
+        if (!Permission.has(commandSender, "heal", "staff")) return List.of();
         if (args.length == 1) {
-            if (Permission.has(sender, "fly.others", "admin")) {
+            if (Permission.has(commandSender, "heal.others", "admin")) {
                 String current = args[0].toLowerCase();
                 return Bukkit.getOnlinePlayers().stream()
                         .map(Player::getName)
@@ -65,6 +61,7 @@ public class FlyCommand implements TabExecutor {
                         .toList();
             }
         }
+
         return List.of();
     }
 }

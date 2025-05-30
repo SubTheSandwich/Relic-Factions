@@ -207,7 +207,7 @@ public class TeleportCommand implements TabExecutor {
                                 .replace("%z%", String.valueOf(Calculate.round(z, 2)))
                 )
         );
-        return false;
+        return true;
     }
 
     @Override

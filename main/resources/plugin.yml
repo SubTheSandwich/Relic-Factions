@@ -73,3 +73,15 @@ commands:
     description: Report
   request:
     description: Request
+  logout:
+    description: Logout
+  heal:
+    description: Heal
+  feed:
+    description: Feed
+  pay:
+    description: Pay
+  spawner:
+    description: Spawner
+  world:
+    description: World

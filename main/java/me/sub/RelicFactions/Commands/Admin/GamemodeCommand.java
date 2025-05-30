@@ -190,7 +190,7 @@ public class GamemodeCommand implements TabExecutor {
             return true;
         }
         sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.gamemode.usage")), s));
-        return false;
+        return true;
     }
 
     @Override

@@ -55,7 +55,7 @@ public class PanicCommand implements TabExecutor {
             }.runTaskTimer(Main.getInstance(), 0, 1);
         }
 
-        return false;
+        return true;
     }
 
     @Override

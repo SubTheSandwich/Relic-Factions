@@ -43,7 +43,7 @@ public class RequestCommand implements TabExecutor {
         }
         PlayerTimer timer = new PlayerTimer(p.getUniqueId(), Timer.REQUEST);
         user.addTimer(timer);
-        return false;
+        return true;
     }
 
     @Override

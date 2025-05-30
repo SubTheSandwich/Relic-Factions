@@ -117,7 +117,7 @@ public class PvPCommand implements TabExecutor {
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.pvp.set")).replace("%player%", user.getName()).replace("%time%", Timer.format(amount))));
             return true;
         }
-        return false;
+        return true;
     }
 
     @Override

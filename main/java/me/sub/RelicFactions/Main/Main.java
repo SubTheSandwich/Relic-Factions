@@ -40,6 +40,14 @@ import java.util.stream.Collectors;
 
 public class Main extends JavaPlugin {
 
+    /*
+
+    TODO: Profile, Settings, Mapkit, Global Chat, Clear Inventory, Custom Timer, Revive,
+    TODO: End Set Spawn & Exit, and Nether Set Spawn & Exit commands, as well as Crowbar Command & Functionality
+
+    TODO: Holograms (Probably through invisible armor stands with custom names)
+     */
+
     private static Economy econ = null;
     private final Logger logger = getLogger();
 
@@ -108,6 +116,8 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("gamemode")).setExecutor(new GamemodeCommand()); Objects.requireNonNull(getCommand("gamemode")).setTabCompleter(new GamemodeCommand());
         Objects.requireNonNull(getCommand("teleport")).setExecutor(new TeleportCommand()); Objects.requireNonNull(getCommand("teleport")).setTabCompleter(new TeleportCommand());
         Objects.requireNonNull(getCommand("tphere")).setExecutor(new TPHereCommand()); Objects.requireNonNull(getCommand("tphere")).setTabCompleter(new TPHereCommand());
+        Objects.requireNonNull(getCommand("spawner")).setExecutor(new SpawnerCommand()); Objects.requireNonNull(getCommand("spawner")).setTabCompleter(new SpawnerCommand());
+        Objects.requireNonNull(getCommand("world")).setExecutor(new WorldCommand()); Objects.requireNonNull(getCommand("world")).setTabCompleter(new WorldCommand());
 
         // Staff
         Objects.requireNonNull(getCommand("staffchat")).setExecutor(new StaffChatCommand()); Objects.requireNonNull(getCommand("staffchat")).setTabCompleter(new StaffChatCommand());
@@ -117,6 +127,8 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("freeze")).setExecutor(new FreezeCommand()); Objects.requireNonNull(getCommand("freeze")).setTabCompleter(new FreezeCommand());
         Objects.requireNonNull(getCommand("fly")).setExecutor(new FlyCommand()); Objects.requireNonNull(getCommand("fly")).setTabCompleter(new FlyCommand());
         Objects.requireNonNull(getCommand("panic")).setExecutor(new PanicCommand()); Objects.requireNonNull(getCommand("panic")).setTabCompleter(new PanicCommand());
+        Objects.requireNonNull(getCommand("heal")).setExecutor(new HealCommand()); Objects.requireNonNull(getCommand("heal")).setTabCompleter(new HealCommand());
+        Objects.requireNonNull(getCommand("feed")).setExecutor(new FeedCommand()); Objects.requireNonNull(getCommand("feed")).setTabCompleter(new FeedCommand());
 
         // User
         Objects.requireNonNull(getCommand("faction")).setExecutor(new FactionCommand()); Objects.requireNonNull(getCommand("faction")).setTabCompleter(new FactionCommand());
@@ -129,6 +141,8 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("ping")).setExecutor(new PingCommand()); Objects.requireNonNull(getCommand("ping")).setTabCompleter(new PingCommand());
         Objects.requireNonNull(getCommand("request")).setExecutor(new RequestCommand()); Objects.requireNonNull(getCommand("request")).setTabCompleter(new RequestCommand());
         Objects.requireNonNull(getCommand("report")).setExecutor(new ReportCommand()); Objects.requireNonNull(getCommand("report")).setTabCompleter(new ReportCommand());
+        Objects.requireNonNull(getCommand("logout")).setExecutor(new LogoutCommand()); Objects.requireNonNull(getCommand("logout")).setTabCompleter(new LogoutCommand());
+        Objects.requireNonNull(getCommand("pay")).setExecutor(new PayCommand()); Objects.requireNonNull(getCommand("pay")).setTabCompleter(new PayCommand());
     }
 
     private void events() {
@@ -294,22 +308,25 @@ public class Main extends JavaPlugin {
             Faction faction = entry.getValue();
             if (!faction.isModified()) continue;
             FactionData factionData = faction.getFactionData();
+            if (faction.getType().equals(FactionType.PLAYER)) {
+                factionData.get().set("members", Maps.serialize(faction.getMembers()));
+                factionData.get().set("open", faction.isOpen());
+                factionData.get().set("leader", faction.getLeader() == null ? null : faction.getLeader().toString());
+                factionData.get().set("points", faction.getPoints());
+                factionData.get().set("koth-captures", faction.getKothCaptures());
+                factionData.get().set("balance", faction.getBalance().doubleValue());
+                factionData.get().set("dtr", faction.getDTR().doubleValue());
+                factionData.get().set("lives", faction.getLives());
+                factionData.get().set("invites", Maps.uuidListToString(faction.getInvites()));
+                factionData.get().set("timeTilRegen", faction.getTimeTilRegen());
+                factionData.get().set("regening", faction.isRegening());
+            }
             factionData.get().set("name", faction.getName());
-            factionData.get().set("members", Maps.serialize(faction.getMembers()));
-            factionData.get().set("open", faction.isOpen());
             factionData.get().set("color", faction.getColor() == null ? null : faction.getColor().name());
-            factionData.get().set("leader", faction.getLeader() == null ? null : faction.getLeader().toString());
             factionData.get().set("type", faction.getType().toString());
-            factionData.get().set("points", faction.getPoints());
-            factionData.get().set("koth-captures", faction.getKothCaptures());
-            factionData.get().set("balance", faction.getBalance().doubleValue());
-            factionData.get().set("dtr", faction.getDTR().doubleValue());
-            factionData.get().set("lives", faction.getLives());
-            factionData.get().set("invites", Maps.uuidListToString(faction.getInvites()));
             factionData.get().set("claims", Maps.cuboidListToString(faction.getClaims()));
             factionData.get().set("deathban", faction.isDeathban());
-            factionData.get().set("timeTilRegen", faction.getTimeTilRegen());
-            factionData.get().set("regening", faction.isRegening());
+            factionData.get().set("home", faction.getHome() == null ? null : faction.getHome());
             factionData.save();
             faction.setModified(false);
             saved++;

@@ -11,7 +11,7 @@ import java.util.List;
 public class ReclaimCommand implements TabExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
-        return false;
+        return true;
     }
 
     @Override

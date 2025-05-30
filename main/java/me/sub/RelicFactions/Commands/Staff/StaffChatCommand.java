@@ -44,7 +44,7 @@ public class StaffChatCommand implements TabExecutor {
             player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.staffchat.message")).replace("%player%", p.getName()).replace("%message%", C.strip(String.join(" ", args)))));
         }
 
-        return false;
+        return true;
     }
 
     @Override

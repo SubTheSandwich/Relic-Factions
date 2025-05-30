@@ -65,7 +65,7 @@ public class LivesCommand implements TabExecutor {
             return true;
         }
         Messages.send(sender, "help.lives");
-        return false;
+        return true;
     }
 
     @Override

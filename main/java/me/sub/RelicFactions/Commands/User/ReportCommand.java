@@ -55,7 +55,7 @@ public class ReportCommand implements TabExecutor {
         }
         PlayerTimer timer = new PlayerTimer(p.getUniqueId(), Timer.REPORT);
         user.addTimer(timer);
-        return false;
+        return true;
     }
 
     @Override

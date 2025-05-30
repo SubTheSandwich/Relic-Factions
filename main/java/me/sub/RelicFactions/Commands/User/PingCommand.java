@@ -31,7 +31,7 @@ public class PingCommand implements TabExecutor {
             return true;
         }
         p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.ping.self")).replace("%ping%", p.getPing() + "")));
-        return false;
+        return true;
     }
 
     @Override

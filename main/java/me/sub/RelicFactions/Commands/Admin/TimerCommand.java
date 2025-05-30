@@ -70,7 +70,7 @@ public class TimerCommand implements TabExecutor {
             return true;
         }
         p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.timer.usage"))));
-        return false;
+        return true;
     }
 
     @Override

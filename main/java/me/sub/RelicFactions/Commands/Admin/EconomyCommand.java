@@ -64,7 +64,7 @@ public class EconomyCommand implements TabExecutor {
             return true;
         }
         Messages.send(sender, "help.economy", s);
-        return false;
+        return true;
     }
 
     @Override

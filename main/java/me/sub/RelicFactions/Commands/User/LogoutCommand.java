@@ -4,9 +4,7 @@ import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Data.PlayerTimer;
 import me.sub.RelicFactions.Files.Enums.Timer;
 import me.sub.RelicFactions.Files.Normal.Locale;
-import me.sub.RelicFactions.Files.Normal.Messages;
 import me.sub.RelicFactions.Utils.C;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -17,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Objects;
 
-public class LFFCommand implements TabExecutor {
+public class LogoutCommand implements TabExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
         if (!(sender instanceof Player p)) {
@@ -25,20 +23,13 @@ public class LFFCommand implements TabExecutor {
             return true;
         }
         User user = User.get(p);
-        if (user.hasTimer("lff")) {
-            String message = Locale.get().getString("events.timer.player.cooldown.lff") == null ? Locale.get().getString("events.timer.player.cooldown.default") : Locale.get().getString("events.timer.cooldown.lff");
-            message = Objects.requireNonNull(message).replace("%time%", Timer.format(user.getTimer("lff").getDuration()));
-            p.sendMessage(C.chat(message));
+        if (user.hasTimer("LOGOUT")) {
+            p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.logout.running"))));
             return true;
         }
-        PlayerTimer timer = new PlayerTimer(p.getUniqueId(), Timer.LFF);
+        PlayerTimer timer = new PlayerTimer(p.getUniqueId(), Timer.LOGOUT);
         user.addTimer(timer);
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            for (String line : Messages.get().getStringList("other.lff")) {
-                if (line.contains("%player%")) line = line.replace("%player%", p.getName());
-                player.sendMessage(C.chat(line));
-            }
-        }
+        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.logout.message"))));
         return true;
     }
 

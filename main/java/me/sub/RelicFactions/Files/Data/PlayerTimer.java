@@ -98,6 +98,7 @@ public class PlayerTimer {
                 }
                 if (Bukkit.getPlayer(uuid) == null) {
                     user.removeTimer("home");
+                    user.removeTimer("logout");
                     cancel();
                     return;
                 }
@@ -105,6 +106,13 @@ public class PlayerTimer {
                 if (paused) return;
                 duration = duration.subtract(BigDecimal.valueOf(0.05));
                 if (duration.doubleValue() > 0) return;
+                if (timer.name().equalsIgnoreCase("LOGOUT")) {
+                    if (user.hasTimer("combat")) user.removeTimer("combat");
+                    Objects.requireNonNull(player).kickPlayer(C.chat(Objects.requireNonNull(Locale.get().getString("commands.logout.success"))));
+                    user.removeTimer(timer.name());
+                    cancel();
+                    return;
+                }
                 if (timer.name().equalsIgnoreCase("HOME")) {
                     if (!user.hasFaction()) {
                         user.removeTimer("home");

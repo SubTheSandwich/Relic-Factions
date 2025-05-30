@@ -79,7 +79,7 @@ public class ModModeCommand implements TabExecutor {
             message = Objects.requireNonNull(message).replace("%status%", Objects.requireNonNull(Locale.get().getString("primary.disabled")));
             p.sendMessage(C.chat(message));
         }
-        return false;
+        return true;
     }
 
     @Override

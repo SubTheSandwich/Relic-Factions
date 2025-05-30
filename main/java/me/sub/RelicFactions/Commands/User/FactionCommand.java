@@ -1246,7 +1246,7 @@ public class FactionCommand implements TabExecutor {
             return true;
         }
         Messages.send(p, "faction.help.main", s);
-        return false;
+        return true;
     }
 
     @Nullable

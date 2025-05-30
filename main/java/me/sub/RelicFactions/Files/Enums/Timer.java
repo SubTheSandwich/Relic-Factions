@@ -19,7 +19,8 @@ public enum Timer {
     GAPPLE(Main.getInstance().getConfig().getInt("timers.gapple")),
     LFF(Main.getInstance().getConfig().getInt("timers.lff")),
     REQUEST(Main.getInstance().getConfig().getInt("timers.request")),
-    REPORT(Main.getInstance().getConfig().getInt("timers.report"));
+    REPORT(Main.getInstance().getConfig().getInt("timers.report")),
+    LOGOUT(Main.getInstance().getConfig().getInt("timers.logout"));
 
     private final int duration;
 

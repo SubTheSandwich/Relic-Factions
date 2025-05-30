@@ -47,7 +47,10 @@ public class UserDamageEvents implements Listener {
         }
 
         if (damagerUser.getModMode() != null) {
-            if (damagerUser.getModMode().isInBypass()) return;
+            if (damagerUser.getModMode().isInBypass()) {
+                generateCombat(hit, damager);
+                return;
+            }
             e.setCancelled(true);
             damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.mod-mode.cant"))));
             return;
@@ -232,7 +235,10 @@ public class UserDamageEvents implements Listener {
         }
 
         if (damagerUser.getModMode() != null) {
-            if (damagerUser.getModMode().isInBypass()) return;
+            if (damagerUser.getModMode().isInBypass()) {
+                generateCombat(damager);
+                return;
+            }
             e.setCancelled(true);
             damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.mod-mode.cant"))));
             return;
@@ -328,7 +334,10 @@ public class UserDamageEvents implements Listener {
         }
 
         if (damagerUser.getModMode() != null) {
-            if (damagerUser.getModMode().isInBypass()) return;
+            if (damagerUser.getModMode().isInBypass()) {
+                generateCombat(hit, damager);
+                return;
+            }
             e.setCancelled(true);
             damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.mod-mode.cant"))));
             return;
@@ -507,7 +516,7 @@ public class UserDamageEvents implements Listener {
         if (hitUser.hasTimer("combat")) {
             hitUser.getTimer("combat").setDuration(Timer.COMBAT.getDuration());
         } else {
-            hit.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.timer.start.combat"))));
+            hit.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.timer.player.start.combat"))));
             PlayerTimer combat = new PlayerTimer(hit.getUniqueId(), Timer.COMBAT);
             hitUser.addTimer(combat);
         }
@@ -515,7 +524,7 @@ public class UserDamageEvents implements Listener {
         if (damagerUser.hasTimer("combat")) {
             damagerUser.getTimer("combat").setDuration(Timer.COMBAT.getDuration());
         } else {
-            damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.timer.start.combat"))));
+            damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.timer.player.start.combat"))));
             PlayerTimer combat = new PlayerTimer(damager.getUniqueId(), Timer.COMBAT);
             damagerUser.addTimer(combat);
         }
@@ -527,7 +536,7 @@ public class UserDamageEvents implements Listener {
         if (hitUser.hasTimer("combat")) {
             hitUser.getTimer("combat").setDuration(Timer.COMBAT.getDuration());
         } else {
-            hit.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.timer.start.combat"))));
+            hit.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.timer.player.start.combat"))));
             PlayerTimer combat = new PlayerTimer(hit.getUniqueId(), Timer.COMBAT);
             hitUser.addTimer(combat);
         }

@@ -24,6 +24,7 @@ public class UserMoveEvent implements Listener {
         if (e.getTo() == null) return;
         if (e.getFrom().getBlockX() == e.getTo().getBlockX() && e.getFrom().getBlockZ() == e.getTo().getBlockZ()) return;
         processHome(e.getPlayer());
+        processLogout(e.getPlayer());
         if (notAllowed(e.getPlayer(), e.getTo(), e.getFrom())) e.setCancelled(true);
     }
 
@@ -32,6 +33,7 @@ public class UserMoveEvent implements Listener {
         if (e.getTo() == null) return;
         if (e.getFrom().getBlockX() == e.getTo().getBlockX() && e.getFrom().getBlockZ() == e.getTo().getBlockZ()) return;
         processHome(e.getPlayer());
+        processLogout(e.getPlayer());
         if (notAllowed(e.getPlayer(), e.getTo(), e.getFrom())) e.setCancelled(true);
     }
 
@@ -41,6 +43,15 @@ public class UserMoveEvent implements Listener {
             if (user.getTimer("home").getDuration().doubleValue() <= 0.01) return;
             user.removeTimer("home");
             p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.teleport-cancelled"))));
+        }
+    }
+
+    private void processLogout(Player p) {
+        User user = User.get(p);
+        if (user.hasTimer("logout")) {
+            if (user.getTimer("logout").getDuration().doubleValue() <= 0.01) return;
+            user.removeTimer("logout");
+            p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.logout.cancelled"))));
         }
     }
 

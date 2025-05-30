@@ -106,6 +106,31 @@ faction:
     damage: "&eYou cannot damage &2%player%&e."
 
 commands:
+  world:
+    usage: "&cUsage: /world <world>"
+    success: "&eYou have been teleported to &b%world%"
+  spawner:
+    usage: "&cUsage: /spawner <entity> <player>"
+    success: "&eYou have been given a &b%entity% &espawner."
+  pay:
+    usage: "&cUsage: /pay <player> <amount>"
+    self: "&cYou cannot pay yourself."
+    not-enough: "&cYou do not have enough money to do this."
+    sent: "&aSent %amount% to %player%"
+    received: "&aReceived %amount% from %player%"
+  heal:
+    success: "&eYou have been healed."
+    other: "&eYou have healed &b%player%&e."
+    target: "&eYou have been healed by &b%player%&e."
+  feed:
+    success: "&eYou have been fed."
+    other: "&eYou have fed &b%player%&e."
+    target: "&eYou have been fed by &b%player%&e."
+  logout:
+    message: "&e&lLogging out... &ePlease wait &c30 &eseconds."
+    cancelled: "&e&lLOGOUT &c&lCANCELLED!"
+    running: "&cYou are already logging out."
+    success: "&cYou have been successfully logged out."
   report:
     usage: "&cUsage: /report <player> <reason>"
     self: "&cYou cannot report yourself."

@@ -43,7 +43,7 @@ public class HCFCommand implements TabExecutor {
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.hcf.reload.success"))));
             return true;
         }
-        return false;
+        return true;
     }
 
     @Override

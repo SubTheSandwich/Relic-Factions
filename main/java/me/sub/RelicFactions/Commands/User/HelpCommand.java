@@ -13,7 +13,7 @@ public class HelpCommand implements TabExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
         Messages.send(commandSender, "help.main");
-        return false;
+        return true;
     }
 
     @Override
