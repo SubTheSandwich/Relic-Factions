@@ -60,12 +60,8 @@ public class TPHereCommand implements TabExecutor {
         if (!Permission.has(sender, "teleport", "admin")) {
             return List.of();
         }
-        ArrayList<String> suggestions = new ArrayList<>();
         if (args.length == 1) {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                suggestions.add(player.getName());
-            }
-            return suggestions;
+            return null;
         }
         return List.of();
     }

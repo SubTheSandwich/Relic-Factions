@@ -17,6 +17,14 @@ import java.util.Objects;
 public class SettingsInteractEvent implements Listener {
 
     @EventHandler
+    public void onProfile(InventoryClickEvent e) {
+        if (e.getClickedInventory() == null) return;
+        if (e.getView().getTitle().equalsIgnoreCase(C.chat(Objects.requireNonNull(Inventories.get().getString("profile.name"))))) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
     public void onClick(InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
         if (e.getClickedInventory() == null) return;
@@ -59,9 +67,7 @@ public class SettingsInteractEvent implements Listener {
                 message = Objects.requireNonNull(message).replace("%status%", Objects.requireNonNull(user.isScoreboard() ? Locale.get().getString("primary.enabled") : Locale.get().getString("primary.disabled")));
                 p.sendMessage(C.chat(message));
             }
-            case "CHAT" -> {
-                p.performCommand("tgc");
-            }
+            case "CHAT" -> p.performCommand("tgc");
             default -> throw new IllegalStateException("Unexpected value: " + clicked.toUpperCase());
         }
         p.closeInventory();

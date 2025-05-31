@@ -22,3 +22,21 @@ settings:
       name: "&eToggle Message Sounds"
       item: BELL
       slot: 28
+
+profile: # Limited control here for plugin
+  name: "&aPlayer Profile"
+  size: 54
+  items:
+    kills:
+      slot: 10
+      item: NETHERITE_SWORD
+    deaths:
+      slot: 16
+      item: WITHER_ROSE
+    ores:
+      name: "&dOres Mined"
+      slot: 13
+      item: IRON_PICKAXE
+    player:
+      slot: 40
+

@@ -96,6 +96,7 @@ public class SpawnerCommand implements TabExecutor {
             Collections.sort(suggestions);
             return suggestions;
         }
+        if (args.length == 2) return null;
         return Collections.emptyList();
     }
 }

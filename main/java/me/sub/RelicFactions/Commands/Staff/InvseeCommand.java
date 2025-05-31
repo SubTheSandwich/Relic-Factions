@@ -88,11 +88,7 @@ public class InvseeCommand implements TabExecutor {
     ) {
         if (!Permission.has(sender, "invsee", "staff")) return List.of();
         if (args.length == 1) {
-            String prefix = args[0].toLowerCase();
-            return Bukkit.getOnlinePlayers().stream()
-                    .map(Player::getName)
-                    .filter(name -> name.toLowerCase().startsWith(prefix))
-                    .collect(Collectors.toList());
+            return null;
         }
         return List.of();
     }

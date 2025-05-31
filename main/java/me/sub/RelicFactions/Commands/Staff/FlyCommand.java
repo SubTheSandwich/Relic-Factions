@@ -58,11 +58,7 @@ public class FlyCommand implements TabExecutor {
         if (!(sender instanceof Player)) return List.of();
         if (args.length == 1) {
             if (Permission.has(sender, "fly.others", "admin")) {
-                String current = args[0].toLowerCase();
-                return Bukkit.getOnlinePlayers().stream()
-                        .map(Player::getName)
-                        .filter(name -> name.toLowerCase().startsWith(current))
-                        .toList();
+                return null;
             }
         }
         return List.of();

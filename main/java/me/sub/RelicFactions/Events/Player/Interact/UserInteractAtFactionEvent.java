@@ -22,8 +22,12 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public class UserInteractAtFactionEvent implements Listener {
 
@@ -126,6 +130,76 @@ public class UserInteractAtFactionEvent implements Listener {
             }
             e.setCancelled(true);
             combined(p, location, false);
+            return;
+        }
+        Block block = e.getBlock();
+        if (isPlayerPlaced(block)) {
+            block.removeMetadata("playerPlaced", Main.getInstance());
+            return;
+        }
+
+        if (isOre(block.getType())) {
+            switch (block.getType()) {
+                case COAL_ORE:
+                case DEEPSLATE_COAL_ORE:
+                    user.setCoalMined(user.getCoalMined() + 1);
+                    break;
+                case IRON_ORE:
+                case DEEPSLATE_IRON_ORE:
+                    user.setIronMined(user.getIronMined() + 1);
+                    break;
+                case COPPER_ORE:
+                case DEEPSLATE_COPPER_ORE:
+                    user.setCopperMined(user.getCopperMined() + 1);
+                    break;
+                case DIAMOND_ORE:
+                case DEEPSLATE_DIAMOND_ORE:
+                    user.setDiamondMined(user.getDiamondMined() + 1);
+                    break;
+                case GOLD_ORE:
+                case DEEPSLATE_GOLD_ORE:
+                case NETHER_GOLD_ORE:
+                    user.setGoldMined(user.getGoldMined() + 1);
+                    break;
+                case REDSTONE_ORE:
+                case DEEPSLATE_REDSTONE_ORE:
+                    user.setRedstoneMined(user.getRedstoneMined() + 1);
+                    break;
+                case LAPIS_ORE:
+                case DEEPSLATE_LAPIS_ORE:
+                    user.setLapisMined(user.getLapisMined() + 1);
+                    break;
+                case EMERALD_ORE:
+                case DEEPSLATE_EMERALD_ORE:
+                    user.setEmeraldMined(user.getEmeraldMined() + 1);
+                    break;
+                case NETHER_QUARTZ_ORE:
+                    user.setQuartzMined(user.getQuartzMined() + 1);
+                    break;
+                case ANCIENT_DEBRIS:
+                    user.setDebrisMined(user.getDebrisMined() + 1);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        if (isVeinFound(block)) return;
+
+        if (isDiamondOre(block)) {
+            Set<Block> vein = new HashSet<>();
+            findVein(block, vein);
+
+            for (Block b : vein) {
+                b.setMetadata("veinFound", new FixedMetadataValue(Main.getInstance(), true));
+            }
+
+            if (!vein.isEmpty()) {
+                String message = Locale.get().getString("events.found-diamonds");
+                message = Objects.requireNonNull(message).replace("%player%", p.getName());
+                message = message.replace("%amount%", vein.size() + "");
+                Main.getInstance().getServer().broadcastMessage(C.chat(message));
+            }
         }
     }
 
@@ -144,6 +218,11 @@ public class UserInteractAtFactionEvent implements Listener {
             }
             e.setCancelled(true);
             combined(p, location, false);
+            return;
+        }
+        Block block = e.getBlockPlaced();
+        if (isOre(block.getType())) {
+            block.setMetadata("playerPlaced", new FixedMetadataValue(Main.getInstance(), true));
         }
     }
 
@@ -398,5 +477,56 @@ public class UserInteractAtFactionEvent implements Listener {
             e.setCancelled(true);
             combined(p, block.getLocation(), true);
         }
+    }
+
+    private boolean isDiamondOre(Block block) {
+        Material type = block.getType();
+        return type == Material.DIAMOND_ORE || type == Material.DEEPSLATE_DIAMOND_ORE;
+    }
+
+    private boolean isPlayerPlaced(Block block) {
+        if (!block.hasMetadata("playerPlaced")) return false;
+        for (MetadataValue value : block.getMetadata("playerPlaced")) {
+            if (value.getOwningPlugin() == Main.getInstance() && value.asBoolean()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void findVein(Block block, Set<Block> vein) {
+        if (!isDiamondOre(block) || vein.contains(block) || isPlayerPlaced(block)) return;
+        vein.add(block);
+
+        // Check all 6 adjacent blocks (no diagonals)
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    if (Math.abs(dx) + Math.abs(dy) + Math.abs(dz) != 1) continue;
+                    Block neighbor = block.getRelative(dx, dy, dz);
+                    findVein(neighbor, vein);
+                }
+            }
+        }
+    }
+
+    private boolean isVeinFound(Block block) {
+        if (!block.hasMetadata("veinFound")) return false;
+        for (MetadataValue value : block.getMetadata("veinFound")) {
+            if (value.getOwningPlugin() == Main.getInstance() && value.asBoolean()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isOre(Material material) {
+        return switch (material) {
+            case COAL_ORE, DEEPSLATE_COAL_ORE, IRON_ORE, DEEPSLATE_IRON_ORE, COPPER_ORE, DEEPSLATE_COPPER_ORE, GOLD_ORE,
+                 DEEPSLATE_GOLD_ORE, REDSTONE_ORE, DEEPSLATE_REDSTONE_ORE, LAPIS_ORE, DEEPSLATE_LAPIS_ORE, DIAMOND_ORE,
+                 DEEPSLATE_DIAMOND_ORE, EMERALD_ORE, DEEPSLATE_EMERALD_ORE, NETHER_GOLD_ORE, NETHER_QUARTZ_ORE,
+                 ANCIENT_DEBRIS -> true;
+            default -> false;
+        };
     }
 }

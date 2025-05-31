@@ -48,6 +48,16 @@ public class User {
     private UUID lastMessaged;
     private boolean revived;
     private boolean scoreboard;
+    private int coalMined;
+    private int ironMined;
+    private int copperMined;
+    private int goldMined;
+    private int redstoneMined;
+    private int lapisMined;
+    private int diamondMined;
+    private int emeraldMined;
+    private int quartzMined;
+    private int debrisMined;
 
     public User(UserData userData) {
         userDisconnected = true;
@@ -82,6 +92,16 @@ public class User {
         lastMessaged = null;
         revived = false;
         scoreboard = userData.get().getBoolean("settings.scoreboard");
+        coalMined = userData.get().getInt("ores.coal");
+        ironMined = userData.get().getInt("ores.iron");
+        copperMined = userData.get().getInt("ores.copper");
+        goldMined = userData.get().getInt("ores.gold");
+        redstoneMined = userData.get().getInt("ores.redstone");
+        lapisMined = userData.get().getInt("ores.lapis");
+        diamondMined = userData.get().getInt("ores.diamond");
+        emeraldMined = userData.get().getInt("ores.emerald");
+        quartzMined = userData.get().getInt("ores.quartz");
+        debrisMined = userData.get().getInt("ores.debris");
     }
 
     public UUID getLoggerUUID() {
@@ -394,5 +414,95 @@ public class User {
     public void setScoreboard(boolean scoreboard) {
         modified = true;
         this.scoreboard = scoreboard;
+    }
+
+    public int getDebrisMined() {
+        return debrisMined;
+    }
+
+    public void setDebrisMined(int debrisMined) {
+        modified = true;
+        this.debrisMined = debrisMined;
+    }
+
+    public int getQuartzMined() {
+        return quartzMined;
+    }
+
+    public void setQuartzMined(int quartzMined) {
+        modified = true;
+        this.quartzMined = quartzMined;
+    }
+
+    public int getEmeraldMined() {
+        return emeraldMined;
+    }
+
+    public void setEmeraldMined(int emeraldMined) {
+        modified = true;
+        this.emeraldMined = emeraldMined;
+    }
+
+    public int getDiamondMined() {
+        return diamondMined;
+    }
+
+    public void setDiamondMined(int diamondMined) {
+        modified = true;
+        this.diamondMined = diamondMined;
+    }
+
+    public int getLapisMined() {
+        return lapisMined;
+    }
+
+    public void setLapisMined(int lapisMined) {
+        modified = true;
+        this.lapisMined = lapisMined;
+    }
+
+    public int getRedstoneMined() {
+        return redstoneMined;
+    }
+
+    public void setRedstoneMined(int redstoneMined) {
+        modified = true;
+        this.redstoneMined = redstoneMined;
+    }
+
+    public int getGoldMined() {
+        return goldMined;
+    }
+
+    public void setGoldMined(int goldMined) {
+        modified = true;
+        this.goldMined = goldMined;
+    }
+
+    public int getCopperMined() {
+        return copperMined;
+    }
+
+    public void setCopperMined(int copperMined) {
+        modified = true;
+        this.copperMined = copperMined;
+    }
+
+    public int getIronMined() {
+        return ironMined;
+    }
+
+    public void setIronMined(int ironMined) {
+        modified = true;
+        this.ironMined = ironMined;
+    }
+
+    public int getCoalMined() {
+        return coalMined;
+    }
+
+    public void setCoalMined(int coalMined) {
+        modified = true;
+        this.coalMined = coalMined;
     }
 }

@@ -95,21 +95,8 @@ public class FreezeCommand implements TabExecutor {
     ) {
         if (!Permission.has(sender, "freeze", "staff")) return List.of();
 
-        // Only tab complete the first argument
         if (args.length == 1) {
-            List<String> completions = new java.util.ArrayList<>();
-            String current = args[0].toLowerCase();
-            // Add "all" if it matches
-            if ("all".startsWith(current)) {
-                completions.add("all");
-            }
-            // Add online player names that match
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                if (player.getName().toLowerCase().startsWith(current)) {
-                    completions.add(player.getName());
-                }
-            }
-            return completions;
+           return null;
         }
 
         return List.of();

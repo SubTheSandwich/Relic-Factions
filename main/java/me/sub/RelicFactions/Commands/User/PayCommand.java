@@ -77,11 +77,7 @@ public class PayCommand implements TabExecutor {
     ) {
         if (!(sender instanceof Player player)) return List.of();
         if (args.length == 1) {
-            return Bukkit.getOnlinePlayers().stream()
-                    .map(Player::getName)
-                    .filter(name -> !name.equalsIgnoreCase(player.getName()))
-                    .filter(name -> name.toLowerCase().startsWith(args[0].toLowerCase()))
-                    .toList();
+            return null;
         }
         return List.of();
     }

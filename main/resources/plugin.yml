@@ -104,3 +104,5 @@ commands:
     description: Revive
   settings:
     description: Settings
+  profile:
+    description: Profile

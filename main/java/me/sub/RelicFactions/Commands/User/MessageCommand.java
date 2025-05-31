@@ -75,11 +75,7 @@ public class MessageCommand implements TabExecutor {
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
         if (!(sender instanceof Player)) return List.of();
         if (args.length == 1) {
-            return Bukkit.getOnlinePlayers().stream()
-                    .map(Player::getName)
-                    .filter(name -> !name.equalsIgnoreCase(sender.getName()))
-                    .filter(name -> name.toLowerCase().startsWith(args[0].toLowerCase()))
-                    .toList();
+            return null;
         }
         return List.of();
     }

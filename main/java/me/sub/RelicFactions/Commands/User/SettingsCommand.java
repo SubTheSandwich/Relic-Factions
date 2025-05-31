@@ -35,7 +35,7 @@ public class SettingsCommand implements TabExecutor {
             ItemStack item = new ItemStack(Objects.requireNonNull(Material.matchMaterial(Objects.requireNonNull(Inventories.get().getString("settings.items." + i + ".item")))));
             ItemMeta meta = item.getItemMeta();
             if (meta == null) continue;
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES);
             meta.setDisplayName(C.chat(Objects.requireNonNull(Inventories.get().getString("settings.items." + i + ".name"))));
             switch (i.toUpperCase()) {
                 case "MESSAGES" -> {

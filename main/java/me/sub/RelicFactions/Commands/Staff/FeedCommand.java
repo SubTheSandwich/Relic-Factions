@@ -54,11 +54,7 @@ public class FeedCommand implements TabExecutor {
         if (!Permission.has(commandSender, "heal", "staff")) return List.of();
         if (args.length == 1) {
             if (Permission.has(commandSender, "heal.others", "admin")) {
-                String current = args[0].toLowerCase();
-                return Bukkit.getOnlinePlayers().stream()
-                        .map(Player::getName)
-                        .filter(name -> name.toLowerCase().startsWith(current))
-                        .toList();
+               return null;
             }
         }
 

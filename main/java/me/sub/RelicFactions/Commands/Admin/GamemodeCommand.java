@@ -242,11 +242,7 @@ public class GamemodeCommand implements TabExecutor {
         if (args.length == 2) {
             if (Permission.has(sender, "gamemode.others", "admin") ||
                     sender.hasPermission("relic.command.gamemode.*")) {
-                String current = args[1].toLowerCase();
-                return Bukkit.getOnlinePlayers().stream()
-                        .map(Player::getName)
-                        .filter(name -> name.toLowerCase().startsWith(current))
-                        .toList();
+                return null;
             }
         }
 

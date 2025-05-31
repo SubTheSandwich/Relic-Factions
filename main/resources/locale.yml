@@ -47,6 +47,7 @@ claiming:
     two: "&eSet position 2"
 
 events:
+  found-diamonds: "&9[FD] &r%player% &bfound %amount% diamond(s)"
   revive:
     items: "&eSince you were revived by a staff member, you have been granted your items back."
     no-items: "&eYou were revived by a staff member."
@@ -114,6 +115,9 @@ faction:
     damage: "&eYou cannot damage &2%player%&e."
 
 commands:
+  profile:
+    self: "&eOpening your profile..."
+    other: "&eOpening &b%player%&e's profile..."
   settings:
     messages: "&6Messages&7: &r%status%"
     message-sounds: "&6Message Sounds&7: &r%status%"

@@ -42,6 +42,10 @@ public class ReviveCommand implements TabExecutor {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
+        if (!Permission.has(sender, "revive", "admin")) {
+            return List.of();
+        }
+        if (args.length == 1) return null;
         return List.of();
     }
 }

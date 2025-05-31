@@ -153,6 +153,7 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("message")).setExecutor(new MessageCommand()); Objects.requireNonNull(getCommand("message")).setTabCompleter(new MessageCommand());
         Objects.requireNonNull(getCommand("reply")).setExecutor(new ReplyCommand()); Objects.requireNonNull(getCommand("reply")).setTabCompleter(new ReplyCommand());
         Objects.requireNonNull(getCommand("settings")).setExecutor(new SettingsCommand()); Objects.requireNonNull(getCommand("settings")).setTabCompleter(new SettingsCommand());
+        Objects.requireNonNull(getCommand("profile")).setExecutor(new ProfileCommand()); Objects.requireNonNull(getCommand("profile")).setTabCompleter(new ProfileCommand());
     }
 
 
@@ -313,6 +314,16 @@ public class Main extends JavaPlugin {
             userData.get().set("settings.messages.enabled", user.isMessages());
             userData.get().set("settings.messages.sounds", user.isMessageSounds());
             userData.get().set("settings.scoreboard", user.isScoreboard());
+            userData.get().set("ores.coal", user.getCoalMined());
+            userData.get().set("ores.iron", user.getIronMined());
+            userData.get().set("ores.copper", user.getCopperMined());
+            userData.get().set("ores.gold", user.getGoldMined());
+            userData.get().set("ores.redstone", user.getRedstoneMined());
+            userData.get().set("ores.lapis", user.getLapisMined());
+            userData.get().set("ores.diamond", user.getDiamondMined());
+            userData.get().set("ores.emerald", user.getEmeraldMined());
+            userData.get().set("ores.quartz", user.getQuartzMined());
+            userData.get().set("ores.debris", user.getDebrisMined());
             userData.save();
             user.setModified(false);
             saved++;
