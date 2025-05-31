@@ -169,6 +169,8 @@ public class UserDamageEvents implements Listener {
             return; // Not a valid UUID
         }
 
+        e.getEntity().getWorld().strikeLightningEffect(e.getEntity().getLocation());
+
         User hitUser = User.get(hit);
         if (hitUser == null) return;
 
@@ -414,6 +416,9 @@ public class UserDamageEvents implements Listener {
         user.setLastInventoryContents(p.getInventory().getContents());
         user.setDeaths(user.getDeaths() + 1);
         // TODO: EOTW
+
+        e.getEntity().getWorld().strikeLightningEffect(e.getEntity().getLocation());
+
         int time = User.getDeathbanTime(p);
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, time);

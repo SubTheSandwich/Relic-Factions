@@ -114,6 +114,10 @@ faction:
     damage: "&eYou cannot damage &2%player%&e."
 
 commands:
+  settings:
+    messages: "&6Messages&7: &r%status%"
+    message-sounds: "&6Message Sounds&7: &r%status%"
+    scoreboard: "&6Scoreboard&7: &r%status%"
   revive:
     usage: "&cUsage: /revive <player>"
     success: "&eYou have revived &b%player%&e."

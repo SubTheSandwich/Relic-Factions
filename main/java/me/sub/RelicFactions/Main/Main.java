@@ -16,6 +16,7 @@ import me.sub.RelicFactions.Files.Data.FactionData;
 import me.sub.RelicFactions.Files.Data.ServerTimer;
 import me.sub.RelicFactions.Files.Data.UserData;
 import me.sub.RelicFactions.Files.Enums.FactionType;
+import me.sub.RelicFactions.Files.Normal.Inventories;
 import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Files.Normal.ModModeFile;
 import me.sub.RelicFactions.Utils.Econ;
@@ -42,10 +43,12 @@ public class Main extends JavaPlugin {
 
     /*
 
-    TODO: Profile (ores mined, etc), Settings, Mapkit, Clear Inventory, Custom Timer,
+    TODO: Profile (ores mined, etc), Settings, Mapkit, Clear Inventory, Custom Timer, Sale, Key-All,
     TODO: End Set Spawn & Exit, and Nether Set Spawn & Exit commands, as well as Crowbar Command & Functionality
 
     TODO: Holograms (Probably through invisible armor stands with custom names)
+
+    TODO: Reclaims
      */
 
     private static Economy econ = null;
@@ -148,6 +151,7 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("toggleglobalchat")).setExecutor(new ToggleGlobalChatCommand()); Objects.requireNonNull(getCommand("toggleglobalchat")).setTabCompleter(new ToggleGlobalChatCommand());
         Objects.requireNonNull(getCommand("message")).setExecutor(new MessageCommand()); Objects.requireNonNull(getCommand("message")).setTabCompleter(new MessageCommand());
         Objects.requireNonNull(getCommand("reply")).setExecutor(new ReplyCommand()); Objects.requireNonNull(getCommand("reply")).setTabCompleter(new ReplyCommand());
+        Objects.requireNonNull(getCommand("settings")).setExecutor(new SettingsCommand()); Objects.requireNonNull(getCommand("settings")).setTabCompleter(new SettingsCommand());
     }
 
     private void events() {
@@ -165,6 +169,7 @@ public class Main extends JavaPlugin {
         pm.registerEvents(new UserDamageEvents(), this);
         pm.registerEvents(new ModModeEvents(), this);
         pm.registerEvents(new FreezeMovementEvent(), this);
+        pm.registerEvents(new SettingsInteractEvent(), this);
     }
 
     private void files() {
@@ -173,6 +178,7 @@ public class Main extends JavaPlugin {
         saveResource("messages.yml", false);
         Locale.load();
         ModModeFile.save();
+        Inventories.save();
     }
 
     private boolean setupEconomy() {
@@ -300,6 +306,10 @@ public class Main extends JavaPlugin {
             userData.get().set("timers", Maps.timersToString(user.getTimers()));
             userData.get().set("lastInventoryContents", Maps.toBase64(user.getLastInventoryContents()));
             userData.get().set("playtime", user.getStoredPlaytime());
+            userData.get().set("settings.global-chat", user.isGlobalChat());
+            userData.get().set("settings.messages.enabled", user.isMessages());
+            userData.get().set("settings.messages.sounds", user.isMessageSounds());
+            userData.get().set("settings.scoreboard", user.isScoreboard());
             userData.save();
             user.setModified(false);
             saved++;

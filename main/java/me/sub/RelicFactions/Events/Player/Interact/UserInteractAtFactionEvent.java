@@ -5,6 +5,7 @@ import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Data.ModMode;
 import me.sub.RelicFactions.Files.Enums.FactionType;
 import me.sub.RelicFactions.Files.Normal.Locale;
+import me.sub.RelicFactions.Files.Normal.ModModeFile;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
 import org.bukkit.Location;
@@ -312,6 +313,11 @@ public class UserInteractAtFactionEvent implements Listener {
         Player p = e.getPlayer();
         User user = User.get(p);
         Action a = e.getAction();
+        if (e.getItem() != null) {
+            if (user.getModMode() == null && ModModeFile.getItem(e.getItem()) != null) {
+                p.getInventory().remove(e.getItem());
+            }
+        }
         if (a.equals(Action.RIGHT_CLICK_BLOCK)) {
             Block block = e.getClickedBlock();
             Material type = Objects.requireNonNull(block).getType();

@@ -47,6 +47,7 @@ public class User {
     private boolean messageSounds;
     private UUID lastMessaged;
     private boolean revived;
+    private boolean scoreboard;
 
     public User(UserData userData) {
         userDisconnected = true;
@@ -75,11 +76,12 @@ public class User {
         isPanic = false;
         storedPlaytime = userData.get().getLong("playtime");
         lastLoginTimestamp = 0;
-        globalChat = true;
+        globalChat = userData.get().getBoolean("settings.global-chat");
         messages = userData.get().getBoolean("settings.messages.enabled");
         messageSounds = userData.get().getBoolean("settings.messages.sounds");
         lastMessaged = null;
         revived = false;
+        scoreboard = userData.get().getBoolean("settings.scoreboard");
     }
 
     public UUID getLoggerUUID() {
@@ -347,6 +349,7 @@ public class User {
     }
 
     public void setGlobalChat(boolean globalChat) {
+        modified = true;
         this.globalChat = globalChat;
     }
 
@@ -382,5 +385,14 @@ public class User {
 
     public void setRevived(boolean revived) {
         this.revived = revived;
+    }
+
+    public boolean isScoreboard() {
+        return scoreboard;
+    }
+
+    public void setScoreboard(boolean scoreboard) {
+        modified = true;
+        this.scoreboard = scoreboard;
     }
 }

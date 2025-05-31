@@ -1,0 +1,24 @@
+filler:
+  enabled: true
+  item: GRAY_STAINED_GLASS_PANE
+
+settings:
+  name: "&aSettings"
+  size: 45
+  items:
+    messages:
+      name: "&eToggle Messages"
+      item: BOOK
+      slot: 10
+    scoreboard:
+      name: "&eToggle Scoreboard"
+      item: OAK_SIGN
+      slot: 13
+    chat:
+      name: "&eToggle Global Chat"
+      item: NAME_TAG
+      slot: 16
+    sounds:
+      name: "&eToggle Message Sounds"
+      item: BELL
+      slot: 28

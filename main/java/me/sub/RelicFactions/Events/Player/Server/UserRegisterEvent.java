@@ -22,6 +22,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Criteria;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -152,8 +156,8 @@ public class UserRegisterEvent implements Listener {
             @Override
             public void run() {
                 if (!Main.getInstance().getConfig().getBoolean("features.scoreboard.enabled")) return;
-                ArrayList<String> lines = new ArrayList<>();
                 FastBoard board = Main.getInstance().boards.getOrDefault(p.getUniqueId(), null);
+                ArrayList<String> lines = new ArrayList<>();
                 if (board == null) {
                     board = new FastBoard(p);
                     board.updateTitle(C.chat(Objects.requireNonNull(Main.getInstance().getConfig().getString("scoreboard.title"))));
@@ -217,7 +221,7 @@ public class UserRegisterEvent implements Listener {
                     lines.add(C.chat(s));
                 }
 
-                if (lines.size() <= Main.getInstance().getConfig().getInt("features.scoreboard.line-limit")) {
+                if (lines.size() <= Main.getInstance().getConfig().getInt("features.scoreboard.line-limit") || !finalUser.isScoreboard()) {
                     board.delete();
                     Main.getInstance().boards.remove(p.getUniqueId());
                 } else {
