@@ -154,6 +154,7 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("settings")).setExecutor(new SettingsCommand()); Objects.requireNonNull(getCommand("settings")).setTabCompleter(new SettingsCommand());
     }
 
+
     private void events() {
         PluginManager pm = getServer().getPluginManager();
 
