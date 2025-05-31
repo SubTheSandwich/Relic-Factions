@@ -110,3 +110,5 @@ commands:
     aliases:
       - clear
       - ci
+  end:
+    description: End

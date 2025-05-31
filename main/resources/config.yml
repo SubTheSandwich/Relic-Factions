@@ -14,6 +14,9 @@ server:
 limiters:
   world-border: 2944
 
+combat:
+  allow-end-portal-enter: false
+
 commands:
   freeze-allowed:
     - "msg"

@@ -5,6 +5,7 @@ import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Data.PlayerTimer;
 import me.sub.RelicFactions.Files.Enums.FactionType;
 import me.sub.RelicFactions.Files.Normal.Locale;
+import me.sub.RelicFactions.Files.Normal.Locations;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
 import org.bukkit.Location;
@@ -13,7 +14,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Objects;
 
@@ -35,6 +38,56 @@ public class UserMoveEvent implements Listener {
         processHome(e.getPlayer());
         processLogout(e.getPlayer());
         if (notAllowed(e.getPlayer(), e.getTo(), e.getFrom())) e.setCancelled(true);
+
+        Player p = e.getPlayer();
+        User user = User.get(p);
+        if (user.hasTimer("combat") && !Main.getInstance().getConfig().getBoolean("combat.allow-end-portal-enter")) {
+            e.setCancelled(true);
+            p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.timer.player.end"))));
+            return;
+        }
+        Locations locations = new Locations();
+        if (!e.getCause().equals(PlayerTeleportEvent.TeleportCause.END_PORTAL) && !e.getCause().equals(PlayerTeleportEvent.TeleportCause.UNKNOWN)) return;
+        if (Objects.requireNonNull(e.getFrom().getWorld()).getEnvironment() == World.Environment.THE_END &&
+                Objects.requireNonNull(e.getTo().getWorld()).getEnvironment() == World.Environment.NORMAL) {
+            Location endExit = locations.get().getLocation("end.exit");
+            if (endExit != null) {
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        if (p.getWorld().getEnvironment() == World.Environment.NORMAL) {
+                            p.teleport(endExit);
+                        }
+                    }
+                }.runTaskLater(Main.getInstance(), 1);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPortal(PlayerPortalEvent e) {
+        Player p = e.getPlayer();
+        User user = User.get(p);
+        if (user.hasTimer("combat") && !Main.getInstance().getConfig().getBoolean("combat.allow-end-portal-enter")) {
+            e.setCancelled(true);
+            p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.timer.player.end"))));
+            return;
+        }
+        Locations locations = new Locations();
+        if (!e.getCause().equals(PlayerTeleportEvent.TeleportCause.END_PORTAL)) return;
+
+
+        if (Objects.requireNonNull(Objects.requireNonNull(e.getTo()).getWorld()).getEnvironment() == World.Environment.THE_END) {
+            Location endSpawn = locations.get().getLocation("end.spawn");
+            if (endSpawn != null) {
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        p.teleport(endSpawn);
+                    }
+                }.runTaskLater(Main.getInstance(), 1);
+            }
+        }
     }
 
     private void processHome(Player p) {

@@ -19,6 +19,7 @@ import me.sub.RelicFactions.Files.Data.UserData;
 import me.sub.RelicFactions.Files.Enums.FactionType;
 import me.sub.RelicFactions.Files.Normal.Inventories;
 import me.sub.RelicFactions.Files.Normal.Locale;
+import me.sub.RelicFactions.Files.Normal.Locations;
 import me.sub.RelicFactions.Files.Normal.ModModeFile;
 import me.sub.RelicFactions.Utils.Econ;
 import me.sub.RelicFactions.Utils.Fastboard.FastBoard;
@@ -45,7 +46,7 @@ public class Main extends JavaPlugin {
     /*
 
     TODO: Mapkit, Custom Timer, Sale, Key-All,
-    TODO: End Set Spawn & Exit, and Nether Set Spawn & Exit commands, as well as Crowbar Command & Functionality
+    TODO: Crowbar Command & Functionality
 
     TODO: Holograms (Probably through invisible armor stands with custom names)
 
@@ -124,6 +125,7 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("world")).setExecutor(new WorldCommand()); Objects.requireNonNull(getCommand("world")).setTabCompleter(new WorldCommand());
         Objects.requireNonNull(getCommand("revive")).setExecutor(new ReviveCommand()); Objects.requireNonNull(getCommand("revive")).setTabCompleter(new ReviveCommand());
         Objects.requireNonNull(getCommand("clearinventory")).setExecutor(new ClearInventoryCommand()); Objects.requireNonNull(getCommand("clearinventory")).setTabCompleter(new ClearInventoryCommand());
+        Objects.requireNonNull(getCommand("end")).setExecutor(new EndCommand()); Objects.requireNonNull(getCommand("end")).setTabCompleter(new EndCommand());
 
         // Staff
         Objects.requireNonNull(getCommand("staffchat")).setExecutor(new StaffChatCommand()); Objects.requireNonNull(getCommand("staffchat")).setTabCompleter(new StaffChatCommand());
@@ -184,6 +186,8 @@ public class Main extends JavaPlugin {
         Locale.load();
         ModModeFile.save();
         Inventories.save();
+        Locations locations = new Locations();
+        locations.save();
     }
 
     private boolean setupEconomy() {

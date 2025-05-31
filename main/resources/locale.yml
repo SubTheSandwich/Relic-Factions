@@ -74,6 +74,7 @@ events:
       expire:
         sotw: "&cThe SOTW period has ended!"
     player:
+      end: "&eYou cannot enter end whilst having a combat timer."
       cannot-claim: "&cYou cannot claim whilst having a PvP timer."
       start: # no default
         combat: "&eYou have been spawn-tagged for &c30 &eseconds!"
@@ -115,6 +116,12 @@ faction:
     damage: "&eYou cannot damage &2%player%&e."
 
 commands:
+  end:
+    usage: "&cUsage: /end <setspawn/setexit>"
+    not-end: "&cYour spawn location must be in the end."
+    not-overworld: "&cYour exit location must be in the overworld."
+    spawn: "&eYou have set your end spawn to your current location."
+    exit: "&eYou have set your end exit to your current location."
   clearinventory:
     usage: "&cUsage: /%alias% <player>"
     success: "&eYou have cleared your inventory."
