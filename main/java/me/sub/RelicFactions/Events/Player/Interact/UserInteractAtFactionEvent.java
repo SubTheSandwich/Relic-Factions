@@ -61,6 +61,7 @@ public class UserInteractAtFactionEvent implements Listener {
 
     private boolean cannotModify(User user, Location location) {
         if (user.isFactionBypass()) return false;
+        if (user.isFrozen()) return true;
         if (user.getModMode() != null) {
             ModMode modMode = user.getModMode();
             if (!modMode.isInBypass()) return true;

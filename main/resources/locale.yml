@@ -189,6 +189,7 @@ commands:
     server-frozen: "&eThe server is now frozen."
     server-unfrozen: "&eThe server is now unfrozen."
     disconnect: "&4&l%player% &c&ldisconnected while frozen!"
+    blocked: "&cYou cannot execute this command while frozen."
   invsee:
     usage: "&cUsage: /%alias% <player>"
     success: "&eOpening the inventory of &b%player%&e..."

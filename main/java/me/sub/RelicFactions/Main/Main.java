@@ -5,6 +5,7 @@ import me.sub.RelicFactions.Commands.Staff.*;
 import me.sub.RelicFactions.Commands.User.*;
 import me.sub.RelicFactions.Events.Player.Attack.UserDamageEvents;
 import me.sub.RelicFactions.Events.Player.Chat.FormatChatEvent;
+import me.sub.RelicFactions.Events.Player.Commands.BlockCommandEvent;
 import me.sub.RelicFactions.Events.Player.Interact.*;
 import me.sub.RelicFactions.Events.Player.Movement.FreezeMovementEvent;
 import me.sub.RelicFactions.Events.Player.Movement.UserMoveEvent;
@@ -43,7 +44,7 @@ public class Main extends JavaPlugin {
 
     /*
 
-    TODO: Profile (ores mined, etc), Settings, Mapkit, Clear Inventory, Custom Timer, Sale, Key-All,
+    TODO: Profile (ores mined, etc), Mapkit, Clear Inventory, Custom Timer, Sale, Key-All,
     TODO: End Set Spawn & Exit, and Nether Set Spawn & Exit commands, as well as Crowbar Command & Functionality
 
     TODO: Holograms (Probably through invisible armor stands with custom names)
@@ -171,6 +172,7 @@ public class Main extends JavaPlugin {
         pm.registerEvents(new ModModeEvents(), this);
         pm.registerEvents(new FreezeMovementEvent(), this);
         pm.registerEvents(new SettingsInteractEvent(), this);
+        pm.registerEvents(new BlockCommandEvent(), this);
     }
 
     private void files() {

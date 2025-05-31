@@ -59,7 +59,7 @@ public class FreezeCommand implements TabExecutor {
             player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.freeze.unfrozen"))));
         } else {
             new BukkitRunnable() {
-                int ticks = 0;
+                int ticks = 100;
                 @Override
                 public void run() {
                     if (!player.isOnline()) {
@@ -74,7 +74,7 @@ public class FreezeCommand implements TabExecutor {
                         return;
                     }
                     ticks++;
-                    if (ticks == 100) {
+                    if (ticks >= 100) {
                         Messages.send(player, "staff.frozen");
                         ticks = 0;
                     }

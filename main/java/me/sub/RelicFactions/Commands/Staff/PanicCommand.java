@@ -39,7 +39,7 @@ public class PanicCommand implements TabExecutor {
                 player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.panic.broadcast")).replace("%player%", p.getName())));
             }
             new BukkitRunnable() {
-                int ticks = 0;
+                int ticks = 100;
                 @Override
                 public void run() {
                     if (!user.isPanic()) {
@@ -47,7 +47,7 @@ public class PanicCommand implements TabExecutor {
                         return;
                     }
                     ticks++;
-                    if (ticks == 100) {
+                    if (ticks >= 100) {
                         Messages.send(p, "staff.panic");
                         ticks = 0;
                     }

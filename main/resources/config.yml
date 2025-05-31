@@ -14,6 +14,17 @@ server:
 limiters:
   world-border: 2944
 
+commands:
+  freeze-allowed:
+    - "msg"
+    - "message"
+    - "whisper"
+    - "w"
+    - "pm"
+    - "tell"
+    - "r"
+    - "reply"
+
 timers:
   starting: 3600
   pvp: 1800
