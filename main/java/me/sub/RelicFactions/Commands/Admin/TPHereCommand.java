@@ -13,7 +13,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -53,7 +52,7 @@ public class TPHereCommand implements TabExecutor {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
-        if (!(sender instanceof Player p)) {
+        if (!(sender instanceof Player)) {
             return List.of();
         }
 

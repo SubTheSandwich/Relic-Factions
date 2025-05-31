@@ -115,6 +115,11 @@ faction:
     damage: "&eYou cannot damage &2%player%&e."
 
 commands:
+  clearinventory:
+    usage: "&cUsage: /%alias% <player>"
+    success: "&eYou have cleared your inventory."
+    other: "&eYou have cleared &b%player%&e's inventory."
+    target: "&eYour inventory was cleared by &b%player%&e."
   profile:
     self: "&eOpening your profile..."
     other: "&eOpening &b%player%&e's profile..."

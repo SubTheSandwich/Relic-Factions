@@ -44,7 +44,7 @@ public class Main extends JavaPlugin {
 
     /*
 
-    TODO: Profile (ores mined, etc), Mapkit, Clear Inventory, Custom Timer, Sale, Key-All,
+    TODO: Mapkit, Custom Timer, Sale, Key-All,
     TODO: End Set Spawn & Exit, and Nether Set Spawn & Exit commands, as well as Crowbar Command & Functionality
 
     TODO: Holograms (Probably through invisible armor stands with custom names)
@@ -123,6 +123,7 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("spawner")).setExecutor(new SpawnerCommand()); Objects.requireNonNull(getCommand("spawner")).setTabCompleter(new SpawnerCommand());
         Objects.requireNonNull(getCommand("world")).setExecutor(new WorldCommand()); Objects.requireNonNull(getCommand("world")).setTabCompleter(new WorldCommand());
         Objects.requireNonNull(getCommand("revive")).setExecutor(new ReviveCommand()); Objects.requireNonNull(getCommand("revive")).setTabCompleter(new ReviveCommand());
+        Objects.requireNonNull(getCommand("clearinventory")).setExecutor(new ClearInventoryCommand()); Objects.requireNonNull(getCommand("clearinventory")).setTabCompleter(new ClearInventoryCommand());
 
         // Staff
         Objects.requireNonNull(getCommand("staffchat")).setExecutor(new StaffChatCommand()); Objects.requireNonNull(getCommand("staffchat")).setTabCompleter(new StaffChatCommand());

@@ -106,3 +106,7 @@ commands:
     description: Settings
   profile:
     description: Profile
+  clearinventory:
+    aliases:
+      - clear
+      - ci
