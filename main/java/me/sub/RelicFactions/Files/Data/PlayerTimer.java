@@ -9,6 +9,7 @@ import me.sub.RelicFactions.Utils.C;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.math.BigDecimal;
@@ -129,7 +130,7 @@ public class PlayerTimer {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            Objects.requireNonNull(player).teleport(home);
+                            Objects.requireNonNull(player).teleport(home, PlayerTeleportEvent.TeleportCause.COMMAND);
                         }
                     }.runTaskLater(Main.getInstance(), 1);
                     Objects.requireNonNull(player).sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.warping")).replace("%faction%", faction.getName())));

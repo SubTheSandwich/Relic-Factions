@@ -45,7 +45,7 @@ public class Main extends JavaPlugin {
 
     /*
 
-    TODO: Mapkit, Custom Timer, Sale, Key-All,
+    TODO: Mapkit, Custom Timer,
     TODO: Crowbar Command & Functionality
 
     TODO: Holograms (Probably through invisible armor stands with custom names)
@@ -66,6 +66,7 @@ public class Main extends JavaPlugin {
     public Set<UUID> sotwEnabled = new HashSet<>();
 
     private boolean isServerFrozen;
+    private String keyAllCommand;
 
     private static Main instance;
 
@@ -103,6 +104,7 @@ public class Main extends JavaPlugin {
         }.runTaskTimer(this, 5 * 60 * 20L, 5 * 60 * 20L);
         handleDTR();
         isServerFrozen = false;
+        keyAllCommand = null;
     }
 
     @Override
@@ -126,6 +128,9 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("revive")).setExecutor(new ReviveCommand()); Objects.requireNonNull(getCommand("revive")).setTabCompleter(new ReviveCommand());
         Objects.requireNonNull(getCommand("clearinventory")).setExecutor(new ClearInventoryCommand()); Objects.requireNonNull(getCommand("clearinventory")).setTabCompleter(new ClearInventoryCommand());
         Objects.requireNonNull(getCommand("end")).setExecutor(new EndCommand()); Objects.requireNonNull(getCommand("end")).setTabCompleter(new EndCommand());
+        Objects.requireNonNull(getCommand("sale")).setExecutor(new SaleCommand()); Objects.requireNonNull(getCommand("sale")).setTabCompleter(new SaleCommand());
+        Objects.requireNonNull(getCommand("keysale")).setExecutor(new KeySaleCommand()); Objects.requireNonNull(getCommand("keysale")).setTabCompleter(new KeySaleCommand());
+        Objects.requireNonNull(getCommand("keyall")).setExecutor(new KeyAllCommand()); Objects.requireNonNull(getCommand("keyall")).setTabCompleter(new KeyAllCommand());
 
         // Staff
         Objects.requireNonNull(getCommand("staffchat")).setExecutor(new StaffChatCommand()); Objects.requireNonNull(getCommand("staffchat")).setTabCompleter(new StaffChatCommand());
@@ -396,5 +401,13 @@ public class Main extends JavaPlugin {
         return Bukkit.getOnlinePlayers().stream()
                 .filter(p -> Permission.has(p, "staff") || Permission.has(p, "admin"))
                 .collect(Collectors.toList());
+    }
+
+    public String getKeyAllCommand() {
+        return keyAllCommand;
+    }
+
+    public void setKeyAllCommand(String keyAllCommand) {
+        this.keyAllCommand = keyAllCommand;
     }
 }

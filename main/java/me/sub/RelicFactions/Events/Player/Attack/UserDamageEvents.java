@@ -22,9 +22,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.projectiles.ProjectileSource;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class UserDamageEvents implements Listener {
 
@@ -499,6 +497,7 @@ public class UserDamageEvents implements Listener {
             }
         }
         e.setDeathMessage(C.chat(deathMessage));
+
     }
 
     private String fillInDead(Player dead, String deathMessage, Player killer) {

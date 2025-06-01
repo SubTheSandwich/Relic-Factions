@@ -94,6 +94,9 @@ scoreboard:
   title: "%primary%&l%servername% &7| &fMap %map-number%"
   lines:
     - "&7&m-------------------------"
+    - "&a&lSale&7: &c%server_sale_timer%<display=%has_server_sale_timer%"
+    - "&a&lKey Sale&7: &c%server_keysale_timer%<display=%has_server_keysale_timer%"
+    - "&b&lKey All&7: &c%server_keyall_timer%<display=%has_server_keyall_timer%"
     - "&a&lStarting&7: &c%player_starting_timer%<display=%has_player_starting_timer%"
     - "&a&lPvP Timer&7: &c%player_pvp_timer%<display=%has_player_pvp_timer%"
     - "&9&lHome&7: &c%player_home_timer%<display=%has_player_home_timer%"

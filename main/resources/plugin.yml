@@ -112,3 +112,9 @@ commands:
       - ci
   end:
     description: End
+  sale:
+    description: Sale
+  keysale:
+    description: Key Sale
+  keyall:
+    description: Key All

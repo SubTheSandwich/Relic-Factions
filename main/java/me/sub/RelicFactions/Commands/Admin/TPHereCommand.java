@@ -9,6 +9,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,7 +44,7 @@ public class TPHereCommand implements TabExecutor {
         new BukkitRunnable() {
             @Override
             public void run() {
-                player.teleport(p.getLocation());
+                player.teleport(p.getLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
             }
         }.runTaskLater(Main.getInstance(), 1);
         p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.teleport.player.here")).replace("%player%", player.getName())));

@@ -73,6 +73,9 @@ events:
     server:
       expire:
         sotw: "&cThe SOTW period has ended!"
+        sale: "&cThe Sale has expired."
+        keysale: "&cThe Key Sale has expired."
+        keyall: "&cThe Key All has been given."
     player:
       end: "&eYou cannot enter end whilst having a combat timer."
       cannot-claim: "&cYou cannot claim whilst having a PvP timer."
@@ -116,6 +119,31 @@ faction:
     damage: "&eYou cannot damage &2%player%&e."
 
 commands:
+  sale:
+    usage: "&cUsage: /sale <time/pause/stop>"
+    started: "&aA Sale has begun."
+    stopped: "&cThe Sale was forcefully stopped."
+    running: "&aThe Sale is currently running."
+    not-running: "&aThe Sale is not running."
+    paused: "&aThe Sale was paused."
+    unpaused: "&aThe Sale was unpaused."
+  key-sale:
+    usage: "&cUsage: /keysale <time/pause/stop>"
+    started: "&aA Key Sale has begun."
+    stopped: "&cThe Key Sale was forcefully stopped."
+    running: "&aThe Key Sale is currently running."
+    not-running: "&aThe Key Sale is not running."
+    paused: "&aThe Key Sale was paused."
+    unpaused: "&aThe Key Sale was unpaused."
+  key-all:
+    usage: "&cUsage: /keyall <time;stop> <command including spaces example:crate giveallkey
+      Tier1 1>"
+    started: "&aA Key All has begun."
+    stopped: "&cThe Key All was forcefully stopped."
+    running: "&aThe Key All is currently running."
+    not-running: "&aThe Key All is not running."
+    paused: "&aThe Key All was paused."
+    unpaused: "&aThe Key All was unpaused."
   end:
     usage: "&cUsage: /end <setspawn/setexit>"
     not-end: "&cYour spawn location must be in the end."

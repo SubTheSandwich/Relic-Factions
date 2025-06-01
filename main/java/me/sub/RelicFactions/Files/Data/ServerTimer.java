@@ -100,6 +100,10 @@ public class ServerTimer {
                     Bukkit.broadcastMessage(C.chat(Locale.get().getString("events.timer.server.expire." + name) == null ? Objects.requireNonNull(Locale.get().getString("events.timer.server.expire.default")).replace("%name%", name) : Objects.requireNonNull(Locale.get().getString("events.timer.server.expire." + name))));
                     cancel();
                     Main.getInstance().serverTimers.remove(name.toUpperCase());
+                    if (name.equalsIgnoreCase("keyall")) {
+                        Bukkit.dispatchCommand(Main.getInstance().getServer().getConsoleSender(), Main.getInstance().getKeyAllCommand());
+                        Main.getInstance().setKeyAllCommand(null);
+                    }
                 }
             }
         }.runTaskTimer(Main.getInstance(), 0, 1);
