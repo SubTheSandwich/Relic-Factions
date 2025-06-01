@@ -1,10 +1,8 @@
 package me.sub.RelicFactions.Files.Data;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
+import me.sub.RelicFactions.Main.Main;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -142,5 +140,21 @@ public class Cuboid {
 
     public int getZMax() {
         return zMax;
+    }
+
+    public boolean isPastBorder() {
+        World.Environment environment = world.getEnvironment();
+        int border;
+        switch (environment) {
+            case CUSTOM, NORMAL -> border = Main.getInstance().getConfig().getInt("limiters.world-border");
+            case NETHER -> border = Main.getInstance().getConfig().getInt("limiters.nether-border");
+            case THE_END -> border = Main.getInstance().getConfig().getInt("limiters.end-border");
+            default -> throw new IllegalArgumentException("An unknown environment occurred.");
+        }
+        if (border < 0) return false; // No border set
+
+        // Check if any part of the cuboid is outside the border square (centered at 0,0)
+        // This assumes the border is a square from -border to +border on X and Z
+        return xMin < -border || xMax > border || zMin < -border || zMax > border;
     }
 }

@@ -59,6 +59,10 @@ public class UserClaimEvents implements Listener {
                 user.setClaim(null);
             }
             case LEFT_CLICK_BLOCK -> {
+                if (isPastBorder(Objects.requireNonNull(e.getClickedBlock()).getLocation())) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("claiming.error.border"))));
+                    return;
+                }
                 if (faction.getType().equals(FactionType.PLAYER)) {
                     if (isInvalid(Objects.requireNonNull(e.getClickedBlock()).getLocation())) {
                         p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("claiming.error.location"))));
@@ -79,6 +83,10 @@ public class UserClaimEvents implements Listener {
                 sendMessage(p);
             }
             case RIGHT_CLICK_BLOCK -> {
+                if (isPastBorder(Objects.requireNonNull(e.getClickedBlock()).getLocation())) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("claiming.error.border"))));
+                    return;
+                }
                 if (faction.getType().equals(FactionType.PLAYER)) {
                     if (isInvalid(Objects.requireNonNull(e.getClickedBlock()).getLocation())) {
                         p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("claiming.error.location"))));
@@ -118,10 +126,20 @@ public class UserClaimEvents implements Listener {
         }
         Faction faction = Faction.get(claim.getUUID());
         Cuboid area = new Cuboid(claim.getCornerOne(), claim.getCornerTwo());
+        if (area.isPastBorder()) {
+            claim.setAttempting(false);
+            p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("claiming.error.border"))));
+            return;
+        }
         for (Faction tested : Main.getInstance().factions.values()) {
             if (tested.getClaims() == null) continue;
             if (tested.getClaims().isEmpty()) continue;
             for (Cuboid cuboid : tested.getClaims()) {
+                if (cuboid.isPastBorder()) {
+                    claim.setAttempting(false);
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("claiming.error.border"))));
+                    return;
+                }
                 if (cuboid.collidesWith(area)) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("claiming.error.in-claim"))));
                     claim.setAttempting(false);
@@ -303,6 +321,22 @@ public class UserClaimEvents implements Listener {
 
     private boolean isInvalid(Location location) {
         return Math.abs(location.getBlockX()) < Main.getInstance().getConfig().getInt("factions.sizes.worlds.default.warzone") && Math.abs(location.getBlockZ()) < Main.getInstance().getConfig().getInt("factions.sizes.worlds.default.warzone");
+    }
+
+    public static boolean isPastBorder(Location location) {
+        World.Environment environment = Objects.requireNonNull(location.getWorld()).getEnvironment();
+        int border;
+        switch (environment) {
+            case CUSTOM, NORMAL -> border = Main.getInstance().getConfig().getInt("limiters.world-border");
+            case NETHER -> border = Main.getInstance().getConfig().getInt("limiters.nether-border");
+            case THE_END -> border = Main.getInstance().getConfig().getInt("limiters.end-border");
+            default -> throw new IllegalArgumentException("An unknown argument occurred.");
+        }
+        if (border < 0) return false;
+
+        int x = location.getBlockX();
+        int z = location.getBlockZ();
+        return Math.abs(x) > border || Math.abs(z) > border;
     }
 
     public double getPrice(Cuboid cuboid) {

@@ -13,6 +13,8 @@ server:
 
 limiters:
   world-border: 2944
+  nether-border: 2000
+  end-border: -1
 
 combat:
   allow-end-portal-enter: false

@@ -45,7 +45,7 @@ public class Main extends JavaPlugin {
 
     /*
 
-    TODO: Mapkit
+    TODO: Mapkit (enchantment limiters, etc), Brewing Potion Limiters
     TODO: Crowbar Command & Functionality
 
     TODO: Holograms (Probably through invisible armor stands with custom names)

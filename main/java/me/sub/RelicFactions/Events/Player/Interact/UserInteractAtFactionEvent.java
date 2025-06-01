@@ -54,6 +54,8 @@ public class UserInteractAtFactionEvent implements Listener {
             player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.mod-mode.cant"))));
         } else if (Objects.requireNonNull(rejectedModifierType(user, location)).equalsIgnoreCase("NONE")) {
             return;
+        } else if (Objects.requireNonNull(rejectedModifierType(user, location)).equalsIgnoreCase("BORDER")) {
+            player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.border.build"))));
         } else {
             if (isUse) {
                 player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.cannot-use")).replace("%faction%", Objects.requireNonNull(Faction.getAt(location)).getValidName(player, false))));
@@ -64,6 +66,7 @@ public class UserInteractAtFactionEvent implements Listener {
     }
 
     private boolean cannotModify(User user, Location location) {
+        if (UserClaimEvents.isPastBorder(location)) return true;
         if (user.isFactionBypass()) return false;
         if (user.isFrozen()) return true;
         if (user.getModMode() != null) {
@@ -89,6 +92,7 @@ public class UserInteractAtFactionEvent implements Listener {
         return !user.getFaction().equals(faction.getUUID());
     }
     private String rejectedModifierType(User user, Location location) {
+        if (UserClaimEvents.isPastBorder(location)) return "BORDER";
         if (user.getModMode() != null) {
             if (!user.getModMode().isInBypass()) return "MOD-MODE";
         }

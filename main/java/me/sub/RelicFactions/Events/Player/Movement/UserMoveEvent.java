@@ -1,5 +1,6 @@
 package me.sub.RelicFactions.Events.Player.Movement;
 
+import me.sub.RelicFactions.Events.Player.Interact.UserClaimEvents;
 import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Data.PlayerTimer;
@@ -130,6 +131,11 @@ public class UserMoveEvent implements Listener {
         final int WARZONE_NETHER = Main.getInstance().getConfig().getInt("factions.sizes.worlds.nether.warzone");
         Faction factionFrom = Faction.getAt(from);
         Faction factionTo = Faction.getAt(to);
+
+        if (UserClaimEvents.isPastBorder(to)) {
+            p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.border.reached"))));
+            return true;
+        }
 
         int used = (p.getWorld().getEnvironment() == World.Environment.CUSTOM ||
                 p.getWorld().getEnvironment() == World.Environment.NORMAL)
