@@ -94,6 +94,7 @@ scoreboard:
   title: "%primary%&l%servername% &7| &fMap %map-number%"
   lines:
     - "&7&m-------------------------"
+    - "%customtimers%"
     - "&a&lSale&7: &c%server_sale_timer%<display=%has_server_sale_timer%"
     - "&a&lKey Sale&7: &c%server_keysale_timer%<display=%has_server_keysale_timer%"
     - "&b&lKey All&7: &c%server_keyall_timer%<display=%has_server_keyall_timer%"

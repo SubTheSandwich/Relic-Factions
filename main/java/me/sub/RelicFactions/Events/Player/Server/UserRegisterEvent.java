@@ -2,10 +2,7 @@ package me.sub.RelicFactions.Events.Player.Server;
 
 import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.User;
-import me.sub.RelicFactions.Files.Data.ModMode;
-import me.sub.RelicFactions.Files.Data.PlayerTimer;
-import me.sub.RelicFactions.Files.Data.ServerTimer;
-import me.sub.RelicFactions.Files.Data.UserData;
+import me.sub.RelicFactions.Files.Data.*;
 import me.sub.RelicFactions.Files.Enums.Timer;
 import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Files.Normal.Messages;
@@ -22,10 +19,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Criteria;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Scoreboard;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -117,6 +110,10 @@ public class UserRegisterEvent implements Listener {
             }
         }
 
+        if (user.getCustomTimers() != null) {
+            user.getCustomTimers().forEach((s, customTimer) -> customTimer.tick());
+        }
+
         user.setLastLoginTimestamp(System.currentTimeMillis());
 
         if (!Permission.has(p, "staff") && !Permission.has(p, "admin")) {
@@ -168,6 +165,13 @@ public class UserRegisterEvent implements Listener {
                     return;
                 }
                 for (String s : Main.getInstance().getConfig().getStringList("scoreboard.lines")) {
+                    if (s.contains("%customtimers%")) {
+                        if (finalUser.getCustomTimers().isEmpty()) continue;
+                        for (CustomTimer timer : finalUser.getCustomTimers().values()) {
+                            lines.add(C.chat(C.bold(timer.getName()) + "&7: &c" + Timer.format(timer.getDuration())));
+                        }
+                        continue;
+                    }
                     if (s.contains("<display=%has_player")) {
                         String[] split = s.split("<display=%has_player_");
                         String timer = split[1];

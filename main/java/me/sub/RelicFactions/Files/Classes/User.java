@@ -2,6 +2,7 @@ package me.sub.RelicFactions.Files.Classes;
 
 import me.sub.RelicFactions.Files.Data.*;
 import me.sub.RelicFactions.Files.Enums.ChatType;
+import me.sub.RelicFactions.Files.Data.CustomTimer;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.Maps;
 import org.bukkit.OfflinePlayer;
@@ -29,6 +30,7 @@ public class User {
     private BigDecimal balance;
     private Claim claim;
     private final HashMap<String, PlayerTimer> timers;
+    private final HashMap<String, CustomTimer> customTimers;
     private boolean factionBypass;
     private HashMap<Faction, List<Cuboid>> map;
     private final Filter filter;
@@ -71,6 +73,7 @@ public class User {
         deaths = userData.get().getInt("deaths");
         balance = BigDecimal.valueOf(userData.get().getDouble("balance"));
         timers = Maps.stringToTimers(userData.get().getString("timers"));
+        customTimers = Maps.deserializeCustomMap(userData.get().getString("customTimers"));
         lives = userData.get().getInt("lives");
         modified = false;
         claim = null;
@@ -504,5 +507,27 @@ public class User {
     public void setCoalMined(int coalMined) {
         modified = true;
         this.coalMined = coalMined;
+    }
+
+    public boolean hasCustomTimer(String name) {
+        return customTimers.get(name) != null;
+    }
+
+    public void addCustomTimer(CustomTimer timer) {
+        modified = true;
+        customTimers.put(timer.getName(), timer);
+    }
+
+    public void removeCustomTimer(String name) {
+        modified = true;
+        customTimers.remove(name);
+    }
+
+    public HashMap<String, CustomTimer> getCustomTimers() {
+        return customTimers;
+    }
+
+    public CustomTimer getCustomTimer(String name) {
+        return customTimers.getOrDefault(name, null);
     }
 }

@@ -118,3 +118,6 @@ commands:
     description: Key Sale
   keyall:
     description: Key All
+  customtimer:
+    aliases:
+      - ct

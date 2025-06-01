@@ -119,6 +119,16 @@ faction:
     damage: "&eYou cannot damage &2%player%&e."
 
 commands:
+  customtimer:
+    usage: "&cUsage: /%alias% <add/reset> <player> <text> <time>"
+    extended: "&aCustom timer with text %timer%&a extended for %player% with duration %duration%"
+    not-found: "&cThe specified player does not have the specified custom timer."
+    started: "&aCustom timer with text %timer%&a started for %player% with duration %duration%"
+    removed: "&aRemoved customtimer with text %timer% &afor %player%."
+    removed-all: "&aRemoved all customtimers for %player%."
+    removed-time: "&aRemoved duration %duration% customtimer with text %timer% &afor %player%."
+    paused: "&aCustom timer with text %timer%&a paused."
+    unpaused: "&aCustom timer with text %timer%&a unpaused."
   sale:
     usage: "&cUsage: /sale <time/pause/stop>"
     started: "&aA Sale has begun."

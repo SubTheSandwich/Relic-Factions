@@ -45,7 +45,7 @@ public class Main extends JavaPlugin {
 
     /*
 
-    TODO: Mapkit, Custom Timer,
+    TODO: Mapkit
     TODO: Crowbar Command & Functionality
 
     TODO: Holograms (Probably through invisible armor stands with custom names)
@@ -131,6 +131,7 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("sale")).setExecutor(new SaleCommand()); Objects.requireNonNull(getCommand("sale")).setTabCompleter(new SaleCommand());
         Objects.requireNonNull(getCommand("keysale")).setExecutor(new KeySaleCommand()); Objects.requireNonNull(getCommand("keysale")).setTabCompleter(new KeySaleCommand());
         Objects.requireNonNull(getCommand("keyall")).setExecutor(new KeyAllCommand()); Objects.requireNonNull(getCommand("keyall")).setTabCompleter(new KeyAllCommand());
+        Objects.requireNonNull(getCommand("customtimer")).setExecutor(new CustomTimerCommand()); Objects.requireNonNull(getCommand("customtimer")).setTabCompleter(new CustomTimerCommand());
 
         // Staff
         Objects.requireNonNull(getCommand("staffchat")).setExecutor(new StaffChatCommand()); Objects.requireNonNull(getCommand("staffchat")).setTabCompleter(new StaffChatCommand());
@@ -318,6 +319,7 @@ public class Main extends JavaPlugin {
             userData.get().set("balance", user.getBalance().doubleValue());
             userData.get().set("lives", user.getLives());
             userData.get().set("timers", Maps.timersToString(user.getTimers()));
+            userData.get().set("customTimers", Maps.serializeCustomMap(user.getCustomTimers()));
             userData.get().set("lastInventoryContents", Maps.toBase64(user.getLastInventoryContents()));
             userData.get().set("playtime", user.getStoredPlaytime());
             userData.get().set("settings.global-chat", user.isGlobalChat());

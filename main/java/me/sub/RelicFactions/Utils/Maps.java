@@ -1,6 +1,7 @@
 package me.sub.RelicFactions.Utils;
 
 import me.sub.RelicFactions.Files.Data.Cuboid;
+import me.sub.RelicFactions.Files.Data.CustomTimer;
 import me.sub.RelicFactions.Files.Data.PlayerTimer;
 import me.sub.RelicFactions.Files.Enums.Timer;
 import org.bukkit.Bukkit;
@@ -11,12 +12,38 @@ import org.bukkit.util.io.BukkitObjectOutputStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class Maps {
+
+    public static String serializeCustomMap(HashMap<String, CustomTimer> map) {
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, CustomTimer> entry : map.entrySet()) {
+            sb.append(entry.getKey().replace(",", "\\,"))
+                    .append("=")
+                    .append(entry.getValue().serialize())
+                    .append("\n");
+        }
+        return sb.toString();
+    }
+
+    public static HashMap<String, CustomTimer> deserializeCustomMap(String s) {
+        HashMap<String, CustomTimer> map = new HashMap<>();
+        if (s == null || s.isEmpty()) return map;
+        String[] lines = s.split("\n");
+        for (String line : lines) {
+            if (line.trim().isEmpty()) continue;
+            int idx = line.indexOf('=');
+            if (idx == -1) continue;
+            String key = line.substring(0, idx).replace("\\,", ",");
+            String value = line.substring(idx + 1);
+            CustomTimer timer = CustomTimer.deserialize(value);
+            map.put(key, timer);
+        }
+        return map;
+    }
 
     public static String serialize(HashMap<UUID, Integer> map) {
         if (map.isEmpty()) return "";
