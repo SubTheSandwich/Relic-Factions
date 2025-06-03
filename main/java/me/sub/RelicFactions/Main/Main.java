@@ -7,6 +7,7 @@ import me.sub.RelicFactions.Events.Player.Attack.UserDamageEvents;
 import me.sub.RelicFactions.Events.Player.Chat.FormatChatEvent;
 import me.sub.RelicFactions.Events.Player.Commands.BlockCommandEvent;
 import me.sub.RelicFactions.Events.Player.Interact.*;
+import me.sub.RelicFactions.Events.Player.Limiters.EnchantLimitEvents;
 import me.sub.RelicFactions.Events.Player.Movement.FreezeMovementEvent;
 import me.sub.RelicFactions.Events.Player.Movement.UserMoveEvent;
 import me.sub.RelicFactions.Events.Player.Server.UserDisconnectEvent;
@@ -183,6 +184,7 @@ public class Main extends JavaPlugin {
         pm.registerEvents(new FreezeMovementEvent(), this);
         pm.registerEvents(new SettingsInteractEvent(), this);
         pm.registerEvents(new BlockCommandEvent(), this);
+        pm.registerEvents(new EnchantLimitEvents(), this);
     }
 
     private void files() {

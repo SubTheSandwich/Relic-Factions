@@ -15,6 +15,12 @@ limiters:
   world-border: 2944
   nether-border: 2000
   end-border: -1
+  enchants:
+    - PROTECTION;2
+    - SHARPNESS;2
+    - KNOCKBACK;0
+    - FIRE_ASPECT;0
+    - POWER;4
 
 combat:
   allow-end-portal-enter: false
