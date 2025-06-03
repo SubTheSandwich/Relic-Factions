@@ -1,5 +1,6 @@
 package me.sub.RelicFactions.Events.Player.Attack;
 
+import me.sub.RelicFactions.Events.Player.Interact.UserInteractAtFactionEvent;
 import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Data.PlayerTimer;
@@ -37,6 +38,11 @@ public class UserDamageEvents implements Listener {
         if (!(e.getDamager() instanceof Player damager)) return;
         User hitUser = User.get(hit);
         User damagerUser = User.get(damager);
+
+        if (UserInteractAtFactionEvent.isCrowbar(damager.getInventory().getItemInMainHand())) {
+            e.setCancelled(true);
+            return;
+        }
 
         if (hitUser.getModMode() != null) {
             e.setCancelled(true);
@@ -212,6 +218,11 @@ public class UserDamageEvents implements Listener {
         if (!(e.getEntity() instanceof Villager villager)) return;
         if (!(e.getDamager() instanceof Player damager)) return;
 
+        if (UserInteractAtFactionEvent.isCrowbar(damager.getInventory().getItemInMainHand())) {
+            e.setCancelled(true);
+            return;
+        }
+
         // Get the UUID from PersistentDataContainer
         NamespacedKey key = new NamespacedKey(Main.getInstance(), "logger_uuid");
         String uuidString = villager.getPersistentDataContainer().get(key, PersistentDataType.STRING);
@@ -323,6 +334,11 @@ public class UserDamageEvents implements Listener {
         }
         if (!(e.getDamager() instanceof Projectile projectile)) return;
         if (!(projectile.getShooter() instanceof Player damager)) return;
+
+        if (UserInteractAtFactionEvent.isCrowbar(damager.getInventory().getItemInMainHand())) {
+            e.setCancelled(true);
+            return;
+        }
 
         User hitUser = User.get(hit);
         User damagerUser = User.get(damager);

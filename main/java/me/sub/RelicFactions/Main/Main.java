@@ -46,8 +46,7 @@ public class Main extends JavaPlugin {
 
     /*
 
-    TODO: Mapkit (enchantment limiters, etc), Brewing Potion Limiters
-    TODO: Crowbar Command & Functionality
+    Brewing Potion Limiting is very complex, may come back and tackle another time
 
     TODO: Holograms (Probably through invisible armor stands with custom names)
 
@@ -133,6 +132,7 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("keysale")).setExecutor(new KeySaleCommand()); Objects.requireNonNull(getCommand("keysale")).setTabCompleter(new KeySaleCommand());
         Objects.requireNonNull(getCommand("keyall")).setExecutor(new KeyAllCommand()); Objects.requireNonNull(getCommand("keyall")).setTabCompleter(new KeyAllCommand());
         Objects.requireNonNull(getCommand("customtimer")).setExecutor(new CustomTimerCommand()); Objects.requireNonNull(getCommand("customtimer")).setTabCompleter(new CustomTimerCommand());
+        Objects.requireNonNull(getCommand("crowbar")).setExecutor(new CrowbarCommand()); Objects.requireNonNull(getCommand("crowbar")).setTabCompleter(new CrowbarCommand());
 
         // Staff
         Objects.requireNonNull(getCommand("staffchat")).setExecutor(new StaffChatCommand()); Objects.requireNonNull(getCommand("staffchat")).setTabCompleter(new StaffChatCommand());

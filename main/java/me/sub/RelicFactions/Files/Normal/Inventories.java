@@ -1,22 +1,16 @@
 package me.sub.RelicFactions.Files.Normal;
 
-import me.sub.RelicFactions.Files.Classes.User;
-import me.sub.RelicFactions.Files.Data.ModMode;
-import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class Inventories {
@@ -57,7 +51,7 @@ public class Inventories {
         ItemStack item = new ItemStack(Objects.requireNonNull(Material.matchMaterial(Objects.requireNonNull(Inventories.get().getString(inventory + ".items." + name + ".item")))));
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return null;
-        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES);
         meta.setDisplayName(C.chat(Objects.requireNonNull(Inventories.get().getString(inventory + ".items." + name + ".name"))));
         item.setItemMeta(meta);
         return item;

@@ -1,5 +1,6 @@
 package me.sub.RelicFactions.Events.Player.Interact;
 
+import me.sub.RelicFactions.Commands.Admin.CrowbarCommand;
 import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Data.ModMode;
@@ -10,8 +11,11 @@ import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,8 +26,13 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -134,6 +143,10 @@ public class UserInteractAtFactionEvent implements Listener {
             }
             e.setCancelled(true);
             combined(p, location, false);
+            return;
+        }
+        if (isCrowbar(p.getInventory().getItemInMainHand())) {
+            e.setCancelled(true);
             return;
         }
         Block block = e.getBlock();
@@ -402,6 +415,7 @@ public class UserInteractAtFactionEvent implements Listener {
                 p.getInventory().remove(e.getItem());
             }
         }
+        e.setCancelled(isCrowbar(p.getInventory().getItemInMainHand()));
         if (a.equals(Action.RIGHT_CLICK_BLOCK)) {
             Block block = e.getClickedBlock();
             Material type = Objects.requireNonNull(block).getType();
@@ -423,6 +437,50 @@ public class UserInteractAtFactionEvent implements Listener {
                     e.setCancelled(true);
                     combined(p, block.getLocation(), true);
                     return;
+                }
+            }
+            ItemStack item = e.getItem();
+            if (item == null) return;
+            ItemMeta meta = item.getItemMeta();
+            if (meta == null) return;
+            if (!(meta instanceof Damageable)) return;
+            NamespacedKey use = new NamespacedKey(Main.getInstance(), "crowbar_uses");
+            NamespacedKey max = new NamespacedKey(Main.getInstance(), "maxUses");
+            if (!meta.getPersistentDataContainer().has(use)) return;
+            int usesLeft = meta.getPersistentDataContainer().getOrDefault(use, PersistentDataType.INTEGER, 0);
+            int maxUses = meta.getPersistentDataContainer().getOrDefault(max, PersistentDataType.INTEGER, 0);
+            if (usesLeft == 0 || maxUses == 0) {
+                p.getInventory().remove(item);
+                return;
+            }
+            if (block.getType() != Material.SPAWNER) return;
+
+            BlockState state = block.getState();
+            if (!(state instanceof CreatureSpawner spawner)) return;
+            Main.getInstance().getServer().dispatchCommand(Main.getInstance().getServer().getConsoleSender(), "spawner " + Objects.requireNonNull(spawner.getSpawnedType()).name() + " " + p.getName());
+
+            block.setType(Material.AIR);
+            usesLeft--;
+
+            if (usesLeft <= 0) {
+                if (e.getHand() == EquipmentSlot.HAND) {
+                    p.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
+                } else if (e.getHand() == EquipmentSlot.OFF_HAND) {
+                    p.getInventory().setItemInOffHand(new ItemStack(Material.AIR));
+                }
+            } else {
+                ItemStack newCrowbar = CrowbarCommand.getCrowbar(usesLeft, maxUses);
+                ItemMeta newMeta = Objects.requireNonNull(newCrowbar).getItemMeta();
+                if (newMeta instanceof Damageable newDamageable) {
+                    int maxDurability = newCrowbar.getType().getMaxDurability();
+                    int damage = maxDurability - (int) ((usesLeft / (double) maxUses) * maxDurability);
+                    newDamageable.setDamage(damage);
+                    newCrowbar.setItemMeta(newDamageable);
+                }
+                if (e.getHand() == EquipmentSlot.HAND) {
+                    p.getInventory().setItemInMainHand(newCrowbar);
+                } else if (e.getHand() == EquipmentSlot.OFF_HAND) {
+                    p.getInventory().setItemInOffHand(newCrowbar);
                 }
             }
             return;
@@ -461,6 +519,7 @@ public class UserInteractAtFactionEvent implements Listener {
             e.setCancelled(true);
             combined(p, block.getLocation(), true);
         }
+        e.setCancelled(isCrowbar(p.getInventory().getItemInMainHand()));
     }
 
     @EventHandler
@@ -481,6 +540,7 @@ public class UserInteractAtFactionEvent implements Listener {
             e.setCancelled(true);
             combined(p, block.getLocation(), true);
         }
+        e.setCancelled(isCrowbar(p.getInventory().getItemInMainHand()));
     }
 
     private boolean isDiamondOre(Block block) {
@@ -532,5 +592,13 @@ public class UserInteractAtFactionEvent implements Listener {
                  ANCIENT_DEBRIS -> true;
             default -> false;
         };
+    }
+
+    public static boolean isCrowbar(ItemStack used) {
+        if (used == null) return false;
+        if (used.getItemMeta() == null) return false;
+        ItemMeta meta = used.getItemMeta();
+        NamespacedKey use = new NamespacedKey(Main.getInstance(), "crowbar_uses");
+        return meta.getPersistentDataContainer().has(use);
     }
 }

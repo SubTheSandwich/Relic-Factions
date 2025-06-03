@@ -123,6 +123,10 @@ faction:
     damage: "&eYou cannot damage &2%player%&e."
 
 commands:
+  crowbar:
+    usage: "&cUsage: /crowbar <player> <uses>"
+    success: "&eYou have given &b%player% &ea crowbar with &d%uses% use(s)&e."
+    target: "&eYou have received a crowbar with &d%uses% use(s)&e."
   customtimer:
     usage: "&cUsage: /%alias% <add/reset> <player> <text> <time>"
     extended: "&aCustom timer with text %timer%&a extended for %player% with duration %duration%"
@@ -196,6 +200,7 @@ commands:
   spawner:
     usage: "&cUsage: /spawner <entity> <player>"
     success: "&eYou have been given a &b%entity% &espawner."
+    other: "&eYou have given &b%player% &ea &d%entity% &espawner."
   pay:
     usage: "&cUsage: /pay <player> <amount>"
     self: "&cYou cannot pay yourself."

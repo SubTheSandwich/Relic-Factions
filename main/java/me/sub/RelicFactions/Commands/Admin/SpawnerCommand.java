@@ -21,18 +21,14 @@ import java.util.*;
 public class SpawnerCommand implements TabExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
-        if (!(sender instanceof Player p)) {
-            sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.not-player"))));
+        if (!Permission.has(sender, "spawner", "admin")) {
+            sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
             return true;
         }
 
-        if (!Permission.has(p, "spawner", "admin")) {
-            p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
-            return true;
-        }
 
         if (args.length != 1 && args.length != 2) {
-            p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.spawner.usage"))));
+            sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.spawner.usage"))));
             return true;
         }
 
@@ -40,20 +36,27 @@ public class SpawnerCommand implements TabExecutor {
         try {
             type = EntityType.valueOf(args[0].toUpperCase());
         } catch (IllegalArgumentException e) {
-            p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.spawner.usage"))));
+            sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.spawner.usage"))));
             return true;
         }
 
         if (!type.isSpawnable() || !type.isAlive()) {
-            p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.spawner.usage"))));
+            sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.spawner.usage"))));
             return true;
         }
 
-        Player target = p;
+        Player target = null;
+        if (args.length == 1) {
+            if (!(sender instanceof Player p)) {
+                sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.not-player"))));
+                return true;
+            }
+            target = p;
+         }
         if (args.length == 2) {
             target = Bukkit.getPlayer(args[1]);
             if (target == null) {
-                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-player"))));
+                sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-player"))));
                 return true;
             }
         }
@@ -69,8 +72,12 @@ public class SpawnerCommand implements TabExecutor {
             target.getWorld().dropItemNaturally(target.getLocation(), leftover);
         }
         target.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.spawner.success")).replace("%entity%", type.name())));
-        if (!target.equals(p)) {
-            p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.spawner.success")).replace("%entity%", type.name())));
+        if (args.length == 2) {
+            sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.spawner.other")).replace("%player%", target.getName()).replace("%entity%", type.name())));
+            return true;
+        }
+        if (!target.getName().equals(sender.getName())) {
+            sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.spawner.success")).replace("%entity%", type.name())));
         }
         return true;
     }
