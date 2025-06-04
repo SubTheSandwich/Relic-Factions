@@ -49,6 +49,18 @@ public class SettingsInteractEvent implements Listener {
         User user = User.get(p);
         if (clicked == null) return;
         switch (clicked.toUpperCase()) {
+            case "MOUNTAINS" -> {
+                user.setMountains(!user.isMountains());
+                String message = Locale.get().getString("commands.settings.mountains");
+                message = Objects.requireNonNull(message).replace("%status%", Objects.requireNonNull(user.isMountains() ? Locale.get().getString("primary.enabled") : Locale.get().getString("primary.disabled")));
+                p.sendMessage(C.chat(message));
+            }
+            case "FOUNDDIAMONDS" -> {
+                user.setFoundDiamonds(!user.isFoundDiamonds());
+                String message = Locale.get().getString("commands.settings.foundDiamonds");
+                message = Objects.requireNonNull(message).replace("%status%", Objects.requireNonNull(user.isFoundDiamonds() ? Locale.get().getString("primary.enabled") : Locale.get().getString("primary.disabled")));
+                p.sendMessage(C.chat(message));
+            }
             case "MESSAGES" -> {
                 user.setMessages(!user.isMessages());
                 String message = Locale.get().getString("commands.settings.messages");

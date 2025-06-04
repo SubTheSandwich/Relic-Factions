@@ -6,7 +6,8 @@ public enum FactionType {
     SYSTEM,
     SAFEZONE,
     KOTH,
-    ROAD;
+    ROAD,
+    MOUNTAIN;
 
     public static boolean isValid(String input) {
         if (input == null) return false;

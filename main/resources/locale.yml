@@ -4,7 +4,7 @@ primary:
   no-player: "&cA player by this name does not exist."
   invalid-number: "&cThe specified number is invalid."
   invalid-material: "&cThe specified material is invalid."
-  cannot-do: "&cYou cannot do this to %player% at this time/"
+  cannot-do: "&cYou cannot do this to %player% at this time."
   lives:
     not-enough: "&cYou do not have enough lives to do this."
     not-deathbanned: "&cYou cannot revive a player that is not deathbanned."
@@ -48,6 +48,8 @@ claiming:
     two: "&eSet position 2"
 
 events:
+  mountain:
+    reset: "&a[%type%] &eMountain has been reset."
   koth:
     started: "&7[Koth] &eKoth &6%koth% &ehas started."
     end:
@@ -137,6 +139,17 @@ faction:
     damage: "&eYou cannot damage &2%player%&e."
 
 commands:
+  mountain:
+    usage: "&cUsage: /mountain <name> <create/delete/reset/setpos1/setpos2/setreset/settype> <type>"
+    exists: "&cA mountain by that name already exists."
+    doesnt-exist: "&cThe mountain %mountain% doesn't exist."
+    created: "&7[Mountain] &eMountain &6%mountain% &ehas been created."
+    deleted: "&7[Mountain] &eMountain &6%mountain% &ehas been deleted."
+    setpos1: "&7[Mountain] &6%mountain%: &ePosition #1 set for &6%mountain%"
+    setpos2: "&7[Mountain] &6%mountain%: &ePosition #2 set for &6%mountain%"
+    setreset: "&7[Mountain] &eMountain &6%mountain%&e's time has been set to &a%time%&e."
+    settype: "&7[Mountain] &eMountain &6%mountain%&e's type has been set to &a%material%&e."
+    not-setup: "&cThe mountain %mountain% is not setup, and therefore cannot be reset."
   koth:
     usage: "&cUsage: /koth <name> <create/delete/start/stop/setpos1/setpos2/settime/pearlable/special>"
     already-exists: "&7[Koth] &eKoth &6%koth% &ealready exists."
@@ -219,6 +232,8 @@ commands:
     messages: "&6Messages&7: &r%status%"
     message-sounds: "&6Message Sounds&7: &r%status%"
     scoreboard: "&6Scoreboard&7: &r%status%"
+    foundDiamonds: "&6Found Diamonds&7: &r%status%"
+    mountains: "&6Mountains on Scoreboard&7: &r%status%"
   revive:
     usage: "&cUsage: /revive <player>"
     success: "&eYou have revived &b%player%&e."
@@ -413,7 +428,7 @@ commands:
       invalid: "&cThe specified color is invalid. Valid colors: BLACK, BLUE, GREEN, CYAN, RED, PURPLE, GOLD, LIGHT_GRAY, GRAY, LIGHT_BLUE, LIME, AQUA, LIGHT_RED, MAGENTA, YELLOW, WHITE"
       success: "&eYou have set the color of &d%faction% &eto %color%&e."
     settype:
-      invalid: "&cThe specified faction type is invalid. Valid types: PLAYER, SYSTEM, SAFEZONE, KOTH, ROAD"
+      invalid: "&cThe specified faction type is invalid. Valid types: PLAYER, SYSTEM, SAFEZONE, KOTH, ROAD, MOUNTAIN"
       success: "&eYou have set the type of &d%faction% &eto &b%type%&e."
     setlocation:
       success: "&eYou have set the location of &d%faction% &eto &ayour current location&e."

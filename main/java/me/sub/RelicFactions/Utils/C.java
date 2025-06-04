@@ -104,4 +104,26 @@ public class C {
         sb.append("&r");  // Reset at the end
         return sb.toString();
     }
+
+    public static String capitalizeWord(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+        // Replace underscores with spaces
+        String[] words = input.replace('_', ' ').split(" ");
+        StringBuilder result = new StringBuilder();
+
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                // Capitalize first letter, keep the rest lowercase
+                result.append(Character.toUpperCase(word.charAt(0)));
+                if (word.length() > 1) {
+                    result.append(word.substring(1).toLowerCase());
+                }
+                result.append(" ");
+            }
+        }
+        // Remove trailing space
+        return result.toString().trim();
+    }
 }

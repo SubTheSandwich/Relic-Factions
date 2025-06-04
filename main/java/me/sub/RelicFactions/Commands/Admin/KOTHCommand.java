@@ -249,7 +249,7 @@ public class KOTHCommand implements TabExecutor {
                             .toList();
                 }
                 case "settime" -> {
-                    return "<seconds>".startsWith(input) ? List.of("<seconds>") : List.of();
+                    return "<minutes>".startsWith(input) ? List.of("<minutes>") : List.of();
                 }
                 case "setfaction" -> {
                     return Main.getInstance().factionNameHolder.values().stream()

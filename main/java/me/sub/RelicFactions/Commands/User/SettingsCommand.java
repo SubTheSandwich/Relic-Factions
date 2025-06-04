@@ -58,6 +58,16 @@ public class SettingsCommand implements TabExecutor {
                         meta.addEnchant(Enchantment.UNBREAKING, 1, true);
                     }
                 }
+                case "FOUNDDIAMONDS" -> {
+                    if (user.isFoundDiamonds()) {
+                        meta.addEnchant(Enchantment.UNBREAKING, 1, true);
+                    }
+                }
+                case "MOUNTAINS" -> {
+                    if (user.isMountains()) {
+                        meta.addEnchant(Enchantment.UNBREAKING, 1, true);
+                    }
+                }
                 default -> throw new IllegalStateException("Unexpected value: " + i.toUpperCase());
             }
             item.setItemMeta(meta);

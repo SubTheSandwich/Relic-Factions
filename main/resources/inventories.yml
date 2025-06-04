@@ -22,6 +22,14 @@ settings:
       name: "&eToggle Message Sounds"
       item: BELL
       slot: 28
+    foundDiamonds:
+      name: "&eToggle Found Diamonds"
+      item: DIAMOND
+      slot: 31
+    mountains:
+      name: "&eToggle Mountains on Leaderboard"
+      item: IRON_PICKAXE
+      slot: 34
 
 profile: # Limited control here for plugin
   name: "&aPlayer Profile"

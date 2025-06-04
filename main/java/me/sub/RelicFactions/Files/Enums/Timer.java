@@ -4,6 +4,7 @@ import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.Calculate;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -96,6 +97,42 @@ public enum Timer {
         long hours = (diff % (24 * 3600)) / 3600;
         long minutes = (diff % 3600) / 60;
         long seconds = diff % 60;
+        StringBuilder format = new StringBuilder();
+
+        if (days > 0) {
+            format.append(days)
+                    .append(" day")
+                    .append(days == 1 ? "" : "s");
+            if (hours > 0 || minutes > 0 || seconds > 0) format.append(" ");
+        }
+        if (hours > 0) {
+            format.append(hours)
+                    .append(" hour")
+                    .append(hours == 1 ? "" : "s");
+            if (minutes > 0 || seconds > 0) format.append(" ");
+        }
+        if (minutes > 0) {
+            format.append(minutes)
+                    .append(" minute")
+                    .append(minutes == 1 ? "" : "s");
+            if (seconds > 0) format.append(" ");
+        }
+        if (seconds > 0 || (days == 0 && hours == 0 && minutes == 0)) {
+            format.append(seconds)
+                    .append(" second")
+                    .append(seconds == 1 ? "" : "s");
+        }
+        return format.toString();
+    }
+
+    public static String getMessageFormat(BigDecimal secondsInput) {
+        long totalSeconds = secondsInput.setScale(0, java.math.RoundingMode.FLOOR).longValue();
+
+        long days = totalSeconds / (24 * 3600);
+        long hours = (totalSeconds % (24 * 3600)) / 3600;
+        long minutes = (totalSeconds % 3600) / 60;
+        long seconds = totalSeconds % 60;
+
         StringBuilder format = new StringBuilder();
 
         if (days > 0) {

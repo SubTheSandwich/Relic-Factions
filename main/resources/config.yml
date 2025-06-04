@@ -61,9 +61,12 @@ deathban:
     DonatorThree: 60
 
 koth:
-  time: 15
+  time: 15 # minutes
   on-capture:
     - say %player% (%faction%) has just captured %koth%!
+
+mountain:
+  reset-time: 2 # minutes
 
 factions:
   dtr:
@@ -122,6 +125,7 @@ scoreboard:
     - "&4&lLogout&7: &c%player_logout_timer%<display=%has_player_logout_timer%"
     - "%mod-lines%"
     - "%koth-lines%"
+    - "%mountain-lines%"
     - "&7&m-------------------------"
   mod-mode:
     - "&6&lStaff Mode"
@@ -132,6 +136,8 @@ scoreboard:
   koth:
     normal: "&9&l%koth%&7: &c%time%"
     special: "&5&l%koth%&7: &c%time%"
+  mountain:
+    line: "&d&l%type%&7: &c%time%"
 
 features:
   scoreboard:

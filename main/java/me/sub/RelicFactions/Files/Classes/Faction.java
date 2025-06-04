@@ -152,6 +152,8 @@ public class Faction {
                     validName = C.chat("&c" + name);
                 }
             }
+        } else if (factionType.equals(FactionType.MOUNTAIN)) {
+            validName = C.chat(color.toColorCode() + name + " Mountain");
         } else if (factionType.equals(FactionType.KOTH)) {
             validName = C.chat(color.toColorCode() + name + " KOTH");
         } else if (factionType.equals(FactionType.ROAD)) {

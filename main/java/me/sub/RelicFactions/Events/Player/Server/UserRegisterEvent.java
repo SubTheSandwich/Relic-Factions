@@ -1,9 +1,6 @@
 package me.sub.RelicFactions.Events.Player.Server;
 
-import me.sub.RelicFactions.Files.Classes.Faction;
-import me.sub.RelicFactions.Files.Classes.KOTH;
-import me.sub.RelicFactions.Files.Classes.RunningKOTH;
-import me.sub.RelicFactions.Files.Classes.User;
+import me.sub.RelicFactions.Files.Classes.*;
 import me.sub.RelicFactions.Files.Data.*;
 import me.sub.RelicFactions.Files.Enums.Timer;
 import me.sub.RelicFactions.Files.Normal.Locale;
@@ -167,6 +164,21 @@ public class UserRegisterEvent implements Listener {
                     return;
                 }
                 for (String s : Main.getInstance().getConfig().getStringList("scoreboard.lines")) {
+                    if (s.contains("%mountain-lines%")) {
+                        if (!finalUser.isMountains()) continue;
+                        for (Mountain mountain : Main.getInstance().mountains.values()) {
+                            if (!mountain.isSetup()) continue;
+                            BigDecimal time = mountain.getTime();
+                            BigDecimal defaultTime = BigDecimal.valueOf(mountain.getDefaultTime() * 60L);
+
+                            BigDecimal diff = defaultTime.subtract(time);
+                            String display = Objects.requireNonNull(Main.getInstance().getConfig().getString("scoreboard.mountain.line"));
+                            display = display.replace("%type%", C.capitalizeWord(mountain.getType().name()));
+                            display = display.replace("%time%", Timer.format(diff));
+                            lines.add(C.chat(display));
+                        }
+                        continue;
+                    }
                     if (s.contains("%koth-lines%")) {
                         for (RunningKOTH runningKOTH : Main.getInstance().runningKOTHS.values()) {
 

@@ -12,14 +12,8 @@ import me.sub.RelicFactions.Events.Player.Movement.FreezeMovementEvent;
 import me.sub.RelicFactions.Events.Player.Movement.UserMoveEvent;
 import me.sub.RelicFactions.Events.Player.Server.UserDisconnectEvent;
 import me.sub.RelicFactions.Events.Player.Server.UserRegisterEvent;
-import me.sub.RelicFactions.Files.Classes.Faction;
-import me.sub.RelicFactions.Files.Classes.KOTH;
-import me.sub.RelicFactions.Files.Classes.RunningKOTH;
-import me.sub.RelicFactions.Files.Classes.User;
-import me.sub.RelicFactions.Files.Data.FactionData;
-import me.sub.RelicFactions.Files.Data.KOTHData;
-import me.sub.RelicFactions.Files.Data.ServerTimer;
-import me.sub.RelicFactions.Files.Data.UserData;
+import me.sub.RelicFactions.Files.Classes.*;
+import me.sub.RelicFactions.Files.Data.*;
 import me.sub.RelicFactions.Files.Enums.FactionType;
 import me.sub.RelicFactions.Files.Normal.Inventories;
 import me.sub.RelicFactions.Files.Normal.Locale;
@@ -66,6 +60,8 @@ public class Main extends JavaPlugin {
     public HashMap<String, Faction> factionNameHolder = new HashMap<>();
     public HashMap<UUID, KOTH> koths = new HashMap<>();
     public HashMap<String, KOTH> kothNameHolder = new HashMap<>();
+    public HashMap<UUID, Mountain> mountains = new HashMap<>();
+    public HashMap<String, Mountain> mountainNameHolder = new HashMap<>();
 
     public HashMap<UUID, RunningKOTH> runningKOTHS = new HashMap<>();
 
@@ -111,6 +107,7 @@ public class Main extends JavaPlugin {
                 saveUsers();
                 saveFactions();
                 saveKOTHS();
+                saveMountains();
             }
         }.runTaskTimer(this, 5 * 60 * 20L, 5 * 60 * 20L);
         handleDTR();
@@ -144,6 +141,7 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("customtimer")).setExecutor(new CustomTimerCommand()); Objects.requireNonNull(getCommand("customtimer")).setTabCompleter(new CustomTimerCommand());
         Objects.requireNonNull(getCommand("crowbar")).setExecutor(new CrowbarCommand()); Objects.requireNonNull(getCommand("crowbar")).setTabCompleter(new CrowbarCommand());
         Objects.requireNonNull(getCommand("koth")).setExecutor(new KOTHCommand()); Objects.requireNonNull(getCommand("koth")).setTabCompleter(new KOTHCommand());
+        Objects.requireNonNull(getCommand("mountain")).setExecutor(new MountainCommand()); Objects.requireNonNull(getCommand("mountain")).setTabCompleter(new MountainCommand());
 
         // Staff
         Objects.requireNonNull(getCommand("staffchat")).setExecutor(new StaffChatCommand()); Objects.requireNonNull(getCommand("staffchat")).setTabCompleter(new StaffChatCommand());
@@ -328,6 +326,18 @@ public class Main extends JavaPlugin {
         }
     }
 
+    private void loadMountains() {
+        if (MountainData.getAll() != null) {
+            for (File f : MountainData.getAll()) {
+                YamlConfiguration file = YamlConfiguration.loadConfiguration(f);
+                UUID uuid = UUID.fromString(Objects.requireNonNull(file.getString("uuid")));
+                Mountain mountain = new Mountain(new MountainData(uuid));
+                mountains.put(uuid, mountain);
+                mountainNameHolder.put(mountain.getName().toLowerCase(), mountain);
+            }
+        }
+    }
+
     private void saveUsers() {
         int saved = 0;
         if (users.isEmpty()) return;
@@ -351,6 +361,8 @@ public class Main extends JavaPlugin {
             userData.get().set("settings.messages.enabled", user.isMessages());
             userData.get().set("settings.messages.sounds", user.isMessageSounds());
             userData.get().set("settings.scoreboard", user.isScoreboard());
+            userData.get().set("settings.foundDiamonds", user.isFoundDiamonds());
+            userData.get().set("settings.mountains", user.isMountains());
             userData.get().set("ores.coal", user.getCoalMined());
             userData.get().set("ores.iron", user.getIronMined());
             userData.get().set("ores.copper", user.getCopperMined());
@@ -423,6 +435,25 @@ public class Main extends JavaPlugin {
         logger.info("Saved " + saved + (saved == 1 ? " koth" : " koths"));
     }
 
+    private void saveMountains() {
+        int saved = 0;
+        if (mountains.isEmpty()) return;
+        for (Map.Entry<UUID, Mountain> entry : mountains.entrySet()) {
+            Mountain mountain = entry.getValue();
+            if (!mountain.isModified()) continue;
+            MountainData mountainData = mountain.getMountainData();
+            mountainData.get().set("name", mountainData.getName());
+            mountainData.get().set("positionOne", mountain.getPositionOne());
+            mountainData.get().set("positionTwo", mountain.getPositionTwo());
+            mountainData.get().set("type", mountain.getType() == null ? null : mountain.getType().name());
+            mountainData.get().set("time", mountain.getDefaultTime());
+            mountainData.save();
+            mountain.setModified(false);
+            saved++;
+        }
+        logger.info("Saved " + saved + (saved == 1 ? " mountain" : " mountains"));
+    }
+
     public static Economy getEconomy() {
         return econ;
     }
@@ -431,12 +462,14 @@ public class Main extends JavaPlugin {
         saveUsers();
         saveFactions();
         saveKOTHS();
+        saveMountains();
     }
 
     public void loadFiles() {
         loadUsers();
         loadFactions();
         loadKOTHS();
+        loadMountains();
     }
 
     public boolean isServerFrozen() {

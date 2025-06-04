@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -69,7 +68,8 @@ public class RunningKOTH {
                     resetControllingPlayer();
                     return;
                 }
-                if (Faction.get(control.getFaction()) == null) {
+                Faction faction = Faction.get(control.getFaction());
+                if (faction == null) {
                     resetControllingPlayer();
                     return;
                 }
@@ -87,7 +87,7 @@ public class RunningKOTH {
                 }
                 timeLeft = timeLeft.subtract(BigDecimal.valueOf(0.05));
                 if (timeLeft.doubleValue() % 30 == 0 && timeLeft.doubleValue() > 1) {
-                    Main.getInstance().sendGlobalMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.koth.controlling")).replace("%koth%", koth.getName()).replace("%time%", Timer.format(timeLeft))));
+                    Main.getInstance().sendGlobalMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.koth.controlling")).replace("%koth%", koth.getName()).replace("%time%", Timer.getMessageFormat(timeLeft))));
                     return;
 
                 }
@@ -100,6 +100,7 @@ public class RunningKOTH {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), s);
                 }
                 Main.getInstance().runningKOTHS.remove(koth.getUUID());
+                faction.setKothCaptures(faction.getKothCaptures() + 1);
                 cancel();
             }
         }.runTaskTimer(Main.getInstance(), 0,1);

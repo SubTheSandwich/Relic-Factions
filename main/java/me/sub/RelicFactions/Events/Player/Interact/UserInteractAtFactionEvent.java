@@ -2,17 +2,16 @@ package me.sub.RelicFactions.Events.Player.Interact;
 
 import me.sub.RelicFactions.Commands.Admin.CrowbarCommand;
 import me.sub.RelicFactions.Files.Classes.Faction;
+import me.sub.RelicFactions.Files.Classes.Mountain;
 import me.sub.RelicFactions.Files.Classes.User;
+import me.sub.RelicFactions.Files.Data.Cuboid;
 import me.sub.RelicFactions.Files.Data.ModMode;
 import me.sub.RelicFactions.Files.Enums.FactionType;
 import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Files.Normal.ModModeFile;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Tag;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
@@ -133,6 +132,21 @@ public class UserInteractAtFactionEvent implements Listener {
         Player p = e.getPlayer();
         User user = User.get(p);
         Location location = e.getBlock().getLocation();
+        for (Mountain mountain : Main.getInstance().mountains.values()) {
+            if (!mountain.isSetup()) continue;
+            Cuboid cuboid = mountain.getCuboid();
+            if (cuboid.isIn(location)) {
+                if (isCrowbar(p.getInventory().getItemInMainHand())) {
+                    e.setCancelled(true);
+                    return;
+                }
+                if (!e.getBlock().getType().equals(mountain.getType())) {
+                    e.setCancelled(true);
+                    return;
+                }
+                return;
+            }
+        }
         if (cannotModify(user, location)) {
             if (Objects.requireNonNull(rejectedModifierType(user, location)).equalsIgnoreCase("FROZEN_SERVER")) {
                 if (!p.hasPermission("relic.bypass.freeze")) {
@@ -215,7 +229,11 @@ public class UserInteractAtFactionEvent implements Listener {
                 String message = Locale.get().getString("events.found-diamonds");
                 message = Objects.requireNonNull(message).replace("%player%", p.getName());
                 message = message.replace("%amount%", vein.size() + "");
-                Main.getInstance().getServer().broadcastMessage(C.chat(message));
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    User use = User.get(player);
+                    if (!use.isFoundDiamonds()) continue;
+                    player.sendMessage(C.chat(message));
+                }
             }
         }
     }

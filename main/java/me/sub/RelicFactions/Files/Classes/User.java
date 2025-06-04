@@ -60,6 +60,8 @@ public class User {
     private int emeraldMined;
     private int quartzMined;
     private int debrisMined;
+    private boolean foundDiamonds;
+    private boolean mountains;
 
     public User(UserData userData) {
         userDisconnected = true;
@@ -92,6 +94,8 @@ public class User {
         globalChat = userData.get().getBoolean("settings.global-chat");
         messages = userData.get().getBoolean("settings.messages.enabled");
         messageSounds = userData.get().getBoolean("settings.messages.sounds");
+        foundDiamonds = userData.get().getBoolean("settings.foundDiamonds");
+        modified = userData.get().getBoolean("settings.mountains");
         lastMessaged = null;
         revived = false;
         scoreboard = userData.get().getBoolean("settings.scoreboard");
@@ -529,5 +533,23 @@ public class User {
 
     public CustomTimer getCustomTimer(String name) {
         return customTimers.getOrDefault(name, null);
+    }
+
+    public boolean isFoundDiamonds() {
+        return foundDiamonds;
+    }
+
+    public void setFoundDiamonds(boolean foundDiamonds) {
+        modified = true;
+        this.foundDiamonds = foundDiamonds;
+    }
+
+    public boolean isMountains() {
+        return mountains;
+    }
+
+    public void setMountains(boolean mountains) {
+        modified = true;
+        this.mountains = mountains;
     }
 }
