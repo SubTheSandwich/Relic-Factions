@@ -81,6 +81,10 @@ public class RunningKOTH {
                     resetControllingPlayer();
                     return;
                 }
+                if (control.getModMode() != null) {
+                    resetControllingPlayer();
+                    return;
+                }
                 timeLeft = timeLeft.subtract(BigDecimal.valueOf(0.05));
                 int secondsLeft = timeLeft.setScale(0, RoundingMode.FLOOR).intValue();
                 if (secondsLeft % 30 == 0 && timeLeft.doubleValue() > 0) {

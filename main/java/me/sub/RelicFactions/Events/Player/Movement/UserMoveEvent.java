@@ -31,15 +31,20 @@ public class UserMoveEvent implements Listener {
     public void onMove(PlayerMoveEvent e) {
         Player p = e.getPlayer();
         if (e.getTo() == null) return;
-        if (e.getFrom().getBlockX() == e.getTo().getBlockX() && e.getFrom().getBlockZ() == e.getTo().getBlockZ()) return;
-        processHome(p);
-        processLogout(p);
-        if (notAllowed(p, e.getTo(), e.getFrom())) {
-            e.setCancelled(true);
-            return;
+
+        // Only run these on block-to-block movement
+        if (e.getFrom().getBlockX() != e.getTo().getBlockX() || e.getFrom().getBlockZ() != e.getTo().getBlockZ()) {
+            processHome(p);
+            processLogout(p);
+            if (notAllowed(p, e.getTo(), e.getFrom())) {
+                e.setCancelled(true);
+                return;
+            }
         }
 
+        // KOTH logic runs on every movement (even within the same block)
         User user = User.get(p);
+        if (user.getModMode() != null) return;
         if (user.hasTimer("pvp") || user.hasTimer("starting")) return;
         if (!user.hasFaction()) return;
         Faction faction = Faction.get(user.getFaction());

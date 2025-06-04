@@ -9,7 +9,6 @@ import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
 import me.sub.RelicFactions.Utils.Permission;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -66,8 +65,20 @@ public class KOTHCommand implements TabExecutor {
             }
 
             if (args[1].equalsIgnoreCase("delete")) {
-                // TODO: This
-
+                if (Main.getInstance().runningKOTHS.containsKey(koth.getUUID())) {
+                    sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.koth.cannot-delete")).replace("%koth%", args[0])));
+                    return true;
+                }
+                String name = koth.getName();
+                UUID uuid = koth.getUUID();
+                boolean del = koth.getKothData().delete();
+                if (del) {
+                    Main.getInstance().koths.remove(uuid);
+                    Main.getInstance().kothNameHolder.remove(name.toLowerCase());
+                    sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.koth.deleted")).replace("%koth%", name)));
+                } else {
+                    sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.error"))));
+                }
                 return true;
             }
 

@@ -415,7 +415,7 @@ public class Main extends JavaPlugin {
             kothData.get().set("pearlable", koth.isPearlable());
             kothData.get().set("special", koth.isSpecial());
             kothData.get().set("time", koth.getTime());
-            kothData.get().set("faction", koth.getFaction().toString());
+            kothData.get().set("faction", koth.getFaction() == null ? null : koth.getFaction().toString());
             kothData.save();
             koth.setModified(false);
             saved++;
