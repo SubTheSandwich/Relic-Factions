@@ -25,6 +25,7 @@ primary:
   enabled: "&aEnabled"
   disabled: "&cDisabled"
   feature-disabled: "&cThis feature is disabled."
+  world: "&cYou cannot select this location, as your other selection is not in the same world."
 
 claiming:
   success: "&aSuccessfully claimed your selected area."
@@ -37,7 +38,6 @@ claiming:
   have: "&cYour faction already has a claim."
   error:
     in-claim: "&cParts of this claim intersect with another claim."
-    world: "&cYou cannot select this location, as your other selection is not in the same dimension."
     invalid-size: "&cYou must only claim a 5x5 area and claim must not exceed than 16 chunks."
     location: "&cYou cannot claim here."
     cost: "&cYour faction does not have enough money to claim this area."
@@ -48,6 +48,20 @@ claiming:
     two: "&eSet position 2"
 
 events:
+  koth:
+    started: "&7[Koth] &eKoth &6%koth% &ehas started."
+    end:
+      cancelled: "&7[Koth] &eKoth &6%koth% &ehas been cancelled."
+      captured: "&7[Koth] &eKoth &6%koth% &ewas captured."
+    control: "&7[Koth] &6%faction% &ehas started to control %koth%&e."
+    control-team: "&7[Koth] &6Your team is now controlling &6%koth%&e."
+    control-player: "&7[Koth] &6You are now controlling &6%koth%&e."
+    knock: "&7[Koth] &6%faction% &ehas lost control of %koth%&e."
+    controlling: "&7[Koth] &6%koth% &eis now at &6%time%."
+  enderpearl:
+    glitch: "&cYou cannot pearl there!"
+    safezone: "&cYou cannot pearl into Safezone areas."
+    koth: "&cYou cannot pearl into this koth area."
   border:
     build: "&cYou cannot build past the border."
     reached: "&cYou cannot go past the border."
@@ -123,6 +137,31 @@ faction:
     damage: "&eYou cannot damage &2%player%&e."
 
 commands:
+  koth:
+    usage: "&cUsage: /koth <name> <create/delete/start/stop/setpos1/setpos2/settime/pearlable/special>"
+    already-exists: "&7[Koth] &eKoth &6%koth% &ealready exists."
+    doesnt-exist: "&7[Koth] &eKoth &6%koth% &edoes not exist."
+    created: "&7[Koth] &eKoth &6%koth% &ehas been created."
+    deleted: "&7[Koth] &eKoth &6%koth% &ehas been deleted."
+    started: "&7[Koth] &eKoth &6%koth% &ehas been started."
+    stopped: "&7[Koth] &eKoth &6%koth% &ehas been stopped."
+    setpos1: "&7[Koth] &ePosition #1 set for &6%koth%"
+    setpos2: "&7[Koth] &ePosition #2 set for &6%koth%"
+    setfaction: "&7[Koth] &eKoth &6%koth%&e's faction has been set to &b%faction%&e."
+    not-koth: "&7[Koth] &eThe faction of Koth &6%koth% &emust be of KOTH type."
+    already-started: "&7[Koth] &eKoth &6%koth% &eis already ongoing."
+    not-setup: "&7[Koth] &eKoth &6%koth% &eis not setup yet."
+    cannot-delete: "&7[Koth] &eKoth &6%koth% &eis ongoing. You must stop it before deleting it."
+    not-running: "&7[Koth] &eKoth &6%koth% &eis not running."
+    special:
+      usage: "&cUsage: /koth <name> special <boolean>"
+      set: "&7[Koth] &eSpecial set for &6%koth%&e to &c%status%"
+    pearlable:
+      usage: "&cUsage: /koth <name> pearlable <boolean>"
+      set: "&7[Koth] &ePearlable set for &6%koth%&e to &c%status%"
+    settime:
+      usage: "&cUsage: /koth <name> settime <minutes>"
+      set: "&7[Koth] &eTime set for &6%koth%&e to &b%time% minutes"
   crowbar:
     usage: "&cUsage: /crowbar <player> <uses>"
     success: "&eYou have given &b%player% &ea crowbar with &d%uses% use(s)&e."

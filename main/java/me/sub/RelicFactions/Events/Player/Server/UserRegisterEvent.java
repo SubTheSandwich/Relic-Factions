@@ -1,6 +1,8 @@
 package me.sub.RelicFactions.Events.Player.Server;
 
 import me.sub.RelicFactions.Files.Classes.Faction;
+import me.sub.RelicFactions.Files.Classes.KOTH;
+import me.sub.RelicFactions.Files.Classes.RunningKOTH;
 import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Data.*;
 import me.sub.RelicFactions.Files.Enums.Timer;
@@ -111,7 +113,7 @@ public class UserRegisterEvent implements Listener {
         }
 
         if (user.getCustomTimers() != null) {
-            user.getCustomTimers().forEach((s, customTimer) -> customTimer.tick());
+            user.getCustomTimers().values().forEach(CustomTimer::tick);
         }
 
         user.setLastLoginTimestamp(System.currentTimeMillis());
@@ -165,6 +167,22 @@ public class UserRegisterEvent implements Listener {
                     return;
                 }
                 for (String s : Main.getInstance().getConfig().getStringList("scoreboard.lines")) {
+                    if (s.contains("%koth-lines%")) {
+                        for (RunningKOTH runningKOTH : Main.getInstance().runningKOTHS.values()) {
+
+                            KOTH koth = runningKOTH.getKOTH();
+                            String display;
+                            if (koth.isSpecial()) {
+                                display = Main.getInstance().getConfig().getString("scoreboard.koth.special");
+                            } else {
+                                display = Main.getInstance().getConfig().getString("scoreboard.koth.normal");
+                            }
+                            display = Objects.requireNonNull(display).replace("%koth%", koth.getName());
+                            display = display.replace("%time%", Timer.format(runningKOTH.getTimeLeft()));
+                            lines.add(C.chat(display));
+                        }
+                        continue;
+                    }
                     if (s.contains("%customtimers%")) {
                         if (finalUser.getCustomTimers().isEmpty()) continue;
                         for (CustomTimer timer : finalUser.getCustomTimers().values()) {

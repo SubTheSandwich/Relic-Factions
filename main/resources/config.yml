@@ -60,6 +60,11 @@ deathban:
     DonatorTwo: 75
     DonatorThree: 60
 
+koth:
+  time: 15
+  on-capture:
+    - say %player% (%faction%) has just captured %koth%!
+
 factions:
   dtr:
     max: 5.5
@@ -116,6 +121,7 @@ scoreboard:
     - "&a&lSOTW&7: &c%server_sotw_timer%<display=%has_server_sotw_timer%"
     - "&4&lLogout&7: &c%player_logout_timer%<display=%has_player_logout_timer%"
     - "%mod-lines%"
+    - "%koth-lines%"
     - "&7&m-------------------------"
   mod-mode:
     - "&6&lStaff Mode"
@@ -123,6 +129,9 @@ scoreboard:
     - " &7* &eGamemode: &c%gamemode%"
     - " &7* &eBypass: &c%modmode-bypass%<display=%has_permission_relic.command.mod.bypass%"
     - " &7* &eOnline: &f%online%"
+  koth:
+    normal: "&9&l%koth%&7: &c%time%"
+    special: "&5&l%koth%&7: &c%time%"
 
 features:
   scoreboard:

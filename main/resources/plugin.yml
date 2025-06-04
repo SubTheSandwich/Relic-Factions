@@ -123,3 +123,5 @@ commands:
       - ct
   crowbar:
     description: Crowbar
+  koth:
+    description: Koth

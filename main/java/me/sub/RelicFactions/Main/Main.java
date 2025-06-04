@@ -13,8 +13,11 @@ import me.sub.RelicFactions.Events.Player.Movement.UserMoveEvent;
 import me.sub.RelicFactions.Events.Player.Server.UserDisconnectEvent;
 import me.sub.RelicFactions.Events.Player.Server.UserRegisterEvent;
 import me.sub.RelicFactions.Files.Classes.Faction;
+import me.sub.RelicFactions.Files.Classes.KOTH;
+import me.sub.RelicFactions.Files.Classes.RunningKOTH;
 import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Data.FactionData;
+import me.sub.RelicFactions.Files.Data.KOTHData;
 import me.sub.RelicFactions.Files.Data.ServerTimer;
 import me.sub.RelicFactions.Files.Data.UserData;
 import me.sub.RelicFactions.Files.Enums.FactionType;
@@ -22,6 +25,7 @@ import me.sub.RelicFactions.Files.Normal.Inventories;
 import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Files.Normal.Locations;
 import me.sub.RelicFactions.Files.Normal.ModModeFile;
+import me.sub.RelicFactions.Utils.C;
 import me.sub.RelicFactions.Utils.Econ;
 import me.sub.RelicFactions.Utils.Fastboard.FastBoard;
 import me.sub.RelicFactions.Utils.Maps;
@@ -47,10 +51,10 @@ public class Main extends JavaPlugin {
     /*
 
     Brewing Potion Limiting is very complex, may come back and tackle another time
+    Same with Holograms
 
-    TODO: Holograms (Probably through invisible armor stands with custom names)
+    Will revisit reclaims also
 
-    TODO: Reclaims
      */
 
     private static Economy econ = null;
@@ -60,6 +64,12 @@ public class Main extends JavaPlugin {
     public HashMap<String, User> userNameHolder = new HashMap<>();
     public HashMap<UUID, Faction> factions = new HashMap<>();
     public HashMap<String, Faction> factionNameHolder = new HashMap<>();
+    public HashMap<UUID, KOTH> koths = new HashMap<>();
+    public HashMap<String, KOTH> kothNameHolder = new HashMap<>();
+
+    public HashMap<UUID, RunningKOTH> runningKOTHS = new HashMap<>();
+
+
     public HashMap<UUID, FastBoard> boards = new HashMap<>();
 
     public final HashMap<String, ServerTimer> serverTimers = new HashMap<>();
@@ -67,6 +77,7 @@ public class Main extends JavaPlugin {
 
     private boolean isServerFrozen;
     private String keyAllCommand;
+
 
     private static Main instance;
 
@@ -93,13 +104,13 @@ public class Main extends JavaPlugin {
         files();
         events();
         commands();
-        loadUsers();
-        loadFactions();
+        loadFiles();
         new BukkitRunnable() {
             @Override
             public void run() {
                 saveUsers();
                 saveFactions();
+                saveKOTHS();
             }
         }.runTaskTimer(this, 5 * 60 * 20L, 5 * 60 * 20L);
         handleDTR();
@@ -109,8 +120,7 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        saveUsers();
-        saveFactions();
+        saveFiles();
     }
 
     private void commands() {
@@ -133,6 +143,7 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("keyall")).setExecutor(new KeyAllCommand()); Objects.requireNonNull(getCommand("keyall")).setTabCompleter(new KeyAllCommand());
         Objects.requireNonNull(getCommand("customtimer")).setExecutor(new CustomTimerCommand()); Objects.requireNonNull(getCommand("customtimer")).setTabCompleter(new CustomTimerCommand());
         Objects.requireNonNull(getCommand("crowbar")).setExecutor(new CrowbarCommand()); Objects.requireNonNull(getCommand("crowbar")).setTabCompleter(new CrowbarCommand());
+        Objects.requireNonNull(getCommand("koth")).setExecutor(new KOTHCommand()); Objects.requireNonNull(getCommand("koth")).setTabCompleter(new KOTHCommand());
 
         // Staff
         Objects.requireNonNull(getCommand("staffchat")).setExecutor(new StaffChatCommand()); Objects.requireNonNull(getCommand("staffchat")).setTabCompleter(new StaffChatCommand());
@@ -305,6 +316,18 @@ public class Main extends JavaPlugin {
         }
     }
 
+    private void loadKOTHS() {
+        if (KOTHData.getAll() != null) {
+            for (File f : KOTHData.getAll()) {
+                YamlConfiguration file = YamlConfiguration.loadConfiguration(f);
+                UUID uuid = UUID.fromString(Objects.requireNonNull(file.getString("uuid")));
+                KOTH koth = new KOTH(new KOTHData(uuid));
+                koths.put(uuid, koth);
+                kothNameHolder.put(koth.getName().toLowerCase(), koth);
+            }
+        }
+    }
+
     private void saveUsers() {
         int saved = 0;
         if (users.isEmpty()) return;
@@ -379,6 +402,27 @@ public class Main extends JavaPlugin {
 
     }
 
+    private void saveKOTHS() {
+        int saved = 0;
+        if (koths.isEmpty()) return;
+        for (Map.Entry<UUID, KOTH> entry : koths.entrySet()) {
+            KOTH koth = entry.getValue();
+            if (!koth.isModified()) continue;
+            KOTHData kothData = koth.getKothData();
+            kothData.get().set("name", koth.getName());
+            kothData.get().set("positionOne", koth.getPositionOne());
+            kothData.get().set("positionTwo", koth.getPositionTwo());
+            kothData.get().set("pearlable", koth.isPearlable());
+            kothData.get().set("special", koth.isSpecial());
+            kothData.get().set("time", koth.getTime());
+            kothData.get().set("faction", koth.getFaction().toString());
+            kothData.save();
+            koth.setModified(false);
+            saved++;
+        }
+        logger.info("Saved " + saved + (saved == 1 ? " koth" : " koths"));
+    }
+
     public static Economy getEconomy() {
         return econ;
     }
@@ -386,11 +430,13 @@ public class Main extends JavaPlugin {
     public void saveFiles() {
         saveUsers();
         saveFactions();
+        saveKOTHS();
     }
 
     public void loadFiles() {
         loadUsers();
         loadFactions();
+        loadKOTHS();
     }
 
     public boolean isServerFrozen() {
@@ -413,5 +459,11 @@ public class Main extends JavaPlugin {
 
     public void setKeyAllCommand(String keyAllCommand) {
         this.keyAllCommand = keyAllCommand;
+    }
+
+    public void sendGlobalMessage(String message) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.sendMessage(C.chat(message));
+        }
     }
 }

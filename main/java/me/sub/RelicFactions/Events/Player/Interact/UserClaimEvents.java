@@ -71,7 +71,7 @@ public class UserClaimEvents implements Listener {
                 }
                 if (claim.getCornerTwo() != null) {
                     if (!Objects.equals(claim.getCornerTwo().getWorld(), Objects.requireNonNull(e.getClickedBlock()).getWorld())) {
-                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("claiming.error.world"))));
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.world"))));
                         return;
                     }
                 }
