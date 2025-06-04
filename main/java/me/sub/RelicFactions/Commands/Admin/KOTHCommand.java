@@ -66,7 +66,7 @@ public class KOTHCommand implements TabExecutor {
 
             if (args[1].equalsIgnoreCase("delete")) {
                 if (Main.getInstance().runningKOTHS.containsKey(koth.getUUID())) {
-                    sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.koth.cannot-delete")).replace("%koth%", args[0])));
+                    sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.koth.cannot-delete")).replace("%koth%", koth.getName())));
                     return true;
                 }
                 String name = koth.getName();
@@ -84,27 +84,27 @@ public class KOTHCommand implements TabExecutor {
 
             if (args[1].equalsIgnoreCase("start")) {
                 if (Main.getInstance().runningKOTHS.containsKey(koth.getUUID())) {
-                    sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.koth.already-started")).replace("%koth%", args[0])));
+                    sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.koth.already-started")).replace("%koth%", koth.getName())));
                     return true;
                 }
                 if (!koth.isSetup()) {
-                    sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.koth.not-setup")).replace("%koth%", args[0])));
+                    sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.koth.not-setup")).replace("%koth%", koth.getName())));
                     return true;
                 }
                 RunningKOTH runningKOTH = new RunningKOTH(koth);
                 Main.getInstance().runningKOTHS.put(koth.getUUID(), runningKOTH);
-                sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.koth.started")).replace("%koth%", args[0])));
+                sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.koth.started")).replace("%koth%", koth.getName())));
                 return true;
             }
 
             if (args[1].equalsIgnoreCase("stop")) {
                 if (!Main.getInstance().runningKOTHS.containsKey(koth.getUUID())) {
-                    sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.koth.not-running")).replace("%koth%", args[0])));
+                    sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.koth.not-running")).replace("%koth%", koth.getName())));
                     return true;
                 }
                 Main.getInstance().runningKOTHS.remove(koth.getUUID());
-                sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.koth.stopped")).replace("%koth%", args[0])));
-                Main.getInstance().sendGlobalMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.koth.end.cancelled")).replace("%koth%", args[0])));
+                sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.koth.stopped")).replace("%koth%", koth.getName())));
+                Main.getInstance().sendGlobalMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.koth.end.cancelled")).replace("%koth%", koth.getName())));
                 return true;
             }
 

@@ -86,8 +86,7 @@ public class RunningKOTH {
                     return;
                 }
                 timeLeft = timeLeft.subtract(BigDecimal.valueOf(0.05));
-                int secondsLeft = timeLeft.setScale(0, RoundingMode.FLOOR).intValue();
-                if (secondsLeft % 30 == 0 && timeLeft.doubleValue() > 0) {
+                if (timeLeft.doubleValue() % 30 == 0 && timeLeft.doubleValue() > 1) {
                     Main.getInstance().sendGlobalMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.koth.controlling")).replace("%koth%", koth.getName()).replace("%time%", Timer.format(timeLeft))));
                     return;
 
