@@ -150,7 +150,7 @@ public class MountainCommand implements TabExecutor {
                 sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.invalid-material"))));
                 return true;
             }
-            if (!material.isBlock()) {
+            if (!Main.getInstance().isValidMaterial(material)) {
                 sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.invalid-material"))));
                 return true;
             }

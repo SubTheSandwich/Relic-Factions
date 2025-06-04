@@ -26,6 +26,8 @@ import me.sub.RelicFactions.Utils.Maps;
 import me.sub.RelicFactions.Utils.Permission;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
@@ -41,6 +43,8 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class Main extends JavaPlugin {
+
+    // TODO: Allies
 
     /*
 
@@ -498,5 +502,66 @@ public class Main extends JavaPlugin {
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.sendMessage(C.chat(message));
         }
+    }
+
+    public boolean isValidMaterial(Material material) {
+        String name = material.name().toUpperCase();
+
+        if (material.isAir()) return false;
+        if (!material.isSolid()) return false;
+        if (name.contains("GLASS")) return false;
+        if (material.isRecord()) return false;
+        if (material.isEdible()) return false;
+        if (Tag.TRAPDOORS.isTagged(material)) return false;
+        if (Tag.DOORS.isTagged(material)) return false;
+        if (Tag.STAIRS.isTagged(material)) return false;
+        if (Tag.RAILS.isTagged(material)) return false;
+        if (Tag.SLABS.isTagged(material)) return false;
+        if (Tag.PRESSURE_PLATES.isTagged(material)) return false;
+        if (Tag.BUTTONS.isTagged(material)) return false;
+        if (Tag.ALL_SIGNS.isTagged(material)) return false;
+        if (Tag.CAMPFIRES.isTagged(material)) return false;
+        if (Tag.CROPS.isTagged(material)) return false;
+        if (Tag.FENCE_GATES.isTagged(material)) return false;
+        if (Tag.FENCES.isTagged(material)) return false;
+        if (Tag.FLOWERS.isTagged(material)) return false;
+        if (Tag.WOOL_CARPETS.isTagged(material)) return false;
+        if (Tag.BEDS.isTagged(material)) return false;
+        if (Tag.CANDLE_CAKES.isTagged(material)) return false;
+        if (Tag.CORAL_PLANTS.isTagged(material)) return false;
+        if (Tag.WALL_CORALS.isTagged(material)) return false;
+        if (Tag.BANNERS.isTagged(material)) return false;
+        if (Tag.WALLS.isTagged(material)) return false;
+        if (material.equals(Material.FARMLAND)) return false;
+        if (material.equals(Material.CAKE)) return false;
+        if (material.equals(Material.DAYLIGHT_DETECTOR)) return false;
+        if (material.equals(Material.POINTED_DRIPSTONE)) return false;
+        if (material.equals(Material.SCULK_VEIN)) return false;
+        if (material.equals(Material.SCULK_CATALYST)) return false;
+        if (material.equals(Material.SCULK_SHRIEKER)) return false;
+        if (material.equals(Material.SCULK_SENSOR)) return false;
+        if (material.equals(Material.CALIBRATED_SCULK_SENSOR)) return false;
+        if (material.equals(Material.BREWING_STAND)) return false;
+        if (material.equals(Material.DECORATED_POT)) return false;
+        if (Tag.CAULDRONS.isTagged(material)) return false;
+        if (material.equals(Material.LANTERN)) return false;
+        if (material.equals(Material.BELL)) return false;
+        if (material.equals(Material.LECTERN)) return false;
+        if (name.contains("PISTON")) return false;
+        if (name.contains("CHEST")) return false;
+        if (material.equals(Material.ENCHANTING_TABLE)) return false;
+        if (Tag.ANVIL.isTagged(material)) return false;
+        if (Tag.LEAVES.isTagged(material)) return false;
+        if (material.equals(Material.BARRIER)) return false;
+        if (material.equals(Material.HOPPER)) return false;
+        if (name.contains("AMETHYST_BUD") || name.contains("AMETHYST_CLUSTER")) return false;
+        if (material.equals(Material.DIRT_PATH)) return false;
+        if (name.contains("INFESTED")) return false;
+        if (material.equals(Material.SNIFFER_EGG)) return false;
+        if (Tag.SHULKER_BOXES.isTagged(material)) return false;
+        if (material.equals(Material.BAMBOO)) return false;
+        if (name.contains("CORAL") && !name.endsWith("_CORAL_BLOCK")) return false;
+
+        return true;
     }
 }

@@ -113,6 +113,7 @@ public class Claim {
             if (material.equals(Material.SNIFFER_EGG)) continue;
             if (Tag.SHULKER_BOXES.isTagged(material)) continue;
             if (material.equals(Material.BAMBOO)) continue;
+            if (material.name().contains("CORAL") && !material.name().endsWith("_CORAL_BLOCK")) continue;
             materials.add(material);
         }
         return materials.get(new Random().nextInt(materials.size()));

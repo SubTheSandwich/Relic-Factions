@@ -87,7 +87,7 @@ public class FactionCommand implements TabExecutor {
                     for (Map.Entry<Faction,Material> entry : pillars.entrySet()) {
                         Faction faction = entry.getKey();
                         Material material = entry.getValue();
-                        p.sendMessage(C.chat(Objects.requireNonNull(Objects.requireNonNull(Locale.get().getString("commands.faction.map.format")).replace("%faction%", faction.getName()).replace("%material%", material.name()))));
+                        p.sendMessage(C.chat(Objects.requireNonNull(Objects.requireNonNull(Locale.get().getString("commands.faction.map.format")).replace("%faction%", faction.getValidName(p, false)).replace("%material%", material.name()))));
                     }
                     user.setMap((HashMap<Faction, List<Cuboid>>) nearbyClaims);
                 } else {

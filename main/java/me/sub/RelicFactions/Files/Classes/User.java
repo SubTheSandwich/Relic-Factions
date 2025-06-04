@@ -95,9 +95,7 @@ public class User {
         messages = userData.get().getBoolean("settings.messages.enabled");
         messageSounds = userData.get().getBoolean("settings.messages.sounds");
         foundDiamonds = userData.get().getBoolean("settings.foundDiamonds");
-        modified = userData.get().getBoolean("settings.mountains");
-        lastMessaged = null;
-        revived = false;
+        mountains = userData.get().getBoolean("settings.mountains");
         scoreboard = userData.get().getBoolean("settings.scoreboard");
         coalMined = userData.get().getInt("ores.coal");
         ironMined = userData.get().getInt("ores.iron");
@@ -109,6 +107,10 @@ public class User {
         emeraldMined = userData.get().getInt("ores.emerald");
         quartzMined = userData.get().getInt("ores.quartz");
         debrisMined = userData.get().getInt("ores.debris");
+
+        modified = false;
+        lastMessaged = null;
+        revived = false;
     }
 
     public UUID getLoggerUUID() {
