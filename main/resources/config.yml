@@ -84,7 +84,9 @@ factions:
     end: 30
     disable-in-end: false
   claim:
-    buffer: RED_STAINED_GLASS
+    buffer:
+      distance: 3
+      type: RED_STAINED_GLASS
     price:
       multiplier: 250
       selling-multiplier: 0.5
@@ -133,6 +135,7 @@ scoreboard:
     - "%mod-lines%"
     - "%koth-lines%"
     - "%mountain-lines%"
+    - "%focus-lines%"
     - "&7&m-------------------------"
   mod-mode:
     - "&6&lStaff Mode"
@@ -140,6 +143,10 @@ scoreboard:
     - " &7* &eGamemode: &c%gamemode%"
     - " &7* &eBypass: &c%modmode-bypass%<display=%has_permission_relic.command.mod.bypass%"
     - " &7* &eOnline: &f%online%"
+  focus:
+    - "&6&lFocus"
+    - " &7* &eFaction&7: &r%faction%"
+    - " &7* &eHome&7: &r%home%"
   koth:
     normal: "&9&l%koth%&7: &c%time%"
     special: "&5&l%koth%&7: &c%time%"

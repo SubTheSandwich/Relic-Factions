@@ -44,8 +44,6 @@ import java.util.stream.Collectors;
 
 public class Main extends JavaPlugin {
 
-    // TODO: Focus
-
     /*
 
     Brewing Potion Limiting is very complex, may come back and tackle another time

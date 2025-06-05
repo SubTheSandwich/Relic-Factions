@@ -426,6 +426,49 @@ public class FactionCommand implements TabExecutor {
             return true;
         }
         if (args.length == 2) {
+            if (args[0].equalsIgnoreCase("focus")) {
+                if (!user.hasFaction()) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
+                    return true;
+                }
+                Faction faction = Faction.get(user.getFaction());
+                Faction requested = Faction.get(args[1]);
+                if (requested == null) {
+                    User use = User.get(args[1]);
+                    if (use == null) {
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.doesnt-exist"))));
+                        return true;
+                    }
+                    if (!use.hasFaction()) {
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.faction-only"))));
+                        return true;
+                    }
+                    if (use.getFaction().equals(faction.getUUID())) {
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.focus.self"))));
+                        return true;
+                    }
+                    requested = Faction.get(use.getFaction());
+                } else {
+                    if (faction.getUUID().equals(requested.getUUID())) {
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.focus.self"))));
+                        return true;
+                    }
+                    if (!requested.getType().equals(FactionType.PLAYER)) {
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.player-only"))));
+                        return true;
+                    }
+                }
+                if (faction.getFocusedFaction() != null) {
+                    if (faction.getFocusedFaction().equals(requested.getUUID())) {
+                        faction.setFocusedFaction(null);
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.focus.unfocused"))));
+                        return true;
+                    }
+                }
+                faction.setFocusedFaction(requested.getUUID());
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.focus.focus")).replace("%faction%", requested.getName())));
+                return true;
+            }
             if (args[0].equalsIgnoreCase("unally")) {
                 if (!user.hasFaction()) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
@@ -453,6 +496,10 @@ public class FactionCommand implements TabExecutor {
                     }
                     requested = Faction.get(use.getFaction());
                 } else {
+                    if (faction.getUUID().equals(requested.getUUID())) {
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.unally.self"))));
+                        return true;
+                    }
                     if (!requested.getType().equals(FactionType.PLAYER)) {
                         p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.player-only"))));
                         return true;
@@ -518,6 +565,10 @@ public class FactionCommand implements TabExecutor {
                     }
                     requested = Faction.get(use.getFaction());
                 } else {
+                    if (faction.getUUID().equals(requested.getUUID())) {
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.ally.self"))));
+                        return true;
+                    }
                     if (!requested.getType().equals(FactionType.PLAYER)) {
                         p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.player-only"))));
                         return true;
@@ -1415,7 +1466,8 @@ public class FactionCommand implements TabExecutor {
         if (args.length == 1) {
             values.addAll(List.of("create", "open", "show", "deposit", "invite", "join", "withdraw",
                     "subclaim", "captain", "coleader", "invites", "announcement", "uninvite", "leave", "kick",
-                    "sethome", "claim", "home", "list", "unclaim", "rename", "disband", "ff", "chat", "ally", "unally"));
+                    "sethome", "claim", "home", "list", "unclaim", "rename", "disband", "ff", "chat", "ally",
+                    "unally", "focus"));
             if (Permission.has(p, "faction.createsystem")) values.add("createsystem");
             if (Permission.has(p, "faction.setcolor")) values.add("setcolor");
             if (Permission.has(p, "faction.settype")) values.add("settype");

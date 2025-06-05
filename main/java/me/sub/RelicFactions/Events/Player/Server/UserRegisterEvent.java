@@ -164,6 +164,26 @@ public class UserRegisterEvent implements Listener {
                     return;
                 }
                 for (String s : Main.getInstance().getConfig().getStringList("scoreboard.lines")) {
+                    if (s.contains("%focus-lines%")) {
+                        if (!finalUser.hasFaction()) continue;
+                        Faction faction = Faction.get(finalUser.getFaction());
+                        if (faction.getFocusedFaction() == null) continue;
+                        Faction focus = Faction.get(faction.getFocusedFaction());
+                        if (focus == null) {
+                            faction.setFocusedFaction(null);
+                            continue;
+                        }
+                        for (String line : Main.getInstance().getConfig().getStringList("scoreboard.focus")) {
+                            line = line.replace("%faction%", focus.getValidName(p, false));
+                            if (focus.getHome() == null) {
+                                line = line.replace("%home%", Objects.requireNonNull(Locale.get().getString("primary.none")));
+                            } else {
+                                line = line.replace("%home%", focus.getHome().getBlockX() + ", " + focus.getHome().getBlockZ());
+                            }
+                            lines.add(C.chat(line));
+                        }
+                        continue;
+                    }
                     if (s.contains("%mountain-lines%")) {
                         if (!finalUser.isMountains()) continue;
                         for (Mountain mountain : Main.getInstance().mountains.values()) {

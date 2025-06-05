@@ -42,6 +42,7 @@ public class Faction {
     private boolean isRegening;
     private ArrayList<UUID> allies;
     private ArrayList<UUID> allyRequests;
+    private UUID focusedFaction;
 
     public Faction(FactionData factionData) {
         this.factionData = factionData;
@@ -66,6 +67,7 @@ public class Faction {
         isRegening = factionData.get().getBoolean("regening");
         allies = Maps.stringToUuidList(factionData.get().getString("allies"));
         allyRequests = Maps.stringToUuidList(factionData.get().getString("allyRequests"));
+        focusedFaction = null;
         ff = false;
         modified = false;
     }
@@ -440,5 +442,13 @@ public class Faction {
     public void setAllyRequests(ArrayList<UUID> allyRequests) {
         modified = true;
         this.allyRequests = allyRequests;
+    }
+
+    public UUID getFocusedFaction() {
+        return focusedFaction;
+    }
+
+    public void setFocusedFaction(UUID focusedFaction) {
+        this.focusedFaction = focusedFaction;
     }
 }

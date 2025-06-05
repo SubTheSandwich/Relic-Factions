@@ -527,6 +527,10 @@ commands:
       starting: "&aAttempting to find a safe nearby location..."
       none: "&cNo safe location was found."
       success: "&aYou have been teleported to the Wilderness nearby."
+    focus:
+      self: "&cYou cannot focus your own faction."
+      unfocused: "&eYou are no longer focusing any faction."
+      focus: "&eYou are now focusing &d%faction%&e."
   economy:
     set: "&eYou have set the balance of &b%player% &eto &d%amount%&e."
     give: "&eYou have added &d%amount% &eto &b%player%&e's balance."

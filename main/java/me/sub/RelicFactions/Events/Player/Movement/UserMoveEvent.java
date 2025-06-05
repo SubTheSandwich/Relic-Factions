@@ -1,10 +1,12 @@
 package me.sub.RelicFactions.Events.Player.Movement;
 
+import me.sub.RelicFactions.Commands.User.FactionCommand;
 import me.sub.RelicFactions.Events.Player.Interact.UserClaimEvents;
 import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.KOTH;
 import me.sub.RelicFactions.Files.Classes.RunningKOTH;
 import me.sub.RelicFactions.Files.Classes.User;
+import me.sub.RelicFactions.Files.Data.ClaimBufferManager;
 import me.sub.RelicFactions.Files.Data.PlayerTimer;
 import me.sub.RelicFactions.Files.Enums.FactionType;
 import me.sub.RelicFactions.Files.Normal.Locale;
@@ -12,11 +14,9 @@ import me.sub.RelicFactions.Files.Normal.Locations;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
 import org.bukkit.*;
-import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -27,10 +27,40 @@ import java.util.Objects;
 
 public class UserMoveEvent implements Listener {
 
+    private final ClaimBufferManager bufferManager = new ClaimBufferManager();
+
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
         Player p = e.getPlayer();
         if (e.getTo() == null) return;
+
+        bufferManager.updateBufferWall(p);
+
+        if (Faction.getAt(e.getTo()) != null) {
+            Faction faction = Faction.getAt(e.getTo());
+            User user = User.get(p);
+            if (faction == null) return;
+            if (faction.getType().equals(FactionType.SAFEZONE) && user.hasTimer("combat")) {
+                Location location = FactionCommand.findSafeLocation(p,20,p.getWorld().getMaxHeight() - 2, p.getWorld().getMinHeight() + 2);
+                if (location == null) return;
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        p.teleport(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
+                    }
+                }.runTaskLater(Main.getInstance(), 1);
+            }
+            if (faction.getType().equals(FactionType.PLAYER) && (user.hasTimer("pvp") || user.hasTimer("starting"))) {
+                Location location = FactionCommand.findSafeLocation(p,20,p.getWorld().getMaxHeight() - 2, p.getWorld().getMinHeight() + 2);
+                if (location == null) return;
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        p.teleport(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
+                    }
+                }.runTaskLater(Main.getInstance(), 1);
+            }
+        }
 
         // Only run these on block-to-block movement
         if (e.getFrom().getBlockX() != e.getTo().getBlockX() || e.getFrom().getBlockZ() != e.getTo().getBlockZ()) {
@@ -41,6 +71,8 @@ public class UserMoveEvent implements Listener {
                 return;
             }
         }
+
+
 
         // KOTH logic runs on every movement (even within the same block)
         User user = User.get(p);
@@ -104,6 +136,7 @@ public class UserMoveEvent implements Listener {
         Player p = e.getPlayer();
         User user = User.get(p);
         if (user.hasTimer("combat") && !Main.getInstance().getConfig().getBoolean("combat.allow-end-portal-enter")) {
+            if (!e.getCause().equals(PlayerTeleportEvent.TeleportCause.END_PORTAL)) return;
             e.setCancelled(true);
             p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.timer.player.end"))));
             return;
@@ -144,7 +177,7 @@ public class UserMoveEvent implements Listener {
                     @Override
                     public void run() {
                         if (p.getWorld().getEnvironment() == World.Environment.NORMAL) {
-                            p.teleport(endExit);
+                            p.teleport(endExit, PlayerTeleportEvent.TeleportCause.END_PORTAL);
                         }
                     }
                 }.runTaskLater(Main.getInstance(), 1);
@@ -171,7 +204,7 @@ public class UserMoveEvent implements Listener {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        p.teleport(endSpawn);
+                        p.teleport(endSpawn, PlayerTeleportEvent.TeleportCause.END_PORTAL);
                     }
                 }.runTaskLater(Main.getInstance(), 1);
             }

@@ -44,7 +44,7 @@ public class TeleportCommand implements TabExecutor {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        p.teleport(p.getWorld().getHighestBlockAt(p.getLocation()).getLocation().add(0,1,0));
+                        p.teleport(p.getWorld().getHighestBlockAt(p.getLocation()).getLocation().add(0,1,0), PlayerTeleportEvent.TeleportCause.PLUGIN);
                     }
                 }.runTaskLater(Main.getInstance(), 1);
                 p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.teleport.top"))));
@@ -114,7 +114,7 @@ public class TeleportCommand implements TabExecutor {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    from.teleport(to.getLocation());
+                    from.teleport(to.getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
                 }
             }.runTaskLater(Main.getInstance(), 1);
 
