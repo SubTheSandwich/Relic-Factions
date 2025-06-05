@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class FactionCommand implements TabExecutor {
 
@@ -117,6 +118,20 @@ public class FactionCommand implements TabExecutor {
                 for (UUID uuid : faction.getMembers().keySet()) {
                     User member = User.get(uuid);
                     member.setFaction(null);
+                }
+                for (UUID uuid : faction.getAllies()) {
+                    Faction fac = Faction.get(uuid);
+                    if (fac == null) continue;
+                    ArrayList<UUID> allies = fac.getAllies();
+                    allies.remove(uuid);
+                    fac.setAllies(allies);
+                }
+                for (UUID uuid : faction.getAllyRequests()) {
+                    Faction fac = Faction.get(uuid);
+                    if (fac == null) continue;
+                    ArrayList<UUID> allies = fac.getAllyRequests();
+                    allies.remove(uuid);
+                    fac.setAllyRequests(allies);
                 }
                 faction.getFactionData().delete();
                 Main.getInstance().factionNameHolder.remove(faction.getName().toLowerCase());
@@ -400,6 +415,138 @@ public class FactionCommand implements TabExecutor {
             return true;
         }
         if (args.length == 2) {
+            if (args[0].equalsIgnoreCase("unally")) {
+                if (!user.hasFaction()) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
+                    return true;
+                }
+                Faction faction = Faction.get(user.getFaction());
+                if (faction.getRoleID(p.getUniqueId()) < 1) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.captain-above"))));
+                    return true;
+                }
+                Faction requested = Faction.get(args[1]);
+                if (requested == null) {
+                    User use = User.get(args[1]);
+                    if (use == null) {
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.doesnt-exist"))));
+                        return true;
+                    }
+                    if (!use.hasFaction()) {
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.faction-only"))));
+                        return true;
+                    }
+                    if (use.getFaction().equals(faction.getUUID())) {
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.unally.self"))));
+                        return true;
+                    }
+                    requested = Faction.get(use.getFaction());
+                } else {
+                    if (!requested.getType().equals(FactionType.PLAYER)) {
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.player-only"))));
+                        return true;
+                    }
+                }
+                if (faction.getAllies().contains(requested.getUUID())) {
+                    ArrayList<UUID> allies = faction.getAllies();
+                    allies.remove(requested.getUUID());
+                    faction.setAllies(allies);
+
+                    ArrayList<UUID> other = requested.getAllies();
+                    other.remove(faction.getUUID());
+                    requested.setAllies(other);
+
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.unally.removed")).replace("%faction%", requested.getName())));
+                    return true;
+                }
+
+                if (faction.getAllyRequests().contains(requested.getUUID())) {
+                    ArrayList<UUID> allies = faction.getAllyRequests();
+                    allies.remove(requested.getUUID());
+                    faction.setAllyRequests(allies);
+
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.unally.removed-request")).replace("%faction%", requested.getName())));
+                    return true;
+                }
+
+                if (requested.getAllyRequests().contains(faction.getUUID())) {
+                    ArrayList<UUID> allies = requested.getAllyRequests();
+                    allies.remove(faction.getUUID());
+                    requested.setAllyRequests(allies);
+
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.unally.denied")).replace("%faction%", requested.getName())));
+                    return true;
+                }
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.unally.not-allied"))));
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("ally")) {
+                if (!user.hasFaction()) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
+                    return true;
+                }
+                Faction faction = Faction.get(user.getFaction());
+                if (faction.getRoleID(p.getUniqueId()) < 1) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.captain-above"))));
+                    return true;
+                }
+                Faction requested = Faction.get(args[1]);
+                if (requested == null) {
+                    User use = User.get(args[1]);
+                    if (use == null) {
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.doesnt-exist"))));
+                        return true;
+                    }
+                    if (!use.hasFaction()) {
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.faction-only"))));
+                        return true;
+                    }
+                    if (use.getFaction().equals(faction.getUUID())) {
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.ally.self"))));
+                        return true;
+                    }
+                    requested = Faction.get(use.getFaction());
+                } else {
+                    if (!requested.getType().equals(FactionType.PLAYER)) {
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.player-only"))));
+                        return true;
+                    }
+                }
+
+                if (faction.getAllies().size() >= Main.getInstance().getConfig().getInt("factions.allies.max") || requested.getAllies().size() >=  Main.getInstance().getConfig().getInt("factions.allies.max")) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.ally.max")).replace("%faction%", requested.getName())));
+                    return true;
+                }
+                if (faction.getAllies().contains(requested.getUUID()) || faction.getAllyRequests().contains(requested.getUUID())) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.ally.already"))));
+                    return true;
+                }
+                if (requested.getAllyRequests().contains(faction.getUUID())) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.ally.accepted")).replace("%faction%", requested.getName())));
+                    ArrayList<UUID> requests = requested.getAllyRequests();
+                    requests.remove(faction.getUUID());
+                    requested.setAllyRequests(requests);
+
+                    ArrayList<UUID> allies = requested.getAllies();
+                    allies.add(faction.getUUID());
+                    requested.setAllies(allies);
+
+                    ArrayList<UUID> other = faction.getAllies();
+                    other.add(requested.getUUID());
+                    faction.setAllies(other);
+                    return true;
+                }
+                ArrayList<UUID> re = faction.getAllyRequests();
+                re.add(requested.getUUID());
+                faction.setAllyRequests(re);
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.ally.sent")).replace("%faction%", requested.getName())));
+                for (Player player : requested.getOnlineMembers()) {
+                    User req = User.get(player);
+                    if (requested.getRoleID(req.getUUID()) < 1) continue;
+                    player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.ally.pending")).replace("%faction%", faction.getName())));
+                }
+                return true;
+            }
             if (args[0].equalsIgnoreCase("chat")) {
                 if (!user.hasFaction()) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
@@ -1257,7 +1404,7 @@ public class FactionCommand implements TabExecutor {
         if (args.length == 1) {
             values.addAll(List.of("create", "open", "show", "deposit", "invite", "join", "withdraw",
                     "subclaim", "captain", "coleader", "invites", "announcement", "uninvite", "leave", "kick",
-                    "sethome", "claim", "home", "list", "unclaim", "rename", "disband", "ff", "chat"));
+                    "sethome", "claim", "home", "list", "unclaim", "rename", "disband", "ff", "chat", "ally", "unally"));
             if (Permission.has(p, "faction.createsystem")) values.add("createsystem");
             if (Permission.has(p, "faction.setcolor")) values.add("setcolor");
             if (Permission.has(p, "faction.settype")) values.add("settype");
@@ -1373,6 +1520,19 @@ public class FactionCommand implements TabExecutor {
                 if (s.contains("%announcement%")) {
                     if (!user.hasFaction() || !user.getFaction().equals(faction.getUUID())) continue;
                     s = s.replace("%announcement%", faction.getAnnouncement() == null ? Objects.requireNonNull(Locale.get().getString("primary.none")) : faction.getAnnouncement());
+                }
+                if (s.contains("%allies%")) {
+                    if (faction.getAllies().isEmpty()) continue;
+                    List<Faction> allies = faction.getAllies()
+                            .stream()
+                            .map(Faction::get)
+                            .filter(Objects::nonNull)
+                            .toList();
+
+                    String allyNames = allies.stream()
+                            .map(f -> f.getValidName(p, false) + " &7[" + f.getOnlineMembers().size() + "/" + f.getMembers().size() + "]")
+                            .collect(Collectors.joining("&e, "));
+                    s = s.replace("%allies%", allyNames);
                 }
                 p.sendMessage(C.chat(s));
             }

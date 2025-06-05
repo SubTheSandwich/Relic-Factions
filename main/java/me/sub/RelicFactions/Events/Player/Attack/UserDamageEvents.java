@@ -100,16 +100,6 @@ public class UserDamageEvents implements Listener {
         Faction hitIn = Faction.getAt(hit.getLocation());
         Faction damagerIn = Faction.getAt(damager.getLocation());
 
-        if ((hitUser.getFaction() != null && damagerUser.getFaction() != null) && (hitUser.getFaction().equals(damagerUser.getFaction()))) {
-            if (!Faction.get(hitUser.getFaction()).isFF()) {
-                e.setCancelled(true);
-                damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.member.damage")).replace("%player%", hit.getName())));
-                return;
-            }
-            generateCombat(hit, damager);
-            return;
-        }
-
         if (damagerIn != null && damagerIn.getType().equals(FactionType.SAFEZONE)) {
             e.setCancelled(true);
             damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.cannot-attack-inside-safezone")).replace("%player%", hit.getName())));
@@ -121,6 +111,29 @@ public class UserDamageEvents implements Listener {
             damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.cannot-attack-here")).replace("%player%", hit.getName())));
             return;
         }
+
+        if ((hitUser.getFaction() != null && damagerUser.getFaction() != null) && (Faction.get(hitUser.getFaction()).getAllies().contains(damagerUser.getFaction()))) {
+
+            if (Main.getInstance().getConfig().getBoolean("factions.allies.attacking.prevent")) {
+                e.setCancelled(true);
+                damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.ally.damage")).replace("%player%", hit.getName())));
+                return;
+            }
+            e.setDamage(e.getDamage() * Main.getInstance().getConfig().getDouble("factions.allies.attacking.damage-multiplier"));
+            generateCombat(hit, damager);
+            return;
+        }
+
+        if ((hitUser.getFaction() != null && damagerUser.getFaction() != null) && (hitUser.getFaction().equals(damagerUser.getFaction()))) {
+            if (!Faction.get(hitUser.getFaction()).isFF()) {
+                e.setCancelled(true);
+                damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.member.damage")).replace("%player%", hit.getName())));
+                return;
+            }
+            generateCombat(hit, damager);
+            return;
+        }
+
         generateCombat(hit, damager);
     }
 
@@ -295,16 +308,6 @@ public class UserDamageEvents implements Listener {
         Faction hitIn = Faction.getAt(villager.getLocation());
         Faction damagerIn = Faction.getAt(damager.getLocation());
 
-        if ((hitUser.getFaction() != null && damagerUser.getFaction() != null) && (hitUser.getFaction().equals(damagerUser.getFaction()))) {
-            if (!Faction.get(hitUser.getFaction()).isFF()) {
-                e.setCancelled(true);
-                damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.member.damage")).replace("%player%", hitUser.getName())));
-                return;
-            }
-            generateCombat(damager);
-            return;
-        }
-
         if (damagerIn != null && damagerIn.getType().equals(FactionType.SAFEZONE)) {
             e.setCancelled(true);
             damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.cannot-attack-inside-safezone")).replace("%player%", hitUser.getName())));
@@ -316,6 +319,29 @@ public class UserDamageEvents implements Listener {
             damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.cannot-attack-here")).replace("%player%", hitUser.getName())));
             return;
         }
+
+        if ((hitUser.getFaction() != null && damagerUser.getFaction() != null) && (Faction.get(hitUser.getFaction()).getAllies().contains(damagerUser.getFaction()))) {
+
+            if (Main.getInstance().getConfig().getBoolean("factions.allies.attacking.prevent")) {
+                e.setCancelled(true);
+                damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.ally.damage")).replace("%player%", hitUser.getName())));
+                return;
+            }
+            e.setDamage(e.getDamage() * Main.getInstance().getConfig().getDouble("factions.allies.attacking.damage-multiplier"));
+            generateCombat(damager);
+            return;
+        }
+
+        if ((hitUser.getFaction() != null && damagerUser.getFaction() != null) && (hitUser.getFaction().equals(damagerUser.getFaction()))) {
+            if (!Faction.get(hitUser.getFaction()).isFF()) {
+                e.setCancelled(true);
+                damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.member.damage")).replace("%player%", hitUser.getName())));
+                return;
+            }
+            generateCombat(damager);
+            return;
+        }
+
         generateCombat(damager);
     }
 
@@ -399,16 +425,6 @@ public class UserDamageEvents implements Listener {
         Faction hitIn = Faction.getAt(hit.getLocation());
         Faction damagerIn = Faction.getAt(damager.getLocation());
 
-        if ((hitUser.getFaction() != null && damagerUser.getFaction() != null) && (hitUser.getFaction().equals(damagerUser.getFaction()))) {
-            if (!Faction.get(hitUser.getFaction()).isFF()) {
-                e.setCancelled(true);
-                damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.member.damage")).replace("%player%", hit.getName())));
-                return;
-            }
-            generateCombat(hit, damager);
-            return;
-        }
-
         if (damagerIn != null && damagerIn.getType().equals(FactionType.SAFEZONE)) {
             e.setCancelled(true);
             damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.cannot-attack-inside-safezone")).replace("%player%", hit.getName())));
@@ -420,6 +436,29 @@ public class UserDamageEvents implements Listener {
             damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.cannot-attack-here")).replace("%player%", hit.getName())));
             return;
         }
+
+        if ((hitUser.getFaction() != null && damagerUser.getFaction() != null) && (Faction.get(hitUser.getFaction()).getAllies().contains(damagerUser.getFaction()))) {
+
+            if (Main.getInstance().getConfig().getBoolean("factions.allies.attacking.prevent")) {
+                e.setCancelled(true);
+                damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.ally.damage")).replace("%player%", hit.getName())));
+                return;
+            }
+            e.setDamage(e.getDamage() * Main.getInstance().getConfig().getDouble("factions.allies.attacking.damage-multiplier"));
+            generateCombat(hit, damager);
+            return;
+        }
+
+        if ((hitUser.getFaction() != null && damagerUser.getFaction() != null) && (hitUser.getFaction().equals(damagerUser.getFaction()))) {
+            if (!Faction.get(hitUser.getFaction()).isFF()) {
+                e.setCancelled(true);
+                damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.member.damage")).replace("%player%", hit.getName())));
+                return;
+            }
+            generateCombat(hit, damager);
+            return;
+        }
+
         generateCombat(hit, damager);
     }
 

@@ -40,6 +40,8 @@ public class Faction {
     private boolean ff;
     private long timeTilRegen;
     private boolean isRegening;
+    private ArrayList<UUID> allies;
+    private ArrayList<UUID> allyRequests;
 
     public Faction(FactionData factionData) {
         this.factionData = factionData;
@@ -62,6 +64,8 @@ public class Faction {
         deathban = factionData.get().getBoolean("deathban");
         timeTilRegen = factionData.get().getLong("timeTilRegen");
         isRegening = factionData.get().getBoolean("regening");
+        allies = Maps.stringToUuidList(factionData.get().getString("allies"));
+        allyRequests = Maps.stringToUuidList(factionData.get().getString("allyRequests"));
         ff = false;
         modified = false;
     }
@@ -148,6 +152,8 @@ public class Faction {
             } else {
                 if (user.getFaction().equals(uuid)) {
                     validName = C.chat("&a" + name);
+                } else if (Faction.get(user.getFaction()).getAllies().contains(uuid)) {
+                    validName = C.chat("&9" + name);
                 } else {
                     validName = C.chat("&c" + name);
                 }
@@ -416,5 +422,23 @@ public class Faction {
 
     public double getMaxDTR() {
         return Math.min(Main.getInstance().getConfig().getDouble("factions.dtr.max"), getMembers().size() * Main.getInstance().getConfig().getDouble("factions.dtr.multiple"));
+    }
+
+    public ArrayList<UUID> getAllies() {
+        return allies;
+    }
+
+    public void setAllies(ArrayList<UUID> allies) {
+        modified = true;
+        this.allies = allies;
+    }
+
+    public ArrayList<UUID> getAllyRequests() {
+        return allyRequests;
+    }
+
+    public void setAllyRequests(ArrayList<UUID> allyRequests) {
+        modified = true;
+        this.allyRequests = allyRequests;
     }
 }

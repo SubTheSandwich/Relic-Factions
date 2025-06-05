@@ -3,6 +3,7 @@ package me.sub.RelicFactions.Files.Enums;
 public enum ChatType {
 
     PUBLIC,
+    ALLY,
     FACTION;
 
     public static boolean isValid(String input) {

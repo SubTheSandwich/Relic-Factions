@@ -105,6 +105,11 @@ factions:
       - "MINEHQ"
       - "VELTPVP"
       - "ARCANE"
+  allies:
+    max: 1
+    attacking:
+      prevent: true
+      damage-multiplier: 0.5
 
 scoreboard:
   title: "%primary%&l%servername% &7| &fMap %map-number%"

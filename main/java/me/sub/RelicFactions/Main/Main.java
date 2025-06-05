@@ -44,7 +44,9 @@ import java.util.stream.Collectors;
 
 public class Main extends JavaPlugin {
 
-    // TODO: Allies
+    // TODO: Focus
+
+    // TODO: Potentially "F STUCK"
 
     /*
 
@@ -403,6 +405,8 @@ public class Main extends JavaPlugin {
                 factionData.get().set("invites", Maps.uuidListToString(faction.getInvites()));
                 factionData.get().set("timeTilRegen", faction.getTimeTilRegen());
                 factionData.get().set("regening", faction.isRegening());
+                factionData.get().set("allies", Maps.uuidListToString(faction.getAllies()));
+                factionData.get().set("allyRequests", Maps.uuidListToString(faction.getAllyRequests()));
             }
             factionData.get().set("name", faction.getName());
             factionData.get().set("color", faction.getColor() == null ? null : faction.getColor().name());

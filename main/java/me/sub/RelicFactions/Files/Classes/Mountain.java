@@ -134,7 +134,7 @@ public class Mountain {
                         Block block = it.next();
                         block.setType(type);
                     }
-                    Main.getInstance().sendGlobalMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.mountain.reset")).replace("%type%", type.name())));
+                    Main.getInstance().sendGlobalMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.mountain.reset")).replace("%type%", C.capitalizeWord(type.name()))));
                     return;
                 }
                 time = time.add(new BigDecimal("0.05"));

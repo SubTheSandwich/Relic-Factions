@@ -137,6 +137,8 @@ faction:
       - "&cMember Death: &f%player%"
       - "&cDTR: &f%dtr%"
     damage: "&eYou cannot damage &2%player%&e."
+  ally:
+    damage: "&eBe careful, &e%player% &eis an ally."
 
 commands:
   mountain:
@@ -504,6 +506,19 @@ commands:
     setdeathban: "&eYou have %status% &ethe deathban of &b%faction%"
     setregening: "&eYou have %status% &ethe regening status of &b%faction%"
     setdtr: "&eYou have set the DTR of &b%faction% &eto &d%dtr%"
+    ally:
+      max: "&6Your faction or %faction% &ehas already reached the max allies limit."
+      already: "&cYou are already allied to this faction or the request is pending."
+      accepted: "&eYour faction is now allied with &d%faction%&e."
+      sent: "&eYou sent an ally request to &6%faction%&e."
+      pending: "&6%faction% &ewishes to be your ally."
+      self: "&cYou cannot ally yourself."
+    unally:
+      denied: "&eYou denied an ally request to &c%faction%&e."
+      removed: "&eYou are no longer allied with &c%faction%&e."
+      removed-request: "&eYou are no longer requested to be allied with &c%faction%&e."
+      not-allied: "&cYou are not allied with this faction."
+      self: "&cYou cannot unally yourself."
   economy:
     set: "&eYou have set the balance of &b%player% &eto &d%amount%&e."
     give: "&eYou have added &d%amount% &eto &b%player%&e's balance."

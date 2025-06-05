@@ -16,6 +16,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 public class FormatChatEvent implements Listener {
 
@@ -93,6 +94,24 @@ public class FormatChatEvent implements Listener {
             Faction faction = Faction.get(user.getFaction());
             for (Player player : faction.getOnlineMembers()) {
                 player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("chat.faction")).replace("%player%", p.getName()).replace("%message%", finalMessage)));
+            }
+        } else if (user.getChatType().equals(ChatType.ALLY)) {
+            e.setCancelled(true);
+            if (!user.hasFaction()) {
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
+                user.setChatType(ChatType.PUBLIC);
+                return;
+            }
+            Faction faction = Faction.get(user.getFaction());
+            for (Player player : faction.getOnlineMembers()) {
+                player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("chat.ally")).replace("%player%", p.getName()).replace("%message%", finalMessage)));
+            }
+            for (UUID uuid : faction.getAllies()) {
+                Faction ally = Faction.get(uuid);
+                if (ally == null) continue;
+                for (Player player : ally.getOnlineMembers()) {
+                    player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("chat.ally")).replace("%player%", p.getName()).replace("%message%", finalMessage)));
+                }
             }
         }
     }

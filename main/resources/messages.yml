@@ -103,6 +103,8 @@ faction:
       - "&e/%alias% invites &7- Show all invitations"
       - "&e/%alias% claim &7- Start a claim for your faction"
       - "&e/%alias% sethome &7- Set your faction's home"
+      - "&e/%alias% ally <faction;player> &7 - Sends a faction an ally request"
+      - "&e/%alias% unally <faction;player> &7 - Removes an ally or ally request"
       - "&9Coleader Commands:"
       - "&e/%alias% open &7- Allows/denies players to join without an invite"
       - "&e/%alias% captain &7- Shows captain management commands"
@@ -174,6 +176,7 @@ faction:
       - "&eStatus: &9%open%"
       - "&eLives: &c%lives%"
       - "&eAnnouncement: &d%announcement%"
+      - "&eAllies: %allies%"
       - "&7&m----------------------------------------------------"
 join-message:
   - "&f"
