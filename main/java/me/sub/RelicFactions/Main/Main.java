@@ -46,8 +46,6 @@ public class Main extends JavaPlugin {
 
     // TODO: Focus
 
-    // TODO: Potentially "F STUCK"
-
     /*
 
     Brewing Potion Limiting is very complex, may come back and tackle another time

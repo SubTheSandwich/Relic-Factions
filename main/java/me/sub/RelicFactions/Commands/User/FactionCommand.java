@@ -62,6 +62,17 @@ public class FactionCommand implements TabExecutor {
             return true;
         }
         if (args.length == 1) {
+            if (args[0].equalsIgnoreCase("stuck")) {
+                if (user.hasTimer("stuck")) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.stuck.running"))));
+                    return true;
+                }
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.stuck.message"))));
+                PlayerTimer timer = new PlayerTimer(p.getUniqueId(), Timer.STUCK);
+                user.addTimer(timer);
+                user.setStuckLocation(p.getLocation());
+                return true;
+            }
             if (args[0].equalsIgnoreCase("lives")) {
                 Messages.send(p, "faction.help.lives", s);
                 return true;
@@ -1634,5 +1645,118 @@ public class FactionCommand implements TabExecutor {
         corners.add(new Location(world, x2, y, z1));
         corners.add(new Location(world, x2, y, z2));
         return corners;
+    }
+
+    public static Location findSafeLocation(Player player, int searchRadius, int maxY, int minY) {
+        Location start = player.getLocation().clone();
+        World world = start.getWorld();
+        User user = User.get(player);
+
+        Faction currentFaction = Faction.getAt(start);
+        Cuboid claim = null;
+        if (currentFaction != null && currentFaction.getType() == FactionType.PLAYER) {
+            for (Cuboid c : currentFaction.getClaims()) {
+                if (c.isIn(start)) {
+                    claim = c;
+                    break;
+                }
+            }
+        }
+
+        // 1. Try just outside the edge of the claim cuboid, at player's Y
+        if (claim != null) {
+            for (Location edgeLoc : getCuboidOuterEdgeLocations(claim, world, player.getLocation().getBlockY(), minY, maxY)) {
+                Faction edgeFaction = Faction.getAt(edgeLoc);
+                if (edgeFaction != null) {
+                    if (edgeFaction.getType() == FactionType.PLAYER) continue;
+                    if (edgeFaction.getType() == FactionType.SAFEZONE && user.hasTimer("pvp")) continue;
+                }
+                if (isSafeBlock(edgeLoc)) {
+                    return edgeLoc;
+                }
+            }
+        }
+
+        // 2. Fallback: Spiral search at player's Y
+        for (int r = 1; r <= searchRadius; r++) {
+            for (int dx = -r; dx <= r; dx++) {
+                for (int dz = -r; dz <= r; dz++) {
+                    if (Math.abs(dx) != r && Math.abs(dz) != r) continue;
+                    int x = start.getBlockX() + dx;
+                    int z = start.getBlockZ() + dz;
+                    int y = player.getLocation().getBlockY();
+                    if (y > maxY) y = maxY;
+                    if (y < minY) y = minY;
+                    Location check = new Location(world, x + 0.5, y, z + 0.5);
+                    Faction faction = Faction.getAt(check);
+                    if (faction != null) {
+                        if (faction.getType() == FactionType.PLAYER) continue;
+                        if (faction.getType() == FactionType.SAFEZONE && user.hasTimer("pvp")) continue;
+                    }
+                    if (!isSafeBlock(check)) continue;
+                    return check;
+                }
+            }
+        }
+
+        // 3. Fallback: Surface search (as before)
+        for (int r = 1; r <= searchRadius; r++) {
+            for (int dx = -r; dx <= r; dx++) {
+                for (int dz = -r; dz <= r; dz++) {
+                    if (Math.abs(dx) != r && Math.abs(dz) != r) continue;
+                    int x = start.getBlockX() + dx;
+                    int z = start.getBlockZ() + dz;
+                    int y = Objects.requireNonNull(world).getHighestBlockYAt(x, z);
+                    if (y > maxY) y = maxY;
+                    if (y < minY) y = minY;
+                    Location check = new Location(world, x + 0.5, y, z + 0.5);
+                    Faction faction = Faction.getAt(check);
+                    if (faction != null) {
+                        if (faction.getType() == FactionType.PLAYER) continue;
+                        if (faction.getType() == FactionType.SAFEZONE && user.hasTimer("pvp")) continue;
+                    }
+                    if (!isSafeBlock(check)) continue;
+                    return check;
+                }
+            }
+        }
+        return null; // No safe location found
+    }
+
+    // Modified edge location getter to allow Y parameter
+    private static List<Location> getCuboidOuterEdgeLocations(Cuboid cuboid, World world, int y, int minY, int maxY) {
+        List<Location> edgeLocations = new ArrayList<>();
+        int xMin = cuboid.getXMin();
+        int xMax = cuboid.getXMax();
+        int zMin = cuboid.getZMin();
+        int zMax = cuboid.getZMax();
+        if (y > maxY) y = maxY;
+        if (y < minY) y = minY;
+
+        // North and South (zMin - 1, zMax + 1)
+        for (int x = xMin; x <= xMax; x++) {
+            for (int z : new int[]{zMin - 1, zMax + 1}) {
+                edgeLocations.add(new Location(world, x + 0.5, y, z + 0.5));
+            }
+        }
+        // West and East (xMin - 1, xMax + 1)
+        for (int z = zMin; z <= zMax; z++) {
+            for (int x : new int[]{xMin - 1, xMax + 1}) {
+                edgeLocations.add(new Location(world, x + 0.5, y, z + 0.5));
+            }
+        }
+        return edgeLocations;
+    }
+
+    // Helper: Check if a location is safe (not suffocating, solid ground)
+    private static boolean isSafeBlock(Location loc) {
+        World world = loc.getWorld();
+        int x = loc.getBlockX();
+        int y = loc.getBlockY();
+        int z = loc.getBlockZ();
+        Material feet = world.getBlockAt(x, y, z).getType();
+        Material head = world.getBlockAt(x, y + 1, z).getType();
+        Material below = world.getBlockAt(x, y - 1, z).getType();
+        return feet == Material.AIR && head == Material.AIR && below.isSolid();
     }
 }

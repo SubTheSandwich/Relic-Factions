@@ -41,6 +41,7 @@ timers:
   pvp: 1800
   combat: 30
   home: 10
+  stuck: 150
   enderpearl: 16
   apple: 10
   gapple: 21600
@@ -128,6 +129,7 @@ scoreboard:
     - "&c&lSpawn Tag&7: &c%player_combat_timer%<display=%has_player_combat_timer%"
     - "&a&lSOTW&7: &c%server_sotw_timer%<display=%has_server_sotw_timer%"
     - "&4&lLogout&7: &c%player_logout_timer%<display=%has_player_logout_timer%"
+    - "&4&lStuck&7: &c%player_stuck_timer%<display=%has_player_stuck_timer%"
     - "%mod-lines%"
     - "%koth-lines%"
     - "%mountain-lines%"

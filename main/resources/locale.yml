@@ -519,6 +519,14 @@ commands:
       removed-request: "&eYou are no longer requested to be allied with &c%faction%&e."
       not-allied: "&cYou are not allied with this faction."
       self: "&cYou cannot unally yourself."
+    stuck:
+      message: "&cStarted stuck timer, please wait 2 minutes and 30 seconds. Do not
+        move more than 5 blocks."
+      cancelled: "&cYou moved more than 5 blocks so your stuck timer was cancelled."
+      running: "&cYou have already started your stuck timer."
+      starting: "&aAttempting to find a safe nearby location..."
+      none: "&cNo safe location was found."
+      success: "&aYou have been teleported to the Wilderness nearby."
   economy:
     set: "&eYou have set the balance of &b%player% &eto &d%amount%&e."
     give: "&eYou have added &d%amount% &eto &b%player%&e's balance."

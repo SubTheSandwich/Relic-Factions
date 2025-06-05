@@ -50,6 +50,15 @@ public class UserMoveEvent implements Listener {
         Faction faction = Faction.get(user.getFaction());
         if (faction == null) return;
 
+        if (user.getStuckLocation() != null && user.hasTimer("stuck")) {
+            if (user.getStuckLocation().distance(p.getLocation()) > 5) {
+                user.setStuckLocation(null);
+                user.removeTimer("stuck");
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.stuck.cancelled"))));
+                return;
+            }
+        }
+
         if (Main.getInstance().runningKOTHS.isEmpty()) return;
         for (RunningKOTH runningKOTH : Main.getInstance().runningKOTHS.values()) {
             KOTH koth = runningKOTH.getKOTH();

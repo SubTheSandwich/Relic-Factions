@@ -4,7 +4,6 @@ import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.Calculate;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -15,6 +14,7 @@ public enum Timer {
     PVP(Main.getInstance().getConfig().getInt("timers.pvp")),
     COMBAT(Main.getInstance().getConfig().getInt("timers.combat")),
     HOME(Main.getInstance().getConfig().getInt("timers.home")),
+    STUCK(Main.getInstance().getConfig().getInt("timers.stuck")),
     ENDERPEARL(Main.getInstance().getConfig().getInt("timers.enderpearl")),
     APPLE(Main.getInstance().getConfig().getInt("timers.apple")),
     GAPPLE(Main.getInstance().getConfig().getInt("timers.gapple")),

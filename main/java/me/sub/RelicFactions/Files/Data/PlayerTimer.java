@@ -1,5 +1,6 @@
 package me.sub.RelicFactions.Files.Data;
 
+import me.sub.RelicFactions.Commands.User.FactionCommand;
 import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Enums.Timer;
@@ -100,6 +101,7 @@ public class PlayerTimer {
                 if (Bukkit.getPlayer(uuid) == null) {
                     user.removeTimer("home");
                     user.removeTimer("logout");
+                    user.removeTimer("stuck");
                     cancel();
                     return;
                 }
@@ -112,6 +114,33 @@ public class PlayerTimer {
                     Objects.requireNonNull(player).kickPlayer(C.chat(Objects.requireNonNull(Locale.get().getString("commands.logout.success"))));
                     user.removeTimer(timer.name());
                     cancel();
+                    return;
+                }
+                if (timer.name().equalsIgnoreCase("STUCK")) {
+                    if (user.getStuckLocation() == null) {
+                        user.removeTimer(timer.name());
+                        cancel();
+                        return;
+                    }
+                    Objects.requireNonNull(player).sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.stuck.starting"))));
+                    Location location = FactionCommand.findSafeLocation(player,20,player.getWorld().getMaxHeight() - 2, player.getWorld().getMinHeight() + 2);
+                    if (location == null) {
+                        player.sendMessage(Objects.requireNonNull(Locale.get().getString("commands.faction.stuck.none")));
+                        cancel();
+                        user.removeTimer(timer.name());
+                        user.setStuckLocation(null);
+                        return;
+                    }
+                    player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.stuck.success"))));
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            player.teleport(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
+                        }
+                    }.runTaskLater(Main.getInstance(), 1);
+                    cancel();
+                    user.removeTimer(timer.name());
+                    user.setStuckLocation(null);
                     return;
                 }
                 if (timer.name().equalsIgnoreCase("HOME")) {

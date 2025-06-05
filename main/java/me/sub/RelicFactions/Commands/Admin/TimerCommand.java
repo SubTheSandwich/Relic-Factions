@@ -56,6 +56,9 @@ public class TimerCommand implements TabExecutor {
             p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.timer.set")).replace("%player%", user.getName()).replace("%duration%", Timer.format(duration)).replace("%timer%", timer.name())));
             PlayerTimer playerTimer = new PlayerTimer(user.getUUID(), timer, BigDecimal.valueOf(duration));
             user.addTimer(playerTimer);
+            if (timer.equals(Timer.STUCK)) {
+                user.setStuckLocation(p.getLocation());
+            }
             return true;
         }
         if (args[0].equalsIgnoreCase("remove")) {

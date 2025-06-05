@@ -5,6 +5,7 @@ import me.sub.RelicFactions.Files.Enums.ChatType;
 import me.sub.RelicFactions.Files.Data.CustomTimer;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.Maps;
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -61,6 +62,7 @@ public class User {
     private int quartzMined;
     private int debrisMined;
     private boolean foundDiamonds;
+    private Location stuckLocation;
     private boolean mountains;
 
     public User(UserData userData) {
@@ -107,6 +109,7 @@ public class User {
         emeraldMined = userData.get().getInt("ores.emerald");
         quartzMined = userData.get().getInt("ores.quartz");
         debrisMined = userData.get().getInt("ores.debris");
+        stuckLocation = null;
 
         modified = false;
         lastMessaged = null;
@@ -553,5 +556,13 @@ public class User {
     public void setMountains(boolean mountains) {
         modified = true;
         this.mountains = mountains;
+    }
+
+    public Location getStuckLocation() {
+        return stuckLocation;
+    }
+
+    public void setStuckLocation(Location stuckLocation) {
+        this.stuckLocation = stuckLocation;
     }
 }
