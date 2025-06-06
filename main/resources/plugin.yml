@@ -127,3 +127,5 @@ commands:
     description: Koth
   mountain:
     description: Mountain
+  conquest:
+    description: Conquest

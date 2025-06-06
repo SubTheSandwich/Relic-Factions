@@ -62,12 +62,22 @@ public class UserData {
     }
 
     public static UserData getByName(String name) {
-        File[] users = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder().getPath() + "/data/profiles").listFiles();
+        File profilesDir = new File(
+                Objects.requireNonNull(
+                        Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")
+                ).getDataFolder().getPath() + "/data/profiles"
+        );
+        File[] users = profilesDir.listFiles(
+                (dir, filename) -> filename.toLowerCase().endsWith(".yml")
+        );
         if (users != null) {
             for (File f : users) {
                 YamlConfiguration file = YamlConfiguration.loadConfiguration(f);
-                if (Objects.requireNonNull(file.getString("name")).equalsIgnoreCase(name.toLowerCase())) {
-                    return new UserData(UUID.fromString(Objects.requireNonNull(file.getString("uuid"))));
+                if (Objects.requireNonNull(file.getString("name"))
+                        .equalsIgnoreCase(name.toLowerCase())) {
+                    return new UserData(
+                            UUID.fromString(Objects.requireNonNull(file.getString("uuid")))
+                    );
                 }
             }
         }
@@ -75,6 +85,13 @@ public class UserData {
     }
 
     public static File[] getAll() {
-        return new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder().getPath() + "/data/profiles").listFiles();
+        File profilesDir = new File(
+                Objects.requireNonNull(
+                        Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")
+                ).getDataFolder().getPath() + "/data/profiles"
+        );
+        return profilesDir.listFiles(
+                (dir, filename) -> filename.toLowerCase().endsWith(".yml")
+        );
     }
 }

@@ -48,6 +48,17 @@ claiming:
     two: "&eSet position 2"
 
 events:
+  conquest:
+    started: "&7[Conquest] &eConquest &6%conquest% &ehas started."
+    end:
+      cancelled: "&7[Conquest] &eConquest &6%conquest% &ehas been cancelled."
+      captured: "&7[Conquest] &eConquest &6%conquest% &ewas captured."
+    control: "&7[Conquest] &6%faction% has started to control %zone%&6."
+    control-team: "&7[Conquest] &6Your team is now controlling %zone%&6."
+    control-player: "&7[Conquest] &6You are now controlling %zone%&6."
+    knock: "&7[Conquest] &6%faction% has lost control of %zone%&6."
+    zone-capped: "&7[Conquest] %zone% &6was captured by %player%."
+    zone-capping: "&7[Conquest] &6Attempting to capture %zone% &b(%time%)"
   mountain:
     reset: "&a[%type%] &eMountain has been reset."
   koth:
@@ -64,6 +75,7 @@ events:
     glitch: "&cYou cannot pearl there!"
     safezone: "&cYou cannot pearl into Safezone areas."
     koth: "&cYou cannot pearl into this koth area."
+    conquest: "&cYou cannot pearl in Conquest areas."
   border:
     build: "&cYou cannot build past the border."
     reached: "&cYou cannot go past the border."
@@ -141,6 +153,26 @@ faction:
     damage: "&eBe careful, &e%player% &eis an ally."
 
 commands:
+  conquest:
+    usage: "&cUsage: /conquest <name> <create/delete/start/stop/setarea/setpoints>"
+    already-exists: "&7[Conquest] &eConquest &6%conquest% &ealready exists."
+    doesnt-exist: "&7[Conquest] &eConquest &6%conquest% &edoes not exist."
+    created: "&7[Conquest] &eConquest &6%conquest% &ehas been created."
+    deleted: "&7[Conquest] &eConquest &6%conquest% &ehas been deleted."
+    started: "&7[Conquest] &eConquest &6%conquest% &ehas been started."
+    stopped: "&7[Conquest] &eConquest &6%conquest% &ehas been stopped."
+    not-setup: "&7[Conquest] &eConquest &6%conquest% &eis not setup yet."
+    already-started: "&7[Conquest] &eConquest &6%conquest% &eis already ongoing."
+    cannot-delete: "&7[Conquest] &eConquest &6%conquest% &eis ongoing. You must stop it before deleting it."
+    not-running: "&7[Conquest] &eConquest &6%conquest% &eis not running."
+    setarea:
+      usage: "&cUsage: /conquest <name> setarea <RED/YELLOW/GREEN/BLUE> <1;2>"
+      one: "&7[Conquest] %zone%&7: &ePosition #1 set for &6%conquest%"
+      two: "&7[Conquest] %zone%&7: &ePosition #2 set for &6%conquest%"
+      invalid-zone: "&7[Conquest] &eZone &6%zone% &eis invalid."
+    setpoints:
+      usage: "&cUsage: /conquest <name> setpoints <faction> <points>"
+      success: "&7[Conquest] &eFaction &6%faction% &epoints have been set to &6%points%"
   mountain:
     usage: "&cUsage: /mountain <name> <create/delete/reset/setpos1/setpos2/setreset/settype> <type>"
     exists: "&cA mountain by that name already exists."

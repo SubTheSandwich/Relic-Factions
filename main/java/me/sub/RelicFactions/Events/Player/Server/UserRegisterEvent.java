@@ -20,9 +20,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Objects;
+import java.util.*;
 
 public class UserRegisterEvent implements Listener {
 
@@ -164,6 +162,28 @@ public class UserRegisterEvent implements Listener {
                     return;
                 }
                 for (String s : Main.getInstance().getConfig().getStringList("scoreboard.lines")) {
+                    if (s.contains("%conquest-lines%")) {
+                        if (Main.getInstance().getRunningConquest() == null) continue;
+                        RunningConquest runningConquest = Main.getInstance().getRunningConquest();
+                        List<Map.Entry<UUID, Integer>> topThree = runningConquest.getPoints().entrySet().stream()
+                                .sorted(Map.Entry.<UUID, Integer>comparingByValue().reversed())
+                                .limit(3)
+                                .toList();
+                        lines.add(C.chat(Objects.requireNonNull(Main.getInstance().getConfig().getString("scoreboard.conquest.header"))));
+                        if (topThree.isEmpty()) {
+                            lines.add(C.chat(Objects.requireNonNull(Main.getInstance().getConfig().getString("scoreboard.conquest.no-scores"))));
+                        } else {
+                            for (Map.Entry<UUID, Integer> entry : topThree) {
+                                Faction faction = Faction.get(entry.getKey());
+                                if (faction == null) {
+                                    runningConquest.getPoints().remove(entry.getKey());
+                                    continue;
+                                }
+                                lines.add(C.chat(Objects.requireNonNull(Main.getInstance().getConfig().getString("scoreboard.conquest.score")).replace("%faction%", faction.getName()).replace("%points%", entry.getValue() + "")));
+                            }
+                        }
+                        continue;
+                    }
                     if (s.contains("%focus-lines%")) {
                         if (!finalUser.hasFaction()) continue;
                         Faction faction = Faction.get(finalUser.getFaction());

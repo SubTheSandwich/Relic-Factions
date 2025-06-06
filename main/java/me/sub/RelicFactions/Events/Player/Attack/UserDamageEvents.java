@@ -2,6 +2,7 @@ package me.sub.RelicFactions.Events.Player.Attack;
 
 import me.sub.RelicFactions.Events.Player.Interact.UserInteractAtFactionEvent;
 import me.sub.RelicFactions.Files.Classes.Faction;
+import me.sub.RelicFactions.Files.Classes.RunningConquest;
 import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Data.PlayerTimer;
 import me.sub.RelicFactions.Files.Data.ServerTimer;
@@ -191,6 +192,14 @@ public class UserDamageEvents implements Listener {
         User hitUser = User.get(hit);
         if (hitUser == null) return;
 
+        if (hitUser.hasFaction()) {
+            Faction faction = Faction.get(hitUser.getFaction());
+            if (Main.getInstance().getConfig().getBoolean("elo.enable")) {
+                faction.setPoints(faction.getPoints() - Main.getInstance().getConfig().getInt("elo.points-on-death"));
+                if (faction.getPoints() < 0) faction.setPoints(0);
+            }
+        }
+
         EntityDamageEvent lastDamage = villager.getLastDamageCause();
         if (lastDamage instanceof EntityDamageByEntityEvent entityDamage) {
             Entity damager = entityDamage.getDamager();
@@ -206,6 +215,12 @@ public class UserDamageEvents implements Listener {
             // Broadcast message
             if (damager instanceof Player player) {
                 User damagerUser = User.get(player);
+                if (damagerUser.hasFaction()) {
+                    Faction faction = Faction.get(damagerUser.getFaction());
+                    if (Main.getInstance().getConfig().getBoolean("elo.enable")) {
+                        faction.setPoints(faction.getPoints() + Main.getInstance().getConfig().getInt("elo.points-on-kill"));
+                    }
+                }
                 damagerUser.setKills(damagerUser.getKills() + 1);
                 String msg = Locale.get().getString("deathmessage.logger.player");
                 if (msg != null) {
@@ -482,6 +497,11 @@ public class UserDamageEvents implements Listener {
         p.kickPlayer(C.chat(Objects.requireNonNull(Locale.get().getString("events.deathban.kick")).replace("%time%", Timer.getMessageFormat(deathban - System.currentTimeMillis()))));
         if (user.hasFaction()) {
             Faction faction = Faction.get(user.getFaction());
+            if (Main.getInstance().getConfig().getBoolean("elo.enable")) {
+                faction.setPoints(faction.getPoints() - Main.getInstance().getConfig().getInt("elo.points-on-death"));
+                if (faction.getPoints() < 0) faction.setPoints(0);
+            }
+
             faction.setDTR(BigDecimal.valueOf(Calculate.round(Math.max(-0.99, faction.getDTR().doubleValue() - Main.getInstance().getConfig().getDouble("factions.dtr.death")), 2)));
             faction.setRegening(false);
             Calendar regen = Calendar.getInstance();
@@ -494,6 +514,12 @@ public class UserDamageEvents implements Listener {
         if (killer != null) {
             User kill = User.get(killer);
             kill.setKills(kill.getKills() + 1);
+            if (kill.hasFaction()) {
+                Faction faction = Faction.get(kill.getFaction());
+                if (Main.getInstance().getConfig().getBoolean("elo.enable")) {
+                    faction.setPoints(faction.getPoints() + Main.getInstance().getConfig().getInt("elo.points-on-kill"));
+                }
+            }
             if (killer.getInventory().getItemInMainHand().getType() == Material.AIR) {
                 deathMessage = Locale.get().getString("deathmessage.entity-attack.player-noitem");
             } else {
@@ -552,6 +578,17 @@ public class UserDamageEvents implements Listener {
             }
         }
         e.setDeathMessage(C.chat(deathMessage));
+
+
+        if (Main.getInstance().getRunningConquest() != null) {
+            if (!user.hasFaction()) return;
+            Faction faction = Faction.get(user.getFaction());
+            if (faction == null) return;
+            RunningConquest runningConquest = Main.getInstance().getRunningConquest();
+            if (!runningConquest.getPoints().isEmpty() || !runningConquest.getPoints().containsKey(faction.getUUID())) return;
+            runningConquest.getPoints().put(faction.getUUID(), runningConquest.getPoints().get(faction.getUUID()) - Main.getInstance().getConfig().getInt("conquest.points-lost-per-death"));
+            if (runningConquest.getPoints().get(faction.getUUID()) < 0) runningConquest.getPoints().put(faction.getUUID(), 0);
+        }
 
     }
 

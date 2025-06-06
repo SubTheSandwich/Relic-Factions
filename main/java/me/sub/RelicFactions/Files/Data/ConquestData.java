@@ -9,15 +9,15 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.UUID;
 
-public class MountainData {
+public class ConquestData {
 
     File file;
     FileConfiguration customFile;
     UUID id;
 
-    public MountainData(UUID uuid) {
+    public ConquestData(UUID uuid) {
         id = uuid;
-        file = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder().getPath() + "/data/mountains/", id.toString() + ".yml");
+        file = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder().getPath() + "/data/conquests/", id.toString() + ".yml");
         customFile = YamlConfiguration.loadConfiguration(file);
     }
 
@@ -61,21 +61,21 @@ public class MountainData {
         customFile = YamlConfiguration.loadConfiguration(file);
     }
 
-    public static MountainData getByName(String name) {
-        File mountainsDir = new File(
+    public static ConquestData getByName(String name) {
+        File conquestsDir = new File(
                 Objects.requireNonNull(
                         Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")
-                ).getDataFolder().getPath() + "/data/mountains"
+                ).getDataFolder().getPath() + "/data/conquests"
         );
-        File[] mountains = mountainsDir.listFiles(
-                (dir, filename) -> filename.toLowerCase().endsWith(".yml")
-        );
-        if (mountains != null) {
-            for (File f : mountains) {
+
+        File[] koths = conquestsDir.listFiles((dir, filename) -> filename.endsWith(".yml"));
+
+        if (koths != null) {
+            for (File f : koths) {
                 YamlConfiguration file = YamlConfiguration.loadConfiguration(f);
                 if (Objects.requireNonNull(file.getString("name"))
                         .equalsIgnoreCase(name.toLowerCase())) {
-                    return new MountainData(
+                    return new ConquestData(
                             UUID.fromString(Objects.requireNonNull(file.getString("uuid")))
                     );
                 }
@@ -85,14 +85,13 @@ public class MountainData {
     }
 
     public static File[] getAll() {
-        File mountainsDir = new File(
+        File conquestsDir = new File(
                 Objects.requireNonNull(
                         Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")
-                ).getDataFolder().getPath() + "/data/mountains"
+                ).getDataFolder().getPath() + "/data/conquests"
         );
-        return mountainsDir.listFiles(
-                (dir, filename) -> filename.toLowerCase().endsWith(".yml")
-        );
+
+        return conquestsDir.listFiles((dir, filename) -> filename.endsWith(".yml"));
     }
 
     public boolean delete() {

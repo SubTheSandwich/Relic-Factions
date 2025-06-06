@@ -66,8 +66,27 @@ koth:
   on-capture:
     - say %player% (%faction%) has just captured %koth%!
 
+conquest:
+  time: 30 # seconds
+  points-per-cap: 5
+  points-loss-per-death: 0
+  max-points: 250
+  on-capture:
+    - say %player% (%faction%) has just captured %conquest%!
+
 mountain:
   reset-time: 2 # minutes
+
+elo:
+  enable: true
+  points-on-kill: 10
+  points-on-death: 10
+  koth:
+    enable: true
+    points-on-win: 25
+  conquest:
+    enable: true
+    points-on-win: 25
 
 factions:
   dtr:
@@ -133,6 +152,7 @@ scoreboard:
     - "&4&lLogout&7: &c%player_logout_timer%<display=%has_player_logout_timer%"
     - "&4&lStuck&7: &c%player_stuck_timer%<display=%has_player_stuck_timer%"
     - "%mod-lines%"
+    - "%conquest-lines%"
     - "%koth-lines%"
     - "%mountain-lines%"
     - "%focus-lines%"
@@ -147,6 +167,10 @@ scoreboard:
     - "&6&lFocus"
     - " &7* &eFaction&7: &r%faction%"
     - " &7* &eHome&7: &r%home%"
+  conquest:
+    header: "&e&lConquest&7:"
+    no-scores: "  &7No scores yet"
+    score: "  &e%faction%&7: &c%points%"
   koth:
     normal: "&9&l%koth%&7: &c%time%"
     special: "&5&l%koth%&7: &c%time%"

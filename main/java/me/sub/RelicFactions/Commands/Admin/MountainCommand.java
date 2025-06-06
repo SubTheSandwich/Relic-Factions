@@ -45,6 +45,7 @@ public class MountainCommand implements TabExecutor {
                 }
                 UUID uuid = UUID.randomUUID();
                 MountainData mountainData = new MountainData(uuid);
+                mountainData.setup();
                 mountainData.get().set("uuid", uuid.toString());
                 mountainData.get().set("name", args[0]);
                 mountainData.get().set("time", Main.getInstance().getConfig().getInt("mountain.reset-time"));

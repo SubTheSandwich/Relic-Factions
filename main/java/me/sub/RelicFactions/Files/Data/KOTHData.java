@@ -62,12 +62,22 @@ public class KOTHData {
     }
 
     public static KOTHData getByName(String name) {
-        File[] koths = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder().getPath() + "/data/koths").listFiles();
+        File kothsDir = new File(
+                Objects.requireNonNull(
+                        Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")
+                ).getDataFolder().getPath() + "/data/koths"
+        );
+        File[] koths = kothsDir.listFiles(
+                (dir, filename) -> filename.toLowerCase().endsWith(".yml")
+        );
         if (koths != null) {
             for (File f : koths) {
                 YamlConfiguration file = YamlConfiguration.loadConfiguration(f);
-                if (Objects.requireNonNull(file.getString("name")).equalsIgnoreCase(name.toLowerCase())) {
-                    return new KOTHData(UUID.fromString(Objects.requireNonNull(file.getString("uuid"))));
+                if (Objects.requireNonNull(file.getString("name"))
+                        .equalsIgnoreCase(name.toLowerCase())) {
+                    return new KOTHData(
+                            UUID.fromString(Objects.requireNonNull(file.getString("uuid")))
+                    );
                 }
             }
         }
@@ -75,7 +85,14 @@ public class KOTHData {
     }
 
     public static File[] getAll() {
-        return new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder().getPath() + "/data/koths").listFiles();
+        File kothsDir = new File(
+                Objects.requireNonNull(
+                        Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")
+                ).getDataFolder().getPath() + "/data/koths"
+        );
+        return kothsDir.listFiles(
+                (dir, filename) -> filename.toLowerCase().endsWith(".yml")
+        );
     }
 
     public boolean delete() {

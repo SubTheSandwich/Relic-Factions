@@ -45,6 +45,7 @@ public class KOTHCommand implements TabExecutor {
                 }
                 UUID uuid = UUID.randomUUID();
                 KOTHData kothData = new KOTHData(uuid);
+                kothData.setup();
                 kothData.get().set("uuid", uuid.toString());
                 kothData.get().set("name", args[0]);
                 kothData.get().set("pearlable", true);

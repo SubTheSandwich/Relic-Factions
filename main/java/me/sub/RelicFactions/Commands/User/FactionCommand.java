@@ -1467,7 +1467,7 @@ public class FactionCommand implements TabExecutor {
             values.addAll(List.of("create", "open", "show", "deposit", "invite", "join", "withdraw",
                     "subclaim", "captain", "coleader", "invites", "announcement", "uninvite", "leave", "kick",
                     "sethome", "claim", "home", "list", "unclaim", "rename", "disband", "ff", "chat", "ally",
-                    "unally", "focus"));
+                    "unally", "focus", "stuck"));
             if (Permission.has(p, "faction.createsystem")) values.add("createsystem");
             if (Permission.has(p, "faction.setcolor")) values.add("setcolor");
             if (Permission.has(p, "faction.settype")) values.add("settype");
@@ -1550,7 +1550,10 @@ public class FactionCommand implements TabExecutor {
                     s = s.replace("%members%", String.join("&e, ", names));
                 }
                 if (s.contains("%balance%")) s = s.replace("%balance%", Calculate.formatMoney(faction.getBalance().doubleValue()));
-                if (s.contains("%points%")) s = s.replace("%points%", faction.getPoints() + "");
+                if (s.contains("%points%")) {
+                    if (!Main.getInstance().getConfig().getBoolean("elo.enable")) continue;
+                    s = s.replace("%points%", faction.getPoints() + "");
+                }
                 if (s.contains("%kothcaptures%")) s = s.replace("%kothcaptures%", faction.getKothCaptures() + "");
                 if (s.contains("%dtr%")) {
                     s = s.replace("%dtr%", Faction.formatDTR(faction.getDTR()));
@@ -1806,7 +1809,7 @@ public class FactionCommand implements TabExecutor {
         int x = loc.getBlockX();
         int y = loc.getBlockY();
         int z = loc.getBlockZ();
-        Material feet = world.getBlockAt(x, y, z).getType();
+        Material feet = Objects.requireNonNull(world).getBlockAt(x, y, z).getType();
         Material head = world.getBlockAt(x, y + 1, z).getType();
         Material below = world.getBlockAt(x, y - 1, z).getType();
         return feet == Material.AIR && head == Material.AIR && below.isSolid();

@@ -64,8 +64,11 @@ public class Main extends JavaPlugin {
     public HashMap<String, KOTH> kothNameHolder = new HashMap<>();
     public HashMap<UUID, Mountain> mountains = new HashMap<>();
     public HashMap<String, Mountain> mountainNameHolder = new HashMap<>();
+    public HashMap<UUID, Conquest> conquests = new HashMap<>();
+    public HashMap<String, Conquest> conquestNameHolder = new HashMap<>();
 
     public HashMap<UUID, RunningKOTH> runningKOTHS = new HashMap<>();
+    private RunningConquest runningConquest = null;
 
 
     public HashMap<UUID, FastBoard> boards = new HashMap<>();
@@ -85,6 +88,14 @@ public class Main extends JavaPlugin {
 
     public Main() {
         instance = this;
+    }
+
+    public RunningConquest getRunningConquest() {
+        return runningConquest;
+    }
+
+    public void setRunningConquest(RunningConquest runningConquest) {
+        this.runningConquest = runningConquest;
     }
 
     @Override
@@ -110,6 +121,7 @@ public class Main extends JavaPlugin {
                 saveFactions();
                 saveKOTHS();
                 saveMountains();
+                saveConquests();
             }
         }.runTaskTimer(this, 5 * 60 * 20L, 5 * 60 * 20L);
         handleDTR();
@@ -144,6 +156,7 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("crowbar")).setExecutor(new CrowbarCommand()); Objects.requireNonNull(getCommand("crowbar")).setTabCompleter(new CrowbarCommand());
         Objects.requireNonNull(getCommand("koth")).setExecutor(new KOTHCommand()); Objects.requireNonNull(getCommand("koth")).setTabCompleter(new KOTHCommand());
         Objects.requireNonNull(getCommand("mountain")).setExecutor(new MountainCommand()); Objects.requireNonNull(getCommand("mountain")).setTabCompleter(new MountainCommand());
+        Objects.requireNonNull(getCommand("conquest")).setExecutor(new ConquestCommand()); Objects.requireNonNull(getCommand("conquest")).setTabCompleter(new ConquestCommand());
 
         // Staff
         Objects.requireNonNull(getCommand("staffchat")).setExecutor(new StaffChatCommand()); Objects.requireNonNull(getCommand("staffchat")).setTabCompleter(new StaffChatCommand());
@@ -340,6 +353,18 @@ public class Main extends JavaPlugin {
         }
     }
 
+    private void loadConquests() {
+        if (ConquestData.getAll() != null) {
+            for (File f : ConquestData.getAll()) {
+                YamlConfiguration file = YamlConfiguration.loadConfiguration(f);
+                UUID uuid = UUID.fromString(Objects.requireNonNull(file.getString("uuid")));
+                Conquest conquest = new Conquest(new ConquestData(uuid));
+                conquests.put(uuid, conquest);
+                conquestNameHolder.put(conquest.getName().toLowerCase(), conquest);
+            }
+        }
+    }
+
     private void saveUsers() {
         int saved = 0;
         if (users.isEmpty()) return;
@@ -458,6 +483,25 @@ public class Main extends JavaPlugin {
         logger.info("Saved " + saved + (saved == 1 ? " mountain" : " mountains"));
     }
 
+    private void saveConquests() {
+        int saved = 0;
+        if (conquests.isEmpty()) return;
+        for (Map.Entry<UUID, Conquest> entry : conquests.entrySet()) {
+            Conquest conquest = entry.getValue();
+            if (!conquest.isModified()) continue;
+            ConquestData conquestData = conquest.getConquestData();
+            conquestData.get().set("name", conquest.getName());
+            conquestData.get().set("red",  conquest.getRed().serialize());
+            conquestData.get().set("green",  conquest.getGreen().serialize());
+            conquestData.get().set("blue",  conquest.getBlue().serialize());
+            conquestData.get().set("yellow",  conquest.getYellow().serialize());
+            conquestData.save();
+            conquest.setModified(false);
+            saved++;
+        }
+        logger.info("Saved " + saved + (saved == 1 ? " conquest" : " conquests"));
+    }
+
     public static Economy getEconomy() {
         return econ;
     }
@@ -467,6 +511,7 @@ public class Main extends JavaPlugin {
         saveFactions();
         saveKOTHS();
         saveMountains();
+        saveConquests();
     }
 
     public void loadFiles() {
@@ -474,6 +519,7 @@ public class Main extends JavaPlugin {
         loadFactions();
         loadKOTHS();
         loadMountains();
+        loadConquests();
     }
 
     public boolean isServerFrozen() {
@@ -560,8 +606,6 @@ public class Main extends JavaPlugin {
         if (material.equals(Material.SNIFFER_EGG)) return false;
         if (Tag.SHULKER_BOXES.isTagged(material)) return false;
         if (material.equals(Material.BAMBOO)) return false;
-        if (name.contains("CORAL") && !name.endsWith("_CORAL_BLOCK")) return false;
-
-        return true;
+        return !name.contains("CORAL") || name.endsWith("_CORAL_BLOCK");
     }
 }

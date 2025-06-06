@@ -2,10 +2,7 @@ package me.sub.RelicFactions.Events.Player.Movement;
 
 import me.sub.RelicFactions.Commands.User.FactionCommand;
 import me.sub.RelicFactions.Events.Player.Interact.UserClaimEvents;
-import me.sub.RelicFactions.Files.Classes.Faction;
-import me.sub.RelicFactions.Files.Classes.KOTH;
-import me.sub.RelicFactions.Files.Classes.RunningKOTH;
-import me.sub.RelicFactions.Files.Classes.User;
+import me.sub.RelicFactions.Files.Classes.*;
 import me.sub.RelicFactions.Files.Data.ClaimBufferManager;
 import me.sub.RelicFactions.Files.Data.PlayerTimer;
 import me.sub.RelicFactions.Files.Enums.FactionType;
@@ -41,24 +38,43 @@ public class UserMoveEvent implements Listener {
             User user = User.get(p);
             if (faction == null) return;
             if (faction.getType().equals(FactionType.SAFEZONE) && user.hasTimer("combat")) {
-                Location location = FactionCommand.findSafeLocation(p,20,p.getWorld().getMaxHeight() - 2, p.getWorld().getMinHeight() + 2);
-                if (location == null) return;
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        p.teleport(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
-                    }
-                }.runTaskLater(Main.getInstance(), 1);
+                if (Faction.getAt(e.getFrom()) == null || !Objects.requireNonNull(Faction.getAt(e.getFrom())).getType().equals(FactionType.SAFEZONE)) {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            p.teleport(e.getFrom(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                        }
+                    }.runTaskLater(Main.getInstance(), 1);
+                } else {
+                    Location location = FactionCommand.findSafeLocation(p,20,p.getWorld().getMaxHeight() - 2, p.getWorld().getMinHeight() + 2);
+                    if (location == null) return;
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            p.teleport(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
+                        }
+                    }.runTaskLater(Main.getInstance(), 1);
+                }
+
             }
             if (faction.getType().equals(FactionType.PLAYER) && (user.hasTimer("pvp") || user.hasTimer("starting"))) {
-                Location location = FactionCommand.findSafeLocation(p,20,p.getWorld().getMaxHeight() - 2, p.getWorld().getMinHeight() + 2);
-                if (location == null) return;
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        p.teleport(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
-                    }
-                }.runTaskLater(Main.getInstance(), 1);
+                if (Faction.getAt(e.getFrom()) == null || !Objects.requireNonNull(Faction.getAt(e.getFrom())).getType().equals(FactionType.PLAYER)) {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            p.teleport(e.getFrom(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                        }
+                    }.runTaskLater(Main.getInstance(), 1);
+                } else {
+                    Location location = FactionCommand.findSafeLocation(p,20,p.getWorld().getMaxHeight() - 2, p.getWorld().getMinHeight() + 2);
+                    if (location == null) return;
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            p.teleport(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
+                        }
+                    }.runTaskLater(Main.getInstance(), 1);
+                }
             }
         }
 
@@ -74,7 +90,6 @@ public class UserMoveEvent implements Listener {
 
 
 
-        // KOTH logic runs on every movement (even within the same block)
         User user = User.get(p);
         if (user.getModMode() != null) return;
         if (user.hasTimer("pvp") || user.hasTimer("starting")) return;
@@ -91,35 +106,148 @@ public class UserMoveEvent implements Listener {
             }
         }
 
-        if (Main.getInstance().runningKOTHS.isEmpty()) return;
-        for (RunningKOTH runningKOTH : Main.getInstance().runningKOTHS.values()) {
-            KOTH koth = runningKOTH.getKOTH();
+        if (Main.getInstance().getRunningConquest() != null) {
+            RunningConquest runningConquest = Main.getInstance().getRunningConquest();
+            Conquest conquest = runningConquest.getConquest();
             Location location = p.getLocation().clone();
             location.setY(0);
-            if (koth.getCuboid().isIn(location)) {
-                if (runningKOTH.getControllingPlayer() == null) {
-                    runningKOTH.setControllingPlayer(p.getUniqueId());
+
+            if (conquest.getRed().getCuboid().isIn(location)) {
+                if (runningConquest.getRedControllingPlayer() == null) {
+                    runningConquest.setRedControllingPlayer(p.getUniqueId());
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         User play = User.get(player);
-                        if (!play.isGlobalChat()) continue;
                         if (!play.hasFaction()) {
-                            player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.koth.control")).replace("%faction%", faction.getName()).replace("%koth%", koth.getName())));
+                            player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.control")).replace("%faction%", faction.getName()).replace("%zone%", "&c" + conquest.getRed().getName())));
                             continue;
                         }
                         if (!play.getFaction().equals(user.getFaction())) {
-                            player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.koth.control")).replace("%faction%", faction.getName()).replace("%koth%", koth.getName())));
+                            player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.control")).replace("%faction%", faction.getName()).replace("%zone%", "&c" + conquest.getRed().getName())));
                             continue;
                         }
                         if (!play.getUUID().equals(p.getUniqueId())) {
-                            player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.koth.control-team")).replace("%koth%", koth.getName())));
+                            player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.control-team")).replace("%zone%", "&c" + conquest.getRed().getName())));
                             continue;
                         }
-                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.koth.control-player")).replace("%koth%", koth.getName())));
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.control-player")).replace("%zone%", "&c" + conquest.getRed().getName())));
                     }
                 }
             } else {
-                if (runningKOTH.getControllingPlayer() != null && runningKOTH.getControllingPlayer().equals(p.getUniqueId())) {
-                    runningKOTH.resetControllingPlayer();
+                if (runningConquest.getRedControllingPlayer() != null && runningConquest.getRedControllingPlayer().equals(p.getUniqueId())) {
+                    runningConquest.resetZone(user, conquest.getRed(), true);
+                }
+            }
+
+            if (conquest.getGreen().getCuboid().isIn(location)) {
+                if (runningConquest.getGreenControllingPlayer() == null) {
+                    runningConquest.setGreenControllingPlayer(p.getUniqueId());
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        User play = User.get(player);
+                        if (!play.hasFaction()) {
+                            player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.control")).replace("%faction%", faction.getName()).replace("%zone%", "&a" + conquest.getGreen().getName())));
+                            continue;
+                        }
+                        if (!play.getFaction().equals(user.getFaction())) {
+                            player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.control")).replace("%faction%", faction.getName()).replace("%zone%", "&a" + conquest.getGreen().getName())));
+                            continue;
+                        }
+                        if (!play.getUUID().equals(p.getUniqueId())) {
+                            player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.control-team")).replace("%zone%", "&a" + conquest.getGreen().getName())));
+                            continue;
+                        }
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.control-player")).replace("%zone%", "&a" + conquest.getGreen().getName())));
+                    }
+                }
+            } else {
+                if (runningConquest.getGreenControllingPlayer() != null && runningConquest.getGreenControllingPlayer().equals(p.getUniqueId())) {
+                    runningConquest.resetZone(user, conquest.getGreen(), true);
+                }
+            }
+
+
+            if (conquest.getBlue().getCuboid().isIn(location)) {
+                if (runningConquest.getBlueControllingPlayer() == null) {
+                    runningConquest.setBlueControllingPlayer(p.getUniqueId());
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        User play = User.get(player);
+                        if (!play.hasFaction()) {
+                            player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.control")).replace("%faction%", faction.getName()).replace("%zone%", "&9" + conquest.getBlue().getName())));
+                            continue;
+                        }
+                        if (!play.getFaction().equals(user.getFaction())) {
+                            player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.control")).replace("%faction%", faction.getName()).replace("%zone%", "&9" + conquest.getBlue().getName())));
+                            continue;
+                        }
+                        if (!play.getUUID().equals(p.getUniqueId())) {
+                            player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.control-team")).replace("%zone%", "&9" + conquest.getBlue().getName())));
+                            continue;
+                        }
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.control-player")).replace("%zone%", "&9" + conquest.getBlue().getName())));
+                    }
+                }
+            } else {
+                if (runningConquest.getBlueControllingPlayer() != null && runningConquest.getBlueControllingPlayer().equals(p.getUniqueId())) {
+                    runningConquest.resetZone(user, conquest.getBlue(), true);
+                }
+            }
+
+
+            if (conquest.getYellow().getCuboid().isIn(location)) {
+                if (runningConquest.getYellowControllingPlayer() == null) {
+                    runningConquest.setYellowControllingPlayer(p.getUniqueId());
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        User play = User.get(player);
+                        if (!play.hasFaction()) {
+                            player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.control")).replace("%faction%", faction.getName()).replace("%zone%", "&e" + conquest.getYellow().getName())));
+                            continue;
+                        }
+                        if (!play.getFaction().equals(user.getFaction())) {
+                            player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.control")).replace("%faction%", faction.getName()).replace("%zone%", "&e" + conquest.getYellow().getName())));
+                            continue;
+                        }
+                        if (!play.getUUID().equals(p.getUniqueId())) {
+                            player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.control-team")).replace("%zone%", "&e" + conquest.getYellow().getName())));
+                            continue;
+                        }
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.control-player")).replace("%zone%", "&e" + conquest.getYellow().getName())));
+                    }
+                }
+            } else {
+                if (runningConquest.getYellowControllingPlayer() != null && runningConquest.getYellowControllingPlayer().equals(p.getUniqueId())) {
+                    runningConquest.resetZone(user, conquest.getYellow(), true);
+                }
+            }
+        }
+
+        if (!Main.getInstance().runningKOTHS.isEmpty()) {
+            for (RunningKOTH runningKOTH : Main.getInstance().runningKOTHS.values()) {
+                KOTH koth = runningKOTH.getKOTH();
+                Location location = p.getLocation().clone();
+                location.setY(0);
+                if (koth.getCuboid().isIn(location)) {
+                    if (runningKOTH.getControllingPlayer() == null) {
+                        runningKOTH.setControllingPlayer(p.getUniqueId());
+                        for (Player player : Bukkit.getOnlinePlayers()) {
+                            User play = User.get(player);
+                            if (!play.hasFaction()) {
+                                player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.koth.control")).replace("%faction%", faction.getName()).replace("%koth%", koth.getName())));
+                                continue;
+                            }
+                            if (!play.getFaction().equals(user.getFaction())) {
+                                player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.koth.control")).replace("%faction%", faction.getName()).replace("%koth%", koth.getName())));
+                                continue;
+                            }
+                            if (!play.getUUID().equals(p.getUniqueId())) {
+                                player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.koth.control-team")).replace("%koth%", koth.getName())));
+                                continue;
+                            }
+                            p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.koth.control-player")).replace("%koth%", koth.getName())));
+                        }
+                    }
+                } else {
+                    if (runningKOTH.getControllingPlayer() != null && runningKOTH.getControllingPlayer().equals(p.getUniqueId())) {
+                        runningKOTH.resetControllingPlayer();
+                    }
                 }
             }
         }
@@ -145,6 +273,13 @@ public class UserMoveEvent implements Listener {
         if (e.getCause().equals(PlayerTeleportEvent.TeleportCause.ENDER_PEARL)) {
             Faction faction = Faction.getAt(e.getTo());
             if (faction == null) return;
+            if (faction.getType().equals(FactionType.CONQUEST)) {
+                e.setCancelled(true);
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.enderpearl.conquest"))));
+                if (!p.getGameMode().equals(GameMode.CREATIVE)) p.getInventory().addItem(new ItemStack(Material.ENDER_PEARL));
+                user.removeTimer("ENDERPEARL");
+                return;
+            }
             if (faction.getType().equals(FactionType.SAFEZONE)) {
                 e.setCancelled(true);
                 p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.enderpearl.safezone"))));
@@ -331,7 +466,4 @@ public class UserMoveEvent implements Listener {
         int absZ = Math.abs(loc.getBlockZ());
         return absX >= AREA || absZ >= AREA;
     }
-
-
-
 }

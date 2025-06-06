@@ -101,6 +101,9 @@ public class RunningKOTH {
                 }
                 Main.getInstance().runningKOTHS.remove(koth.getUUID());
                 faction.setKothCaptures(faction.getKothCaptures() + 1);
+                if (Main.getInstance().getConfig().getBoolean("elo.enable") && Main.getInstance().getConfig().getBoolean("elo.koth.enable")) {
+                    faction.setPoints(faction.getPoints() + Main.getInstance().getConfig().getInt("elo.koth.points-on-win"));
+                }
                 cancel();
             }
         }.runTaskTimer(Main.getInstance(), 0,1);

@@ -62,12 +62,22 @@ public class FactionData {
     }
 
     public static FactionData getByName(String name) {
-        File[] users = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder().getPath() + "/data/factions").listFiles();
+        File factionsDir = new File(
+                Objects.requireNonNull(
+                        Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")
+                ).getDataFolder().getPath() + "/data/factions"
+        );
+        File[] users = factionsDir.listFiles(
+                (dir, filename) -> filename.toLowerCase().endsWith(".yml")
+        );
         if (users != null) {
             for (File f : users) {
                 YamlConfiguration file = YamlConfiguration.loadConfiguration(f);
-                if (Objects.requireNonNull(file.getString("name")).equalsIgnoreCase(name.toLowerCase())) {
-                    return new FactionData(UUID.fromString(Objects.requireNonNull(file.getString("uuid"))));
+                if (Objects.requireNonNull(file.getString("name"))
+                        .equalsIgnoreCase(name.toLowerCase())) {
+                    return new FactionData(
+                            UUID.fromString(Objects.requireNonNull(file.getString("uuid")))
+                    );
                 }
             }
         }
@@ -75,7 +85,14 @@ public class FactionData {
     }
 
     public static File[] getAll() {
-        return new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder().getPath() + "/data/factions").listFiles();
+        File factionsDir = new File(
+                Objects.requireNonNull(
+                        Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")
+                ).getDataFolder().getPath() + "/data/factions"
+        );
+        return factionsDir.listFiles(
+                (_, filename) -> filename.toLowerCase().endsWith(".yml")
+        );
     }
 
     public boolean delete() {
