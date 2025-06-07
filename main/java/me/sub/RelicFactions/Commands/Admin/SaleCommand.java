@@ -2,7 +2,6 @@ package me.sub.RelicFactions.Commands.Admin;
 
 import me.sub.RelicFactions.Files.Data.ServerTimer;
 import me.sub.RelicFactions.Files.Normal.Locale;
-import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
 import me.sub.RelicFactions.Utils.Permission;
 import org.bukkit.command.Command;
@@ -17,7 +16,7 @@ import java.util.Objects;
 
 public class SaleCommand implements TabExecutor {
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
         if (!Permission.has(sender, "sale", "admin")) {
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
             return true;
@@ -59,13 +58,13 @@ public class SaleCommand implements TabExecutor {
             return true;
         }
         double duration = Double.parseDouble(args[0]);
-        ServerTimer timer = new ServerTimer("sale", BigDecimal.valueOf(duration), false);
+        ServerTimer ignored = new ServerTimer("sale", BigDecimal.valueOf(duration), false);
         sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.sale.started"))));
         return true;
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
         if (!Permission.has(sender, "sale", "admin")) {
             return List.of();
         }

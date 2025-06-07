@@ -21,7 +21,7 @@ import java.util.Objects;
 
 public class TeleportCommand implements TabExecutor {
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
 
         if (!Permission.has(sender, "teleport", "admin")) {
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
@@ -224,7 +224,7 @@ public class TeleportCommand implements TabExecutor {
             @NotNull CommandSender sender,
             @NotNull Command cmd,
             @NotNull String s,
-            @NotNull String[] args
+            @NotNull String @NotNull [] args
     ) {
         // Only tab complete if sender has permission
         if (!Permission.has(sender, "teleport", "admin")) {
@@ -243,7 +243,7 @@ public class TeleportCommand implements TabExecutor {
             }
             String current = args[0].toLowerCase();
             return suggestions.stream()
-                    .filter(sugg -> sugg.toLowerCase().startsWith(current))
+                    .filter(sug -> sug.toLowerCase().startsWith(current))
                     .toList();
         }
 

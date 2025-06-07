@@ -16,7 +16,7 @@ import java.util.Objects;
 
 public class KeySaleCommand implements TabExecutor {
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
         if (!Permission.has(sender, "keysale", "admin")) {
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
             return true;
@@ -58,13 +58,13 @@ public class KeySaleCommand implements TabExecutor {
             return true;
         }
         double duration = Double.parseDouble(args[0]);
-        ServerTimer timer = new ServerTimer("keysale", BigDecimal.valueOf(duration), false);
+        ServerTimer ignored = new ServerTimer("keysale", BigDecimal.valueOf(duration), false);
         sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.key-sale.started"))));
         return true;
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
         if (!Permission.has(sender, "keysale", "admin")) {
             return List.of();
         }

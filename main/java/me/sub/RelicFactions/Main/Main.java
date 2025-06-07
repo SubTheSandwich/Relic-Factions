@@ -12,6 +12,7 @@ import me.sub.RelicFactions.Events.Player.Movement.FreezeMovementEvent;
 import me.sub.RelicFactions.Events.Player.Movement.UserMoveEvent;
 import me.sub.RelicFactions.Events.Player.Server.UserDisconnectEvent;
 import me.sub.RelicFactions.Events.Player.Server.UserRegisterEvent;
+import me.sub.RelicFactions.Events.World.ListenerEvents;
 import me.sub.RelicFactions.Files.Classes.*;
 import me.sub.RelicFactions.Files.Data.*;
 import me.sub.RelicFactions.Files.Enums.FactionType;
@@ -43,6 +44,11 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class Main extends JavaPlugin {
+
+    // TODO: Listeners (ex. entity limiter,
+    // TODO: beacon strength, autosmelt, hide other players in safezone)
+
+    // TODO: notes command, tablist
 
     /*
 
@@ -106,7 +112,7 @@ public class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         if (!setupEconomy() ) {
-            getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
+            getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getName()));
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -209,6 +215,9 @@ public class Main extends JavaPlugin {
         pm.registerEvents(new SettingsInteractEvent(), this);
         pm.registerEvents(new BlockCommandEvent(), this);
         pm.registerEvents(new EnchantLimitEvents(), this);
+
+        // Server
+        pm.registerEvents(new ListenerEvents(), this);
     }
 
     private void files() {
@@ -382,7 +391,7 @@ public class Main extends JavaPlugin {
             userData.get().set("lives", user.getLives());
             userData.get().set("timers", Maps.timersToString(user.getTimers()));
             userData.get().set("customTimers", Maps.serializeCustomMap(user.getCustomTimers()));
-            userData.get().set("lastInventoryContents", Maps.toBase64(user.getLastInventoryContents()));
+            userData.get().set("lastInventoryContents", Maps.toBase64(user, user.getLastInventoryContents()));
             userData.get().set("playtime", user.getStoredPlaytime());
             userData.get().set("settings.global-chat", user.isGlobalChat());
             userData.get().set("settings.messages.enabled", user.isMessages());

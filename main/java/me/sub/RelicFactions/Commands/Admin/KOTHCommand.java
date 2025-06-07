@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 
 public class KOTHCommand implements TabExecutor {
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
 
         if (!Permission.has(sender, "koth", "admin")) {
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
@@ -219,7 +219,7 @@ public class KOTHCommand implements TabExecutor {
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
         List<String> subcommands = List.of(
                 "create", "setfaction", "start", "stop", "setpos1", "setpos2", "settime", "special", "pearlable", "delete"
         );

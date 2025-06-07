@@ -7,6 +7,7 @@ import me.sub.RelicFactions.Files.Enums.Timer;
 import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -111,7 +112,7 @@ public class PlayerTimer {
                 if (duration.doubleValue() > 0) return;
                 if (timer.name().equalsIgnoreCase("LOGOUT")) {
                     if (user.hasTimer("combat")) user.removeTimer("combat");
-                    Objects.requireNonNull(player).kickPlayer(C.chat(Objects.requireNonNull(Locale.get().getString("commands.logout.success"))));
+                    Objects.requireNonNull(player).kick(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("commands.logout.success")))));
                     user.removeTimer(timer.name());
                     cancel();
                     return;

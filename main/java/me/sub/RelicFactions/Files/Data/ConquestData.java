@@ -68,7 +68,7 @@ public class ConquestData {
                 ).getDataFolder().getPath() + "/data/conquests"
         );
 
-        File[] koths = conquestsDir.listFiles((dir, filename) -> filename.endsWith(".yml"));
+        File[] koths = conquestsDir.listFiles((_, filename) -> filename.endsWith(".yml"));
 
         if (koths != null) {
             for (File f : koths) {
@@ -91,7 +91,7 @@ public class ConquestData {
                 ).getDataFolder().getPath() + "/data/conquests"
         );
 
-        return conquestsDir.listFiles((dir, filename) -> filename.endsWith(".yml"));
+        return conquestsDir.listFiles((_, filename) -> filename.endsWith(".yml"));
     }
 
     public boolean delete() {

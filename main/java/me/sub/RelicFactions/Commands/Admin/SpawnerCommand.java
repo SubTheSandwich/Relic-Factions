@@ -20,7 +20,7 @@ import java.util.*;
 
 public class SpawnerCommand implements TabExecutor {
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
         if (!Permission.has(sender, "spawner", "admin")) {
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
             return true;
@@ -87,7 +87,7 @@ public class SpawnerCommand implements TabExecutor {
             @NotNull CommandSender sender,
             @NotNull Command cmd,
             @NotNull String alias,
-            @NotNull String[] args
+            @NotNull String @NotNull [] args
     ) {
         if (args.length == 1) {
             String input = args[0].toUpperCase();

@@ -4,6 +4,7 @@ import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
 import me.sub.RelicFactions.Utils.Permission;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,7 +27,7 @@ import java.util.Objects;
 public class CrowbarCommand implements TabExecutor {
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
         if (!Permission.has(sender, "crowbar", "admin")) {
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
             return true;
@@ -58,7 +59,7 @@ public class CrowbarCommand implements TabExecutor {
         ItemStack crowbar = getCrowbar(uses);
         sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.crowbar.success")).replace("%player%", player.getName()).replace("%uses%", uses + "")));
         player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.crowbar.target")).replace("%uses%", uses + "")));
-        Map<Integer, ItemStack> leftovers = player.getInventory().addItem(crowbar);
+        Map<Integer, ItemStack> leftovers = player.getInventory().addItem(Objects.requireNonNull(crowbar));
         if (!leftovers.isEmpty()) {
             Location dropLoc = player.getLocation();
             leftovers.values().forEach(leftover ->
@@ -69,7 +70,7 @@ public class CrowbarCommand implements TabExecutor {
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
         if (!Permission.has(sender, "crowbar", "admin")) {
             return List.of();
         }
@@ -81,14 +82,14 @@ public class CrowbarCommand implements TabExecutor {
         ItemStack itemStack = new ItemStack(Material.DIAMOND_HOE);
         ItemMeta meta = itemStack.getItemMeta();
         if (meta == null) return null;
-        ArrayList<String> lore = new ArrayList<>();
-        lore.add(C.chat("&eUses: &b" + uses));
-        meta.setLore(lore);
+        ArrayList<Component> lore = new ArrayList<>();
+        lore.add(Component.text(C.chat("&eUses: &b" + uses)));
+        meta.lore(lore);
         NamespacedKey use = new NamespacedKey(Main.getInstance(), "crowbar_uses");
         NamespacedKey max = new NamespacedKey(Main.getInstance(), "maxUses");
         meta.getPersistentDataContainer().set(use, PersistentDataType.INTEGER, uses);
         meta.getPersistentDataContainer().set(max, PersistentDataType.INTEGER, uses);
-        meta.setDisplayName(C.chat("&bCrowbar"));
+        meta.displayName(Component.text(C.chat("&bCrowbar")));
         itemStack.setItemMeta(meta);
         return itemStack;
     }
@@ -97,14 +98,14 @@ public class CrowbarCommand implements TabExecutor {
         ItemStack itemStack = new ItemStack(Material.DIAMOND_HOE);
         ItemMeta meta = itemStack.getItemMeta();
         if (meta == null) return null;
-        ArrayList<String> lore = new ArrayList<>();
-        lore.add(C.chat("&eUses: &b" + uses));
-        meta.setLore(lore);
+        ArrayList<Component> lore = new ArrayList<>();
+        lore.add(Component.text(C.chat("&eUses: &b" + uses)));
+        meta.lore(lore);
         NamespacedKey use = new NamespacedKey(Main.getInstance(), "crowbar_uses");
         NamespacedKey max = new NamespacedKey(Main.getInstance(), "maxUses");
         meta.getPersistentDataContainer().set(use, PersistentDataType.INTEGER, uses);
         meta.getPersistentDataContainer().set(max, PersistentDataType.INTEGER, maxUses);
-        meta.setDisplayName(C.chat("&bCrowbar"));
+        meta.displayName(Component.text(C.chat("&bCrowbar")));
         itemStack.setItemMeta(meta);
         return itemStack;
     }

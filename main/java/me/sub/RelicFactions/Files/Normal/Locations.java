@@ -6,6 +6,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 public class Locations {
 
@@ -13,7 +14,7 @@ public class Locations {
     FileConfiguration customFile;
 
     public Locations() {
-        file = new File(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions").getDataFolder(), "locations.yml");
+        file = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder(), "locations.yml");
         customFile = YamlConfiguration.loadConfiguration(file);
     }
 

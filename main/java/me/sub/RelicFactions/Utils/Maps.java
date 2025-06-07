@@ -1,18 +1,20 @@
 package me.sub.RelicFactions.Utils;
 
+import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Data.Cuboid;
 import me.sub.RelicFactions.Files.Data.CustomTimer;
 import me.sub.RelicFactions.Files.Data.PlayerTimer;
 import me.sub.RelicFactions.Files.Enums.Timer;
+import me.sub.RelicFactions.Main.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.io.BukkitObjectInputStream;
-import org.bukkit.util.io.BukkitObjectOutputStream;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -158,38 +160,38 @@ public class Maps {
         return timers;
     }
 
-    public static String toBase64(ItemStack[] items) {
+    public static String toBase64(User user, ItemStack[] items) {
         if (items == null) return null;
         try {
+            YamlConfiguration config = new YamlConfiguration();
+            config.set("items", items);
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
-
-            dataOutput.writeInt(items.length);
-            for (ItemStack item : items) {
-                dataOutput.writeObject(item);
-            }
-            dataOutput.close();
+            OutputStreamWriter writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
+            writer.write(config.saveToString());
+            writer.close();
             return Base64.getEncoder().encodeToString(outputStream.toByteArray());
         } catch (Exception e) {
-            e.printStackTrace();
+            Main.getInstance().getLogger().severe("Failed to convert to Base64. File UUID: " + user.getUUID().toString());
             return null;
         }
     }
 
-    public static ItemStack[] fromBase64(String data) {
+    public static ItemStack[] fromBase64(User user, String data) {
+        if (data == null) return new ItemStack[0];
         try {
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64.getDecoder().decode(data));
-            BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
-
-            int size = dataInput.readInt();
-            ItemStack[] items = new ItemStack[size];
-            for (int i = 0; i < size; i++) {
-                items[i] = (ItemStack) dataInput.readObject();
-            }
-            dataInput.close();
-            return items;
+            byte[] bytes = Base64.getDecoder().decode(data);
+            String yaml = new String(bytes, StandardCharsets.UTF_8);
+            YamlConfiguration config = new YamlConfiguration();
+            config.loadFromString(yaml);
+            List<?> rawList = config.getList("items");
+            if (rawList == null) return new ItemStack[0];
+            List<ItemStack> items = rawList.stream()
+                    .filter(ItemStack.class::isInstance)
+                    .map(ItemStack.class::cast)
+                    .toList();
+            return items.toArray(new ItemStack[0]);
         } catch (Exception e) {
-            e.printStackTrace();
+            Main.getInstance().getLogger().severe("Failed to convert from Base64. File UUID: " + user.getUUID().toString());
             return new ItemStack[0];
         }
     }

@@ -111,6 +111,7 @@ events:
     player:
       end: "&eYou cannot enter end whilst having a combat timer."
       cannot-claim: "&cYou cannot claim whilst having a PvP timer."
+      cannot-place: "&cYou cannoty place blocks while in combat."
       start: # no default
         combat: "&eYou have been spawn-tagged for &c30 &eseconds!"
       expire:

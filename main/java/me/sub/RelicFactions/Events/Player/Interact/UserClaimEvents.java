@@ -36,7 +36,7 @@ public class UserClaimEvents implements Listener {
         if (e.getItem() == null) return;
         if (!e.getItem().hasItemMeta()) return;
         if (!e.getItem().getType().equals(Material.DIAMOND_HOE)) return;
-        if (!Objects.requireNonNull(e.getItem().getItemMeta()).getDisplayName().equalsIgnoreCase(C.chat("&bClaiming Wand"))) return;
+        if (!C.serialize(Objects.requireNonNull(e.getItem().getItemMeta()).displayName()).equalsIgnoreCase(C.chat("&bClaiming Wand"))) return;
         e.setCancelled(true);
         Claim claim = user.getClaim();
         Faction faction = Faction.get(claim.getUUID());

@@ -106,10 +106,6 @@ public class Faction {
         this.ff = ff;
     }
 
-    public FactionData getUserData() {
-        return factionData;
-    }
-
     public UUID getUUID() {
         return uuid;
     }
@@ -327,19 +323,6 @@ public class Faction {
             }
         }
         return null;
-    }
-
-    public static boolean hasAt(Location location) {
-        Location clone = location.clone();
-        clone.setY(0);
-        if (Main.getInstance().factions.isEmpty()) return false;
-        for (Faction faction : Main.getInstance().factions.values()) {
-            if (faction.getClaims().isEmpty()) continue;
-            for (Cuboid cuboid : faction.getClaims()) {
-                if (cuboid.isIn(location)) return true;
-            }
-        }
-        return false;
     }
 
     @Override

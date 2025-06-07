@@ -3,6 +3,7 @@ package me.sub.RelicFactions.Files.Data;
 import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -16,14 +17,6 @@ public class ServerTimer {
     private BigDecimal duration;
     private boolean paused;
     private final BukkitTask task;
-
-    public ServerTimer(String name, BigDecimal duration) {
-        this.name = name;
-        this.duration = duration;
-        this.paused = false;
-        task = tick();
-        Main.getInstance().serverTimers.put(name.toUpperCase(), this);
-    }
 
     public ServerTimer(String name, BigDecimal duration, boolean paused) {
         this.name = name;
@@ -97,7 +90,7 @@ public class ServerTimer {
                 if (paused) return;
                 duration = duration.subtract(BigDecimal.valueOf(0.05));
                 if (duration.compareTo(BigDecimal.ZERO) <= 0) {
-                    Bukkit.broadcastMessage(C.chat(Locale.get().getString("events.timer.server.expire." + name) == null ? Objects.requireNonNull(Locale.get().getString("events.timer.server.expire.default")).replace("%name%", name) : Objects.requireNonNull(Locale.get().getString("events.timer.server.expire." + name))));
+                    Bukkit.broadcast(Component.text(C.chat(Locale.get().getString("events.timer.server.expire." + name) == null ? Objects.requireNonNull(Locale.get().getString("events.timer.server.expire.default")).replace("%name%", name) : Objects.requireNonNull(Locale.get().getString("events.timer.server.expire." + name)))));
                     cancel();
                     Main.getInstance().serverTimers.remove(name.toUpperCase());
                     if (name.equalsIgnoreCase("keyall")) {

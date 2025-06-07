@@ -85,7 +85,7 @@ public class User {
         map = null;
         filter = new Filter();
         loggerUUID = userData.get().getString("loggerUUID") == null ? null : UUID.fromString(Objects.requireNonNull(userData.get().getString("loggerUUID")));
-        lastInventoryContents = userData.get().getString("lastInventoryContents") == null ? null : Maps.fromBase64(userData.get().getString("lastInventoryContents"));
+        lastInventoryContents = userData.get().getString("lastInventoryContents") == null ? null : Maps.fromBase64(this, userData.get().getString("lastInventoryContents"));
         chatType = ChatType.PUBLIC;
         isStaffChat = false;
         modMode = null;
@@ -260,7 +260,7 @@ public class User {
     public void setDisconnected(boolean userDisconnected) {
         this.userDisconnected = userDisconnected;
         if (!userDisconnected && !timers.isEmpty()) {
-            timers.forEach((s, timer) -> timer.tick());
+            timers.forEach((_, timer) -> timer.tick());
         }
     }
 

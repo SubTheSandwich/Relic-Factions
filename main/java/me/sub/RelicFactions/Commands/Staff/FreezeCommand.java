@@ -6,6 +6,7 @@ import me.sub.RelicFactions.Files.Normal.Messages;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
 import me.sub.RelicFactions.Utils.Permission;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -20,7 +21,7 @@ import java.util.Objects;
 
 public class FreezeCommand implements TabExecutor {
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
         if (!Permission.has(sender, "freeze", "staff")) {
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
             return true;
@@ -38,7 +39,7 @@ public class FreezeCommand implements TabExecutor {
             }
             Main.getInstance().setServerFrozen(!Main.getInstance().isServerFrozen());
             String message = Main.getInstance().isServerFrozen() ? Locale.get().getString("commands.freeze.server-frozen") : Locale.get().getString("commands.freeze.server-unfrozen");
-            Bukkit.broadcastMessage(C.chat(Objects.requireNonNull(message)));
+            Bukkit.broadcast(Component.text(C.chat(Objects.requireNonNull(message))));
             return true;
         }
 
@@ -91,7 +92,7 @@ public class FreezeCommand implements TabExecutor {
             @NotNull CommandSender sender,
             @NotNull Command cmd,
             @NotNull String s,
-            @NotNull String[] args
+            @NotNull String @NotNull [] args
     ) {
         if (!Permission.has(sender, "freeze", "staff")) return List.of();
 

@@ -20,7 +20,7 @@ import java.util.Objects;
 
 public class SOTWCommand implements TabExecutor {
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
 
         if (args.length == 1 && args[0].equalsIgnoreCase("enable")) {
 
@@ -108,12 +108,12 @@ public class SOTWCommand implements TabExecutor {
                     return true;
                 }
                 int time = Integer.parseInt(args[1]);
-                ServerTimer sotw = ServerTimer.get("sotw");
-                if (sotw != null) {
+                ServerTimer ignored = ServerTimer.get("sotw");
+                if (ignored != null) {
                     sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.sotw.running"))));
                     return true;
                 }
-                sotw = new ServerTimer("sotw", BigDecimal.valueOf(time), false);
+                new ServerTimer("sotw", BigDecimal.valueOf(time), false);
                 sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.sotw.started"))));
                 return true;
             }
@@ -123,7 +123,7 @@ public class SOTWCommand implements TabExecutor {
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
         ArrayList<String> values = new ArrayList<>();
         if (args.length == 1) {
             values.add("enable");

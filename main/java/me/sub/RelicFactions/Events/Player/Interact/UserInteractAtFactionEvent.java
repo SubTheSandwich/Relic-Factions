@@ -11,6 +11,7 @@ import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Files.Normal.ModModeFile;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
+import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -18,10 +19,7 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockExplodeEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.*;
@@ -60,11 +58,10 @@ public class UserInteractAtFactionEvent implements Listener {
             player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.freeze.cannot"))));
         } else if (Objects.requireNonNull(rejectedModifierType(user, location)).equalsIgnoreCase("MOD-MODE")) {
             player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.mod-mode.cant"))));
-        } else if (Objects.requireNonNull(rejectedModifierType(user, location)).equalsIgnoreCase("NONE")) {
-            return;
         } else if (Objects.requireNonNull(rejectedModifierType(user, location)).equalsIgnoreCase("BORDER")) {
             player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.border.build"))));
         } else {
+            if (Objects.requireNonNull(rejectedModifierType(user, location)).equalsIgnoreCase("NONE")) return;
             if (isUse) {
                 player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("faction.cannot-use")).replace("%faction%", Objects.requireNonNull(Faction.getAt(location)).getValidName(player, false))));
             } else {
@@ -255,6 +252,11 @@ public class UserInteractAtFactionEvent implements Listener {
             combined(p, location, false);
             return;
         }
+        if (user.hasTimer("combat") && !Main.getInstance().getConfig().getBoolean("listeners.place-in-combat")) {
+            p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.timer.player.cannot-place"))));
+            e.setCancelled(true);
+            return;
+        }
         Block block = e.getBlockPlaced();
         if (isOre(block.getType())) {
             block.setMetadata("playerPlaced", new FixedMetadataValue(Main.getInstance(), true));
@@ -370,10 +372,13 @@ public class UserInteractAtFactionEvent implements Listener {
     }
 
     @EventHandler
-    public void onSign(PlayerSignOpenEvent e) {
+    public void onChange(SignChangeEvent e) {
+
+        // TODO: This
+
         Player p = e.getPlayer();
         User user = User.get(p);
-        Location location = e.getSign().getLocation();
+        Location location = e.getBlock().getLocation();
         if (cannotModify(user, location)) {
             if (Objects.requireNonNull(rejectedModifierType(user, location)).equalsIgnoreCase("FROZEN_SERVER")) {
                 if (!p.hasPermission("relic.bypass.freeze")) {
@@ -384,7 +389,16 @@ public class UserInteractAtFactionEvent implements Listener {
             }
             e.setCancelled(true);
             combined(p, location, true);
+            return;
         }
+
+        String line0 = C.serialize(e.line(0));
+        String line1 = C.serialize(e.line(1));
+
+        if (!line0.equalsIgnoreCase("[Elevator]")) return;
+        if (!line1.equalsIgnoreCase("Up") && !line1.equalsIgnoreCase("Down")) return;
+
+        e.line(0, Component.text("&9[Elevator]"));
     }
 
     @EventHandler
@@ -454,6 +468,11 @@ public class UserInteractAtFactionEvent implements Listener {
                     }
                     e.setCancelled(true);
                     combined(p, block.getLocation(), true);
+                    return;
+                }
+                if (type.equals(Material.ENDER_CHEST) && Main.getInstance().getConfig().getBoolean("limiters.disable-enderchest")) {
+                    e.setCancelled(true);
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.feature-disabled"))));
                     return;
                 }
             }

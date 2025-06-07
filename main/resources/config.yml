@@ -11,7 +11,17 @@ server:
     number: 1
     start-date: "5/16/25"
 
+listeners:
+  place-in-combat: true
+  starting-timer: true
+  disable-enderchest: true
+  experience:
+    furnace-multiplier: 1.0
+    fishing-multiplier: 1.0
+
 limiters:
+  entity:
+    per-chunk: 25
   world-border: 2944
   nether-border: 2000
   end-border: -1

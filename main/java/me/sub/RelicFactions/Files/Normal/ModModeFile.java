@@ -4,6 +4,7 @@ import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Data.ModMode;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -69,10 +70,10 @@ public class ModModeFile {
             }
             ItemStack item = new ItemStack(Objects.requireNonNull(Material.matchMaterial(Objects.requireNonNull(ModModeFile.get().getString("mod-mode.items." + i + ".item")))));
             ItemMeta meta = item.getItemMeta();
-            ArrayList<String> lore = new ArrayList<>();
-            ModModeFile.get().getStringList("mod-mode.items." + i + ".lore").forEach(s -> lore.add(C.chat(s)));
-            Objects.requireNonNull(meta).setLore(lore);
-            meta.setDisplayName(C.chat(Objects.requireNonNull(ModModeFile.get().getString("mod-mode.items." + i + ".name"))));
+            ArrayList<Component> lore = new ArrayList<>();
+            ModModeFile.get().getStringList("mod-mode.items." + i + ".lore").forEach(s -> lore.add(Component.text(C.chat(s))));
+            Objects.requireNonNull(meta).lore(lore);
+            meta.displayName(Component.text(C.chat(Objects.requireNonNull(ModModeFile.get().getString("mod-mode.items." + i + ".name")))));
             item.setItemMeta(meta);
             player.getInventory().setItem(ModModeFile.get().getInt("mod-mode.items." + i + ".slot"), item);
         }
@@ -82,10 +83,10 @@ public class ModModeFile {
         for (String i : Objects.requireNonNull(ModModeFile.get().getConfigurationSection("mod-mode.items")).getKeys(false)) {
             ItemStack item = new ItemStack(Objects.requireNonNull(Material.matchMaterial(Objects.requireNonNull(ModModeFile.get().getString("mod-mode.items." + i + ".item")))));
             ItemMeta meta = item.getItemMeta();
-            ArrayList<String> lore = new ArrayList<>();
-            ModModeFile.get().getStringList("mod-mode.items." + i + ".lore").forEach(s -> lore.add(C.chat(s)));
-            Objects.requireNonNull(meta).setLore(lore);
-            meta.setDisplayName(C.chat(Objects.requireNonNull(ModModeFile.get().getString("mod-mode.items." + i + ".name"))));
+            ArrayList<Component> lore = new ArrayList<>();
+            ModModeFile.get().getStringList("mod-mode.items." + i + ".lore").forEach(s -> lore.add(Component.text(C.chat(s))));
+            Objects.requireNonNull(meta).lore(lore);
+            meta.displayName(Component.text(C.chat(Objects.requireNonNull(ModModeFile.get().getString("mod-mode.items." + i + ".name")))));
             item.setItemMeta(meta);
             for (ItemStack it : player.getInventory().getContents()) {
                 if (it == null) continue;
@@ -101,10 +102,10 @@ public class ModModeFile {
         for (String i : Objects.requireNonNull(ModModeFile.get().getConfigurationSection("mod-mode.items")).getKeys(false)) {
             ItemStack item = new ItemStack(Objects.requireNonNull(Material.matchMaterial(Objects.requireNonNull(ModModeFile.get().getString("mod-mode.items." + i + ".item")))));
             ItemMeta meta = item.getItemMeta();
-            ArrayList<String> lore = new ArrayList<>();
-            ModModeFile.get().getStringList("mod-mode.items." + i + ".lore").forEach(s -> lore.add(C.chat(s)));
-            Objects.requireNonNull(meta).setLore(lore);
-            meta.setDisplayName(C.chat(Objects.requireNonNull(ModModeFile.get().getString("mod-mode.items." + i + ".name"))));
+            ArrayList<Component> lore = new ArrayList<>();
+            ModModeFile.get().getStringList("mod-mode.items." + i + ".lore").forEach(s -> lore.add(Component.text(C.chat(s))));
+            Objects.requireNonNull(meta).lore(lore);
+            meta.displayName(Component.text(C.chat(Objects.requireNonNull(ModModeFile.get().getString("mod-mode.items." + i + ".name")))));
             item.setItemMeta(meta);
             if (item.isSimilar(itemStack)) return i;
         }

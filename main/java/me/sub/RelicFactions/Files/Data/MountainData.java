@@ -68,7 +68,7 @@ public class MountainData {
                 ).getDataFolder().getPath() + "/data/mountains"
         );
         File[] mountains = mountainsDir.listFiles(
-                (dir, filename) -> filename.toLowerCase().endsWith(".yml")
+                (_, filename) -> filename.toLowerCase().endsWith(".yml")
         );
         if (mountains != null) {
             for (File f : mountains) {
@@ -91,7 +91,7 @@ public class MountainData {
                 ).getDataFolder().getPath() + "/data/mountains"
         );
         return mountainsDir.listFiles(
-                (dir, filename) -> filename.toLowerCase().endsWith(".yml")
+                (_, filename) -> filename.toLowerCase().endsWith(".yml")
         );
     }
 

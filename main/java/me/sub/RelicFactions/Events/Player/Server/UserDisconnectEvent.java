@@ -5,6 +5,7 @@ import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
+import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
@@ -20,7 +21,7 @@ public class UserDisconnectEvent implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
-        e.setQuitMessage(null);
+        e.quitMessage(null);
         Player p = e.getPlayer();
         User user = User.get(p);
         if (user.hasFaction()) {
@@ -40,7 +41,7 @@ public class UserDisconnectEvent implements Listener {
             villager.setPersistent(true);
             villager.setHealth(p.getHealth());
             villager.setAI(false);
-            villager.setCustomName(C.chat("&e" + user.getName()));
+            villager.customName(Component.text(C.chat("&e" + user.getName())));
             NamespacedKey key = new NamespacedKey(Main.getInstance(), "logger_uuid");
             villager.getPersistentDataContainer().set(key, PersistentDataType.STRING, p.getUniqueId().toString());
             user.setLoggerUUID(villager.getUniqueId());

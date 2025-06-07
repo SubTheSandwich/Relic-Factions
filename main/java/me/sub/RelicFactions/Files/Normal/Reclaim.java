@@ -6,6 +6,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 public class Reclaim {
 
@@ -13,7 +14,7 @@ public class Reclaim {
     FileConfiguration customFile;
 
     public Reclaim() {
-        file = new File(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions").getDataFolder(), "reclaims.yml");
+        file = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder(), "reclaims.yml");
         customFile = YamlConfiguration.loadConfiguration(file);
     }
 

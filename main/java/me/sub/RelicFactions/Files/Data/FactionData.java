@@ -39,7 +39,7 @@ public class FactionData {
         if (!file.exists()) {
             try {
                 file.createNewFile();
-            } catch (IOException e) {
+            } catch (IOException _) {
 
             }
         }
@@ -68,7 +68,7 @@ public class FactionData {
                 ).getDataFolder().getPath() + "/data/factions"
         );
         File[] users = factionsDir.listFiles(
-                (dir, filename) -> filename.toLowerCase().endsWith(".yml")
+                (_, filename) -> filename.toLowerCase().endsWith(".yml")
         );
         if (users != null) {
             for (File f : users) {

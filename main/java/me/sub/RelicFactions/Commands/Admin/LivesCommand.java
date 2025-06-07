@@ -18,7 +18,7 @@ import java.util.Objects;
 
 public class LivesCommand implements TabExecutor {
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
         if (args.length == 0 && sender instanceof Player p) {
             User user = User.get(p);
             p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.lives.check")).replace("%amount%", user.getLives() + "")));
@@ -69,7 +69,7 @@ public class LivesCommand implements TabExecutor {
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
         if (!(Permission.has(sender, "lives", "admin"))) return new ArrayList<>();
         if (args.length == 1) return List.of("add", "set", "take");
         if (args.length == 2) return null;

@@ -29,7 +29,6 @@ public class UserMoveEvent implements Listener {
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
         Player p = e.getPlayer();
-        if (e.getTo() == null) return;
 
         bufferManager.updateBufferWall(p);
 
@@ -255,7 +254,6 @@ public class UserMoveEvent implements Listener {
 
     @EventHandler
     public void onMove(PlayerTeleportEvent e) {
-        if (e.getTo() == null) return;
         if (e.getFrom().getBlockX() == e.getTo().getBlockX() && e.getFrom().getBlockZ() == e.getTo().getBlockZ()) return;
         processHome(e.getPlayer());
         processLogout(e.getPlayer());

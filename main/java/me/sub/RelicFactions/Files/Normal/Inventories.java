@@ -1,6 +1,7 @@
 package me.sub.RelicFactions.Files.Normal;
 
 import me.sub.RelicFactions.Utils.C;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -52,7 +53,7 @@ public class Inventories {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return null;
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES);
-        meta.setDisplayName(C.chat(Objects.requireNonNull(Inventories.get().getString(inventory + ".items." + name + ".name"))));
+        meta.displayName(Component.text(C.chat(Objects.requireNonNull(Inventories.get().getString(inventory + ".items." + name + ".name")))));
         item.setItemMeta(meta);
         return item;
     }

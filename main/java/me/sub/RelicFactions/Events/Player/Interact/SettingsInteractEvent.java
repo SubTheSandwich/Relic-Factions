@@ -19,7 +19,7 @@ public class SettingsInteractEvent implements Listener {
     @EventHandler
     public void onProfile(InventoryClickEvent e) {
         if (e.getClickedInventory() == null) return;
-        if (e.getView().getTitle().equalsIgnoreCase(C.chat(Objects.requireNonNull(Inventories.get().getString("profile.name"))))) {
+        if (C.serialize(e.getView().title()).equalsIgnoreCase(C.chat(Objects.requireNonNull(Inventories.get().getString("profile.name"))))) {
             e.setCancelled(true);
         }
     }
@@ -28,7 +28,7 @@ public class SettingsInteractEvent implements Listener {
     public void onClick(InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
         if (e.getClickedInventory() == null) return;
-        if (!e.getView().getTitle().equalsIgnoreCase(C.chat(Objects.requireNonNull(Inventories.get().getString("settings.name"))))) return;
+        if (!C.serialize(e.getView().title()).equalsIgnoreCase(C.chat(Objects.requireNonNull(Inventories.get().getString("settings.name"))))) return;
         if (e.getCurrentItem() == null) return;
         if (!e.getCurrentItem().hasItemMeta()) return;
         e.setCancelled(true);

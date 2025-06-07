@@ -1,7 +1,9 @@
 package me.sub.RelicFactions.Utils;
 
 import me.sub.RelicFactions.Main.Main;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 import java.util.Objects;
 
@@ -18,7 +20,7 @@ public class C {
         if (s.contains("%discord%")) s = s.replace("%discord%", Objects.requireNonNull(Main.getInstance().getConfig().getString("server.discord")));
         if (s.contains("%website%")) s = s.replace("%website%", Objects.requireNonNull(Main.getInstance().getConfig().getString("server.website")));
         if (s.contains("%store%")) s = s.replace("%store%", Objects.requireNonNull(Main.getInstance().getConfig().getString("server.store")));
-        return ChatColor.translateAlternateColorCodes('&', s);
+        return serialize(LegacyComponentSerializer.legacyAmpersand().deserialize(s));
     }
 
     public static String chat(String s, String alias) {
@@ -50,9 +52,9 @@ public class C {
     }
 
     public static String strip(String s) {
-        if (s.contains("%")) s = C.chat(s);
-        if (s.contains("&")) s = C.chat(s);
-        return ChatColor.stripColor(s);
+        if (s.contains("%") || s.contains("&")) s = C.chat(s);
+        Component component = LegacyComponentSerializer.legacySection().deserialize(s);
+        return PlainTextComponentSerializer.plainText().serialize(component);
     }
 
     public static String strikethrough(String input) {
@@ -125,5 +127,9 @@ public class C {
         }
         // Remove trailing space
         return result.toString().trim();
+    }
+
+    public static String serialize(Component component) {
+        return LegacyComponentSerializer.legacySection().serialize(component);
     }
 }

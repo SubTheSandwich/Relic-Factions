@@ -10,11 +10,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDropItemEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCreativeEvent;
-import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
@@ -62,7 +60,6 @@ public class ModModeEvents implements Listener {
                     .map(Player::getName)
                     .collect(java.util.stream.Collectors.joining(", "));
             p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.mod-mode.online-staff")).replace("%players%", staffOrAdmin)));
-            return;
         }
     }
 
@@ -149,7 +146,6 @@ public class ModModeEvents implements Listener {
                     .map(Player::getName)
                     .collect(java.util.stream.Collectors.joining(", "));
             p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.mod-mode.online-staff")).replace("%players%", staffOrAdmin)));
-            return;
         }
     }
     public Player getRandomPlayer() {
@@ -163,7 +159,7 @@ public class ModModeEvents implements Listener {
 
     @EventHandler
     public void onView(InventoryClickEvent e) {
-        if (e.getView().getTitle().equalsIgnoreCase(C.chat("&eInventory Inspector"))) e.setCancelled(true);
+        if (C.serialize(e.getView().title()).equalsIgnoreCase(C.chat("&eInventory Inspector"))) e.setCancelled(true);
     }
 
 }

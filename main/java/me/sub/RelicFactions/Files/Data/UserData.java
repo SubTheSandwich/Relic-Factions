@@ -39,7 +39,7 @@ public class UserData {
         if (!file.exists()) {
             try {
                 file.createNewFile();
-            } catch (IOException e) {
+            } catch (IOException _) {
 
             }
         }
@@ -68,7 +68,7 @@ public class UserData {
                 ).getDataFolder().getPath() + "/data/profiles"
         );
         File[] users = profilesDir.listFiles(
-                (dir, filename) -> filename.toLowerCase().endsWith(".yml")
+                (_, filename) -> filename.toLowerCase().endsWith(".yml")
         );
         if (users != null) {
             for (File f : users) {
@@ -91,7 +91,7 @@ public class UserData {
                 ).getDataFolder().getPath() + "/data/profiles"
         );
         return profilesDir.listFiles(
-                (dir, filename) -> filename.toLowerCase().endsWith(".yml")
+                (_, filename) -> filename.toLowerCase().endsWith(".yml")
         );
     }
 }

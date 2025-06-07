@@ -22,10 +22,8 @@ import java.util.Optional;
 
 public class PvPCommand implements TabExecutor {
 
-    // TODO: Implement
-
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
         if (args.length == 1 && args[0].equalsIgnoreCase("enable")) {
             if (!(sender instanceof Player p)) {
                 sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.not-player"))));
@@ -121,7 +119,7 @@ public class PvPCommand implements TabExecutor {
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
         List<String> values = new ArrayList<>();
         if (args.length == 1) {
             values.addAll(List.of("revive", "enable"));

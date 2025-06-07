@@ -1,6 +1,7 @@
 package me.sub.RelicFactions.Files.Data;
 
 import me.sub.RelicFactions.Utils.C;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Tag;
@@ -130,7 +131,7 @@ public class Claim {
     public static ItemStack getWand() {
         ItemStack wand = new ItemStack(Material.DIAMOND_HOE);
         ItemMeta wandMeta = wand.getItemMeta();
-        Objects.requireNonNull(wandMeta).setDisplayName(C.chat("&bClaiming Wand"));
+        Objects.requireNonNull(wandMeta).displayName(Component.text(C.chat("&bClaiming Wand")));
         wand.setItemMeta(wandMeta);
         return wand;
     }

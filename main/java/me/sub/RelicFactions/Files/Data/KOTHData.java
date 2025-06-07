@@ -68,7 +68,7 @@ public class KOTHData {
                 ).getDataFolder().getPath() + "/data/koths"
         );
         File[] koths = kothsDir.listFiles(
-                (dir, filename) -> filename.toLowerCase().endsWith(".yml")
+                (_, filename) -> filename.toLowerCase().endsWith(".yml")
         );
         if (koths != null) {
             for (File f : koths) {
@@ -91,7 +91,7 @@ public class KOTHData {
                 ).getDataFolder().getPath() + "/data/koths"
         );
         return kothsDir.listFiles(
-                (dir, filename) -> filename.toLowerCase().endsWith(".yml")
+                (_, filename) -> filename.toLowerCase().endsWith(".yml")
         );
     }
 

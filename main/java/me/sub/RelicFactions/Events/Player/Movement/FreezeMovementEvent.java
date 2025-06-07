@@ -17,7 +17,6 @@ public class FreezeMovementEvent implements Listener {
     public void onMove(PlayerMoveEvent e) {
         Player p = e.getPlayer();
         User user = User.get(p);
-        if (e.getTo() == null) return;
         if (e.getFrom().getX() == e.getTo().getX() && e.getFrom().getZ() == e.getTo().getZ()) return;
         if (user.isFrozen() || user.isPanic()) {
             p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.freeze.cannot"))));

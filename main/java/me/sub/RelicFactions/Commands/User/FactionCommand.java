@@ -17,6 +17,7 @@ import me.sub.RelicFactions.Utils.C;
 import me.sub.RelicFactions.Utils.Calculate;
 import me.sub.RelicFactions.Utils.Maps;
 import me.sub.RelicFactions.Utils.Permission;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -36,7 +37,7 @@ import java.util.stream.Collectors;
 public class FactionCommand implements TabExecutor {
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
         if (!(sender instanceof Player p)) {
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.not-player"))));
             return true;
@@ -742,7 +743,7 @@ public class FactionCommand implements TabExecutor {
                 }
                 String status = faction.isRegening() ? Locale.get().getString("primary.enabled") : Locale.get().getString("primary.disabled");
                 status = Objects.requireNonNull(status).toLowerCase();
-                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.setregening")).replace("%faction%", faction.getName()).replace("%status%", status)));
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.resetting")).replace("%faction%", faction.getName()).replace("%status%", status)));
                 return true;
             }
             if (args[0].equalsIgnoreCase("claimfor")) {
@@ -869,7 +870,7 @@ public class FactionCommand implements TabExecutor {
                 Main.getInstance().factions.put(uuid, faction);
                 Main.getInstance().factionNameHolder.put(args[1].toLowerCase(), faction);
                 p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.createsystem.success")).replace("%faction%", args[1])));
-                Bukkit.broadcastMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.createsystem.bc")).replace("%faction%", args[1]).replace("%player%", p.getName())));
+                Bukkit.broadcast(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.createsystem.bc")).replace("%faction%", args[1]).replace("%player%", p.getName()))));
                 return true;
             }
             if (args[0].equalsIgnoreCase("who") || args[0].equalsIgnoreCase("show")) {
@@ -968,7 +969,7 @@ public class FactionCommand implements TabExecutor {
                 Main.getInstance().factions.put(uuid, faction);
                 Main.getInstance().factionNameHolder.put(args[1].toLowerCase(), faction);
                 p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.create.success")).replace("%faction%", args[1])));
-                Bukkit.broadcastMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.create.bc")).replace("%faction%", args[1]).replace("%player%", p.getName())));
+                Bukkit.broadcast(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.create.bc")).replace("%faction%", args[1]).replace("%player%", p.getName()))));
                 return true;
             }
             if (args[0].equalsIgnoreCase("d") || args[0].equalsIgnoreCase("deposit")) {
@@ -1460,7 +1461,7 @@ public class FactionCommand implements TabExecutor {
 
     @Nullable
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
         if (!(sender instanceof Player p)) return new ArrayList<>();
         List<String> values = new ArrayList<>();
         if (args.length == 1) {

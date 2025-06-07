@@ -18,7 +18,7 @@ import java.util.Objects;
 
 public class KeyAllCommand implements TabExecutor {
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
         if (!Permission.has(sender, "keyall", "admin")) {
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
             return true;
@@ -56,7 +56,7 @@ public class KeyAllCommand implements TabExecutor {
             return true;
         }
         double duration = Double.parseDouble(args[0]);
-        ServerTimer timer = new ServerTimer("keyall", BigDecimal.valueOf(duration), false);
+        ServerTimer ignored = new ServerTimer("keyall", BigDecimal.valueOf(duration), false);
         String command = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
         Main.getInstance().setKeyAllCommand(command);
         sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.key-all.started"))));
@@ -64,7 +64,7 @@ public class KeyAllCommand implements TabExecutor {
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
         if (!Permission.has(sender, "keyall", "admin")) {
             return List.of();
         }

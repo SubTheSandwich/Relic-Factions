@@ -6,6 +6,7 @@ import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Files.Normal.ModModeFile;
 import me.sub.RelicFactions.Utils.C;
 import me.sub.RelicFactions.Utils.Permission;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -18,7 +19,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class InvseeCommand implements TabExecutor {
 
@@ -27,7 +27,7 @@ public class InvseeCommand implements TabExecutor {
             @NotNull CommandSender sender,
             @NotNull Command cmd,
             @NotNull String label,
-            @NotNull String[] args
+            @NotNull String @NotNull [] args
     ) {
         if (!(sender instanceof Player p)) {
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.not-player"))));
@@ -66,7 +66,7 @@ public class InvseeCommand implements TabExecutor {
             Inventory viewInv = Bukkit.createInventory(
                     null,
                     36, // 4 rows of 9
-                    C.chat("&eInventory Inspector")
+                    Component.text(C.chat("&eInventory Inspector"))
             );
 
             ItemStack[] contents = target.getInventory().getContents();
@@ -84,7 +84,7 @@ public class InvseeCommand implements TabExecutor {
             @NotNull CommandSender sender,
             @NotNull Command cmd,
             @NotNull String label,
-            @NotNull String[] args
+            @NotNull String @NotNull [] args
     ) {
         if (!Permission.has(sender, "invsee", "staff")) return List.of();
         if (args.length == 1) {

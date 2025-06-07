@@ -5,6 +5,7 @@ import me.sub.RelicFactions.Files.Enums.Color;
 import me.sub.RelicFactions.Files.Normal.Inventories;
 import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Utils.C;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -25,7 +26,7 @@ import java.util.Objects;
 
 public class ProfileCommand implements TabExecutor {
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
         if (!(sender instanceof Player p)) {
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.not-player"))));
             return true;
@@ -46,8 +47,8 @@ public class ProfileCommand implements TabExecutor {
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
-        if (!(sender instanceof Player p)) return List.of();
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
+        if (!(sender instanceof Player)) return List.of();
         if (args.length == 1) {
             return null;
         }
@@ -56,17 +57,20 @@ public class ProfileCommand implements TabExecutor {
 
     private void open(Player p, User user) {
 
-        Inventory inventory = Bukkit.createInventory(null, Inventories.get().getInt("profile.size"), C.chat(Objects.requireNonNull(Inventories.get().getString("profile.name"))));
+        Inventory inventory = Bukkit.createInventory(null,
+                Inventories.get().getInt("profile.size"),
+                Component.text(C.chat(Objects.requireNonNull(Inventories.get().getString("profile.name"))))
+        );
 
         ItemStack kills = new ItemStack(Objects.requireNonNull(Material.matchMaterial(Objects.requireNonNull(Inventories.get().getString("profile.items.kills.item")))));
         ItemMeta killsMeta = kills.getItemMeta();
-        Objects.requireNonNull(killsMeta).setDisplayName(C.chat("&aKills&7: &r" + user.getKills()));
+        Objects.requireNonNull(killsMeta).displayName(Component.text(C.chat("&aKills&7: &r" + user.getKills())));
         killsMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         kills.setItemMeta(killsMeta);
 
         ItemStack deaths = new ItemStack(Objects.requireNonNull(Material.matchMaterial(Objects.requireNonNull(Inventories.get().getString("profile.items.deaths.item")))));
         ItemMeta deathsMeta = deaths.getItemMeta();
-        Objects.requireNonNull(deathsMeta).setDisplayName(C.chat("&cDeaths&7: &r" + user.getDeaths()));
+        Objects.requireNonNull(deathsMeta).displayName(Component.text(C.chat("&cDeaths&7: &r" + user.getDeaths())));
         deathsMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         deaths.setItemMeta(deathsMeta);
 
@@ -75,18 +79,17 @@ public class ProfileCommand implements TabExecutor {
         SkullMeta playerMeta = (SkullMeta) player.getItemMeta();
         if (playerMeta == null) return;
         playerMeta.setOwningPlayer(Bukkit.getOfflinePlayer(user.getUUID()));
-        playerMeta.setOwnerProfile(Bukkit.getOfflinePlayer(user.getUUID()).getPlayerProfile());
         playerMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-        playerMeta.setDisplayName(C.chat("&b" + user.getName() + "&e's Profile"));
+        playerMeta.displayName(Component.text(C.chat("&b" + user.getName() + "&e's Profile")));
         player.setItemMeta(playerMeta);
 
         ItemStack ores = new ItemStack(Objects.requireNonNull(Material.matchMaterial(Objects.requireNonNull(Inventories.get().getString("profile.items.ores.item")))));
         ItemMeta oresMeta = ores.getItemMeta();
         if (oresMeta == null) return;
-        ArrayList<String> lore = getStrings(user);
-        oresMeta.setLore(lore);
+        ArrayList<Component> lore = getStrings(user);
+        oresMeta.lore(lore);
         oresMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-        oresMeta.setDisplayName(C.chat(Objects.requireNonNull(Inventories.get().getString("profile.items.ores.name"))));
+        oresMeta.displayName(Component.text(C.chat(Objects.requireNonNull(Inventories.get().getString("profile.items.ores.name")))));
         ores.setItemMeta(oresMeta);
 
         inventory.setItem(Inventories.get().getInt("profile.items.kills.slot"), kills);
@@ -97,7 +100,7 @@ public class ProfileCommand implements TabExecutor {
         ItemStack fill = new ItemStack(Objects.requireNonNull(Material.matchMaterial(Objects.requireNonNull(Inventories.get().getString("filler.item")))));
         ItemMeta meta = fill.getItemMeta();
         if (meta == null) return;
-        meta.setDisplayName(C.chat("&e"));
+        meta.displayName(Component.text(C.chat("&e")));
         fill.setItemMeta(meta);
 
         if (Inventories.get().getBoolean("filler.enabled")) {
@@ -110,8 +113,8 @@ public class ProfileCommand implements TabExecutor {
         p.openInventory(inventory);
     }
 
-    private @NotNull ArrayList<String> getStrings(User user) {
-        ArrayList<String> lore = new ArrayList<>();
+    private @NotNull ArrayList<Component> getStrings(User user) {
+        ArrayList<Component> lore = new ArrayList<>();
         lore.add(format(Color.GRAY, "Coal", user.getCoalMined()));
         lore.add(format(Color.WHITE, "Iron", user.getIronMined()));
         lore.add(format(Color.GOLD, "Copper", user.getCopperMined()));
@@ -125,7 +128,7 @@ public class ProfileCommand implements TabExecutor {
         return lore;
     }
 
-    private String format(Color color, String name, int what) {
-        return C.chat(color.toColorCode() + name + "&7: " + what);
+    private Component format(Color color, String name, int what) {
+        return Component.text(C.chat(color.toColorCode() + name + "&7: " + what));
     }
 }

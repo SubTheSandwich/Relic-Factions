@@ -23,7 +23,6 @@
  */
 package me.sub.RelicFactions.Utils.Fastboard;
 
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.lang.invoke.MethodHandle;
@@ -48,9 +47,11 @@ import java.util.stream.Stream;
 public abstract class FastBoardBase<T> {
 
     private static final Map<Class<?>, Field[]> PACKETS = new HashMap<>(8);
-    protected static final String[] COLOR_CODES = Arrays.stream(ChatColor.values())
-            .map(Object::toString)
-            .toArray(String[]::new);
+    protected static final String[] COLOR_CODES = {
+            "§0", "§1", "§2", "§3", "§4", "§5", "§6", "§7",
+            "§8", "§9", "§a", "§b", "§c", "§d", "§e", "§f",
+            "§k", "§l", "§m", "§n", "§o", "§r"
+    };
     private static final VersionType VERSION_TYPE;
     // Packets and components
     private static final Class<?> CHAT_COMPONENT_CLASS;
@@ -389,6 +390,7 @@ public abstract class FastBoardBase<T> {
      * @throws IllegalArgumentException if one line is longer than 30 chars on 1.12 or lower
      * @throws IllegalStateException    if {@link #delete()} was call before
      */
+    @SuppressWarnings("unchecked")
     public void updateLines(T... lines) {
         updateLines(Arrays.asList(lines));
     }
@@ -440,7 +442,7 @@ public abstract class FastBoardBase<T> {
                     for (int i = oldLinesCopy.size(); i > linesSize; i--) {
                         sendTeamPacket(i - 1, TeamMode.REMOVE);
                         sendScorePacket(i - 1, ScoreboardAction.REMOVE);
-                        oldLines.remove(0);
+                        oldLines.removeFirst();
                     }
                 } else {
                     for (int i = oldLinesCopy.size(); i < linesSize; i++) {
@@ -505,7 +507,8 @@ public abstract class FastBoardBase<T> {
      * @throws IllegalArgumentException if the size of the texts does not match the current size of the board
      * @throws IllegalStateException    if {@link #delete()} was call before
      */
-    public synchronized void updateScores(T... texts) {
+    @SuppressWarnings("unchecked")
+    public final synchronized void updateScores(T... texts) {
         updateScores(Arrays.asList(texts));
     }
 

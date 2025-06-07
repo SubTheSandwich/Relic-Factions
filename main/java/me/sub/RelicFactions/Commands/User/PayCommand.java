@@ -1,6 +1,5 @@
 package me.sub.RelicFactions.Commands.User;
 
-import me.sub.RelicFactions.Commands.Staff.PanicCommand;
 import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Main.Main;
@@ -19,7 +18,7 @@ import java.util.Objects;
 
 public class PayCommand implements TabExecutor {
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
         if (!(sender instanceof Player p)) {
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.not-player"))));
             return true;
@@ -73,9 +72,9 @@ public class PayCommand implements TabExecutor {
             @NotNull CommandSender sender,
             @NotNull Command cmd,
             @NotNull String s,
-            @NotNull String[] args
+            @NotNull String @NotNull [] args
     ) {
-        if (!(sender instanceof Player player)) return List.of();
+        if (!(sender instanceof Player)) return List.of();
         if (args.length == 1) {
             return null;
         }

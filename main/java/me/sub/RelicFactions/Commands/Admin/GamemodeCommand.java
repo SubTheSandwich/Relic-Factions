@@ -17,7 +17,7 @@ import java.util.Objects;
 
 public class GamemodeCommand implements TabExecutor {
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
 
         if (!Permission.has(sender, "gamemode", "admin")) {
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
@@ -198,7 +198,7 @@ public class GamemodeCommand implements TabExecutor {
             @NotNull CommandSender sender,
             @NotNull Command cmd,
             @NotNull String s,
-            @NotNull String[] args
+            @NotNull String @NotNull [] args
     ) {
         // List of shortcut commands that should not return tab completions
         boolean b = s.equalsIgnoreCase("gma") ||

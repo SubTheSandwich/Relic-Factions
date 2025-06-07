@@ -5,6 +5,7 @@ import me.sub.RelicFactions.Files.Enums.Timer;
 import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -178,9 +179,9 @@ public class RunningConquest {
                     if (time.doubleValue() < 0) {
                         zoneTimers.put(conquest.getRed(), new BigDecimal(Main.getInstance().getConfig().getInt("conquest.time")));
                         points.put(faction.getUUID(), points.getOrDefault(faction.getUUID(), 0) + Main.getInstance().getConfig().getInt("conquest.points-per-cap"));
-                        Bukkit.broadcastMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.zone-capped"))
+                        Bukkit.broadcast(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.zone-capped"))
                                 .replace("%player%", user.getName())
-                                .replace("%zone%", "&c" + conquest.getRed().getName())));
+                                .replace("%zone%", "&c" + conquest.getRed().getName()))));
                     }
                     int seconds = time.setScale(0, RoundingMode.FLOOR).intValue();
                     if (seconds != redLast) {
@@ -227,9 +228,9 @@ public class RunningConquest {
                     if (time.doubleValue() < 0) {
                         zoneTimers.put(conquest.getBlue(), new BigDecimal(Main.getInstance().getConfig().getInt("conquest.time")));
                         points.put(faction.getUUID(), points.getOrDefault(faction.getUUID(), 0) + Main.getInstance().getConfig().getInt("conquest.points-per-cap"));
-                        Bukkit.broadcastMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.zone-capped"))
+                        Bukkit.broadcast(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.zone-capped"))
                                 .replace("%player%", user.getName())
-                                .replace("%zone%", "&9" + conquest.getBlue().getName())));
+                                .replace("%zone%", "&9" + conquest.getBlue().getName()))));
                     }
                     int seconds = time.setScale(0, RoundingMode.FLOOR).intValue();
                     if (seconds != blueLast) {
@@ -276,9 +277,9 @@ public class RunningConquest {
                     if (time.doubleValue() < 0) {
                         zoneTimers.put(conquest.getGreen(), new BigDecimal(Main.getInstance().getConfig().getInt("conquest.time")));
                         points.put(faction.getUUID(), points.getOrDefault(faction.getUUID(), 0) + Main.getInstance().getConfig().getInt("conquest.points-per-cap"));
-                        Bukkit.broadcastMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.zone-capped"))
+                        Bukkit.broadcast(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.zone-capped"))
                                 .replace("%player%", user.getName())
-                                .replace("%zone%", "&a" + conquest.getGreen().getName())));
+                                .replace("%zone%", "&a" + conquest.getGreen().getName()))));
                     }
                     int seconds = time.setScale(0, RoundingMode.FLOOR).intValue();
                     if (seconds != greenLast) {
@@ -325,9 +326,9 @@ public class RunningConquest {
                     if (time.doubleValue() < 0) {
                         zoneTimers.put(conquest.getYellow(), new BigDecimal(Main.getInstance().getConfig().getInt("conquest.time")));
                         points.put(faction.getUUID(), points.getOrDefault(faction.getUUID(), 0) + Main.getInstance().getConfig().getInt("conquest.points-per-cap"));
-                        Bukkit.broadcastMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.zone-capped"))
+                        Bukkit.broadcast(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.zone-capped"))
                                 .replace("%player%", user.getName())
-                                .replace("%zone%", "&e" + conquest.getYellow().getName())));
+                                .replace("%zone%", "&e" + conquest.getYellow().getName()))));
                     }
                     int seconds = time.setScale(0, RoundingMode.FLOOR).intValue();
                     if (seconds != yellowLast) {
@@ -361,9 +362,9 @@ public class RunningConquest {
         Faction faction = Faction.get(user.getFaction());
         if (faction == null) return;
         if (knock) {
-            Bukkit.broadcastMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.knock")).replace("%faction%", faction.getName()).replace("%zone%", zone.getName())));
+            Bukkit.broadcast(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.knock")).replace("%faction%", faction.getName()).replace("%zone%", zone.getName()))));
         } else {
-            Bukkit.broadcastMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.zone-capped")).replace("%zone%", zone.getName()).replace("%player%", user.getName())));
+            Bukkit.broadcast(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("events.conquest.zone-capped")).replace("%zone%", zone.getName()).replace("%player%", user.getName()))));
         }
     }
 

@@ -12,6 +12,7 @@ import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
 import me.sub.RelicFactions.Utils.Calculate;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -228,14 +229,14 @@ public class UserDamageEvents implements Listener {
                             .replace("%killer-kills%", String.valueOf(damagerUser.getKills()))
                             .replace("%dead%", hitUser.getName())
                             .replace("%dead-kills%", String.valueOf(hitUser.getKills()));
-                    Bukkit.broadcastMessage(C.chat(msg));
+                    Bukkit.broadcast(Component.text(C.chat(msg)));
                 }
             } else {
                 String msg = Locale.get().getString("deathmessage.logger.unknown");
                 if (msg != null) {
                     msg = msg.replace("%dead%", hitUser.getName())
                             .replace("%dead-kills%", String.valueOf(hitUser.getKills()));
-                    Bukkit.broadcastMessage(C.chat(msg));
+                    Bukkit.broadcast(Component.text(C.chat(msg)));
                 }
             }
         }
@@ -494,7 +495,7 @@ public class UserDamageEvents implements Listener {
         user.setDeathbannedTill(deathban);
         user.setDeathBanned(true);
         user.getTimers().clear();
-        p.kickPlayer(C.chat(Objects.requireNonNull(Locale.get().getString("events.deathban.kick")).replace("%time%", Timer.getMessageFormat(deathban - System.currentTimeMillis()))));
+        p.kick(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("events.deathban.kick")).replace("%time%", Timer.getMessageFormat(deathban - System.currentTimeMillis())))));
         if (user.hasFaction()) {
             Faction faction = Faction.get(user.getFaction());
             if (Main.getInstance().getConfig().getBoolean("elo.enable")) {
@@ -525,7 +526,7 @@ public class UserDamageEvents implements Listener {
             } else {
                 deathMessage = Objects.requireNonNull(Locale.get().getString("deathmessage.entity-attack.player"))
                         .replace("%item%", killer.getInventory().getItemInMainHand().hasItemMeta() ?
-                                Objects.requireNonNull(killer.getInventory().getItemInMainHand().getItemMeta()).getDisplayName() :
+                                C.serialize(Objects.requireNonNull(killer.getInventory().getItemInMainHand().getItemMeta()).displayName()) :
                                 killer.getInventory().getItemInMainHand().getType().name());
             }
             deathMessage = fillInDead(p, deathMessage, killer);
@@ -546,7 +547,7 @@ public class UserDamageEvents implements Listener {
                             deathMessage = Objects.requireNonNull(Locale.get().getString("deathmessage.projectile.player"))
                                     .replace("%distance%", (int) p.getLocation().distance(shooterPlayer.getLocation()) + "")
                                     .replace("%item%", held.hasItemMeta() && Objects.requireNonNull(held.getItemMeta()).hasDisplayName() ?
-                                            held.getItemMeta().getDisplayName() :
+                                            C.serialize(held.getItemMeta().displayName()) :
                                             held.getType().name());
                         }
                         deathMessage = fillInDead(p, deathMessage, shooterPlayer);
@@ -577,7 +578,7 @@ public class UserDamageEvents implements Listener {
                 deathMessage = fillInDead(p, deathMessage);
             }
         }
-        e.setDeathMessage(C.chat(deathMessage));
+        e.deathMessage(Component.text(C.chat(deathMessage)));
 
 
         if (Main.getInstance().getRunningConquest() != null) {
