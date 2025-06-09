@@ -126,7 +126,7 @@ public class PlayerTimer {
                     Objects.requireNonNull(player).sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.stuck.starting"))));
                     Location location = FactionCommand.findSafeLocation(player,20,player.getWorld().getMaxHeight() - 2, player.getWorld().getMinHeight() + 2);
                     if (location == null) {
-                        player.sendMessage(Objects.requireNonNull(Locale.get().getString("commands.faction.stuck.none")));
+                        player.sendMessage(Objects.requireNonNull(Locale.get().getString("primary.no-safe-location")));
                         cancel();
                         user.removeTimer(timer.name());
                         user.setStuckLocation(null);

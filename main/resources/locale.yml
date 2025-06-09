@@ -26,6 +26,7 @@ primary:
   disabled: "&cDisabled"
   feature-disabled: "&cThis feature is disabled."
   world: "&cYou cannot select this location, as your other selection is not in the same world."
+  no-safe-location: "&cNo safe location was found."
 
 claiming:
   success: "&aSuccessfully claimed your selected area."
@@ -111,7 +112,7 @@ events:
     player:
       end: "&eYou cannot enter end whilst having a combat timer."
       cannot-claim: "&cYou cannot claim whilst having a PvP timer."
-      cannot-place: "&cYou cannoty place blocks while in combat."
+      cannot-place: "&cYou cannot place blocks while in combat."
       start: # no default
         combat: "&eYou have been spawn-tagged for &c30 &eseconds!"
       expire:
@@ -558,7 +559,6 @@ commands:
       cancelled: "&cYou moved more than 5 blocks so your stuck timer was cancelled."
       running: "&cYou have already started your stuck timer."
       starting: "&aAttempting to find a safe nearby location..."
-      none: "&cNo safe location was found."
       success: "&aYou have been teleported to the Wilderness nearby."
     focus:
       self: "&cYou cannot focus your own faction."

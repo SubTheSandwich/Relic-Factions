@@ -16,6 +16,8 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -30,10 +32,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class UserInteractAtFactionEvent implements Listener {
 
@@ -373,9 +374,6 @@ public class UserInteractAtFactionEvent implements Listener {
 
     @EventHandler
     public void onChange(SignChangeEvent e) {
-
-        // TODO: This
-
         Player p = e.getPlayer();
         User user = User.get(p);
         Location location = e.getBlock().getLocation();
@@ -392,13 +390,23 @@ public class UserInteractAtFactionEvent implements Listener {
             return;
         }
 
+        Block block = e.getBlock();
+        List<Component> lines = e.lines();
+        if (block.getState() instanceof Sign sign) {
+            List<Component> oldLines = sign.getSide(e.getSide()).lines();
+            if (C.serialize(oldLines.getFirst()).equalsIgnoreCase(C.chat("&9[Elevator]")) && !C.serialize(lines.getFirst()).equals("[Elevator]")) {
+                e.line(0, Component.text(C.strip(C.serialize(e.line(0)))));
+                return;
+            }
+        }
+
         String line0 = C.serialize(e.line(0));
         String line1 = C.serialize(e.line(1));
 
         if (!line0.equalsIgnoreCase("[Elevator]")) return;
         if (!line1.equalsIgnoreCase("Up") && !line1.equalsIgnoreCase("Down")) return;
 
-        e.line(0, Component.text("&9[Elevator]"));
+        e.line(0, Component.text(C.chat("&9[Elevator]")));
     }
 
     @EventHandler
@@ -450,6 +458,57 @@ public class UserInteractAtFactionEvent implements Listener {
         e.setCancelled(isCrowbar(p.getInventory().getItemInMainHand()));
         if (a.equals(Action.RIGHT_CLICK_BLOCK)) {
             Block block = e.getClickedBlock();
+            if (block != null && block.getState() instanceof Sign sign) {
+                List<Component> lines = sign.getSide(Side.FRONT).lines();
+                if (!C.serialize(lines.getFirst()).equalsIgnoreCase(C.chat("&9[Elevator]"))) return;
+                e.setCancelled(true);
+                String type = C.serialize(lines.get(1));
+                if (!type.equalsIgnoreCase("up") && !type.equalsIgnoreCase("down")) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.error"))));
+                    return;
+                }
+                int x = block.getX();
+                int z = block.getZ();
+                int y = block.getY();
+                int maxY = block.getWorld().getMaxHeight();
+                int minY = block.getWorld().getMinHeight();
+
+                Location target = null;
+
+                if (type.equalsIgnoreCase("up")) {
+                    for (int ny = y + 2; ny <= maxY; ny++) {
+                        Block feet = block.getWorld().getBlockAt(x, ny, z);
+                        Block head = block.getWorld().getBlockAt(x, ny + 1, z);
+                        Block below = block.getWorld().getBlockAt(x, ny - 1, z);
+                        if (isPassableForElevator(feet) && isPassableForElevator(head) && below.getType().isSolid()) {
+                            target = new Location(block.getWorld(), x + 0.5, ny, z + 0.5);
+                            break;
+                        }
+                    }
+                } else if (type.equalsIgnoreCase("down")) {
+                    for (int ny = y - 1; ny >= minY; ny--) {
+                        Block feet = block.getWorld().getBlockAt(x, ny, z);
+                        Block head = block.getWorld().getBlockAt(x, ny + 1, z);
+                        Block below = block.getWorld().getBlockAt(x, ny - 1, z);
+                        if (isPassableForElevator(feet) && isPassableForElevator(head) && below.getType().isSolid()) {
+                            target = new Location(block.getWorld(), x + 0.5, ny, z + 0.5);
+                            break;
+                        }
+                    }
+                }
+
+                if (target != null) {
+                    Location finalTarget = target;
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            p.teleport(finalTarget, PlayerTeleportEvent.TeleportCause.PLUGIN);
+                        }
+                    }.runTaskLater(Main.getInstance(), 1);
+                } else {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-safe-location"))));
+                }
+            }
             Material type = Objects.requireNonNull(block).getType();
             if (Tag.TRAPDOORS.isTagged(type) || Tag.WOODEN_DOORS.isTagged(type) || Tag.BUTTONS.isTagged(type) || Tag.ANVIL.isTagged(type)
                     || type.equals(Material.BARREL) || type.equals(Material.BEACON) || type.equals(Material.BLAST_FURNACE) || type.equals(Material.CARTOGRAPHY_TABLE)
@@ -637,5 +696,9 @@ public class UserInteractAtFactionEvent implements Listener {
         ItemMeta meta = used.getItemMeta();
         NamespacedKey use = new NamespacedKey(Main.getInstance(), "crowbar_uses");
         return meta.getPersistentDataContainer().has(use);
+    }
+
+    private boolean isPassableForElevator(Block block) {
+        return block.isEmpty() || block.isPassable();
     }
 }
