@@ -163,6 +163,18 @@ public class UserInteractAtFactionEvent implements Listener {
             return;
         }
         Block block = e.getBlock();
+
+        if (isOre(block.getType()) && Main.getInstance().getConfig().getBoolean("features.autosmelt")) {
+            Material smelted = getSmeltedResult(block.getType());
+            if (smelted != null) {
+                e.setDropItems(false);
+                block.getWorld().dropItem(block.getLocation().add(0.5, 0.5, 0.5), new ItemStack(smelted));
+                block.getWorld().spawn(block.getLocation().add(0.5, 0.5, 0.5), org.bukkit.entity.ExperienceOrb.class)
+                        .setExperience(getSmeltXP(block.getType()));
+                return;
+            }
+        }
+
         if (isPlayerPlaced(block)) {
             block.removeMetadata("playerPlaced", Main.getInstance());
             return;
@@ -732,5 +744,25 @@ public class UserInteractAtFactionEvent implements Listener {
             if (isPassableForElevator(m1) && isPassableForElevator(m2)) return new Location(loc.getWorld(), loc.getBlockX() + 0.5, k, loc.getBlockZ() + 0.5, loc.getYaw(), loc.getPitch());
         }
         return new Location(loc.getWorld(), loc.getBlockX() + 0.5, loc.getWorld().getHighestBlockYAt(loc.getBlockX(), loc.getBlockZ()), loc.getBlockZ() + 0.5, loc.getYaw(), loc.getPitch());
+    }
+
+    private Material getSmeltedResult(Material ore) {
+        return switch (ore) {
+            case IRON_ORE, DEEPSLATE_IRON_ORE -> Material.IRON_INGOT;
+            case GOLD_ORE, DEEPSLATE_GOLD_ORE, NETHER_GOLD_ORE -> Material.GOLD_INGOT;
+            case COPPER_ORE, DEEPSLATE_COPPER_ORE -> Material.COPPER_INGOT;
+            case ANCIENT_DEBRIS -> Material.NETHERITE_SCRAP;
+            case NETHER_QUARTZ_ORE -> Material.QUARTZ;
+            default -> null;
+        };
+    }
+
+    private int getSmeltXP(Material ore) {
+        return switch (ore) {
+            case IRON_ORE, DEEPSLATE_IRON_ORE, GOLD_ORE, DEEPSLATE_GOLD_ORE, NETHER_GOLD_ORE, COPPER_ORE,
+                 DEEPSLATE_COPPER_ORE -> 1;
+            case ANCIENT_DEBRIS, NETHER_QUARTZ_ORE -> 2;
+            default -> 0;
+        };
     }
 }

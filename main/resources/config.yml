@@ -192,6 +192,7 @@ scoreboard:
     line: "&d&l%type%&7: &c%time%"
 
 features:
+  autosmelt: true
   scoreboard:
     enabled: true
     line-limit: 2

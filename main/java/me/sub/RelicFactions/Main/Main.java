@@ -45,8 +45,7 @@ import java.util.stream.Collectors;
 
 public class Main extends JavaPlugin {
 
-    // TODO: Listeners (ex. entity limiter,
-    // TODO: beacon strength, autosmelt, hide other players in safezone)
+    // TODO: Listeners (ex. hide other players in safezone)
 
     // TODO: notes command, tablist
 
