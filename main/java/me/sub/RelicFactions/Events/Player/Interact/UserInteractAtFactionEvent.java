@@ -25,6 +25,7 @@ import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
@@ -390,6 +391,8 @@ public class UserInteractAtFactionEvent implements Listener {
             return;
         }
 
+        if (!Main.getInstance().getConfig().getBoolean("elevators.sign")) return;
+
         Block block = e.getBlock();
         List<Component> lines = e.lines();
         if (block.getState() instanceof Sign sign) {
@@ -700,5 +703,34 @@ public class UserInteractAtFactionEvent implements Listener {
 
     private boolean isPassableForElevator(Block block) {
         return block.isEmpty() || block.isPassable();
+    }
+
+    @EventHandler
+    public void onMinecart(VehicleEnterEvent e) {
+        if (!Main.getInstance().getConfig().getBoolean("elevators.minecart")) return;
+        if (e.getVehicle() instanceof org.bukkit.entity.Minecart && e.getEntered() instanceof Player p) {
+            if (User.get(p) == null) return;
+            if (User.get(p).getModMode() != null) {
+                e.setCancelled(true);
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.mod-mode.cant"))));
+                return;
+            }
+            Location l = e.getVehicle().getLocation();
+            Location loc = new Location(p.getWorld(), l.getBlockX(), l.getBlockY(), l.getBlockZ(), p.getLocation().getYaw(), p.getLocation().getPitch());
+            Material m = loc.getBlock().getType();
+            if (Tag.FENCE_GATES.isTagged(m) || loc.getBlock().getState() instanceof Sign) {
+                e.setCancelled(true);
+                p.teleport(teleportSpot(loc, loc.getBlockY(), loc.getWorld().getMaxHeight() - 1));
+            }
+        }
+    }
+
+    public Location teleportSpot(Location loc, int min, int max) {
+        for (int k = min; k < max; k++) {
+            Block m1 = (new Location(loc.getWorld(), loc.getBlockX(), k, loc.getBlockZ())).getBlock();
+            Block m2 = (new Location(loc.getWorld(), loc.getBlockX(), (k + 1), loc.getBlockZ())).getBlock();
+            if (isPassableForElevator(m1) && isPassableForElevator(m2)) return new Location(loc.getWorld(), loc.getBlockX() + 0.5, k, loc.getBlockZ() + 0.5, loc.getYaw(), loc.getPitch());
+        }
+        return new Location(loc.getWorld(), loc.getBlockX() + 0.5, loc.getWorld().getHighestBlockYAt(loc.getBlockX(), loc.getBlockZ()), loc.getBlockZ() + 0.5, loc.getYaw(), loc.getPitch());
     }
 }

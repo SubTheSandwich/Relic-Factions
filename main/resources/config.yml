@@ -98,6 +98,10 @@ elo:
     enable: true
     points-on-win: 25
 
+elevators:
+  sign: true
+  minecart: true
+
 factions:
   dtr:
     max: 5.5
