@@ -575,6 +575,10 @@ commands:
       self: "&cYou cannot focus your own faction."
       unfocused: "&eYou are no longer focusing any faction."
       focus: "&eYou are now focusing &d%faction%&e."
+    leader:
+      self: "&eYou have transferred ownership of your faction to &b%player%&e."
+      other: "&eYou are now the leader of &b%faction%&e."
+      no: "&cYou cannot leader yourself."
   economy:
     set: "&eYou have set the balance of &b%player% &eto &d%amount%&e."
     give: "&eYou have added &d%amount% &eto &b%player%&e's balance."

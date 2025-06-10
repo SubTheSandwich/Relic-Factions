@@ -1227,6 +1227,38 @@ public class FactionCommand implements TabExecutor {
                 }
                 return true;
             }
+            if (args[0].equalsIgnoreCase("leader")) {
+                if (!user.hasFaction()) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
+                    return true;
+                }
+                Faction faction = Faction.get(user.getFaction());
+                if (faction.getRoleID(p.getUniqueId()) != 3) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.leader"))));
+                    return true;
+                }
+                User play = User.get(args[1]);
+                if (play == null) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-player"))));
+                    return true;
+                }
+                if (!play.hasFaction() || !play.getFaction().equals(user.getFaction())) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.not-in"))));
+                    return true;
+                }
+                if (play.getUUID().equals(p.getUniqueId())) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.leader.no"))));
+                    return true;
+                }
+                faction.setLeader(play.getUUID());
+                faction.getMembers().put(play.getUUID(), 3);
+                faction.getMembers().put(p.getUniqueId(), 2);
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.leader.self")).replace("%player%", play.getName())));
+                if (Bukkit.getPlayer(play.getUUID()) != null) {
+                    Objects.requireNonNull(Bukkit.getPlayer(play.getUUID())).sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.leader.other")).replace("%faction%", faction.getName())));
+                }
+                return true;
+            }
             Messages.send(p, "faction.help.main", s);
             return true;
         }
@@ -1472,7 +1504,7 @@ public class FactionCommand implements TabExecutor {
             values.addAll(List.of("create", "open", "show", "deposit", "invite", "join", "withdraw",
                     "subclaim", "captain", "coleader", "invites", "announcement", "uninvite", "leave", "kick",
                     "sethome", "claim", "home", "list", "unclaim", "rename", "disband", "ff", "chat", "ally",
-                    "unally", "focus", "stuck"));
+                    "unally", "focus", "stuck", "leader"));
             if (Permission.has(p, "faction.createsystem")) values.add("createsystem");
             if (Permission.has(p, "faction.setcolor")) values.add("setcolor");
             if (Permission.has(p, "faction.settype")) values.add("settype");

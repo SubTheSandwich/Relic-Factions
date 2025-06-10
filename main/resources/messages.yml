@@ -116,6 +116,7 @@ faction:
       - "&e/%alias% coleader &7- Shows coleader management commands"
       - "&e/%alias% rename <name> &7- Renames your faction"
       - "&e/%alias% disband &7- Disbands your faction"
+      - "&e/%alias% leader <player> &7- Transfers ownership of your faction"
       - "&7&m----------------------------------------------------"
     captain:
       - "&7&m----------------------------------------------------"
