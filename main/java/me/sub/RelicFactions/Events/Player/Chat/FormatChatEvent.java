@@ -3,7 +3,9 @@ package me.sub.RelicFactions.Events.Player.Chat;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.User;
+import me.sub.RelicFactions.Files.Data.PlayerTimer;
 import me.sub.RelicFactions.Files.Enums.ChatType;
+import me.sub.RelicFactions.Files.Enums.Timer;
 import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
@@ -12,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -45,6 +48,23 @@ public class FormatChatEvent implements Listener {
             e.setCancelled(true);
             String finalMessage = message.substring(1);
             if (finalMessage.isEmpty()) return;
+            if (Main.getInstance().getChat().isMuted()) {
+                if (!p.hasPermission("relic.bypass.chat")) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.chat.chat-muted"))));
+                    return;
+                }
+            }
+            if (Main.getInstance().getChat().getSlowMode() != 0) {
+                if (!p.hasPermission("relic.bypass.chat")) {
+                    if (user.hasTimer("chat")) {
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.chat.chat-slowed")).replace("%time%", Timer.getMessageFormat(user.getTimer("chat").getDuration()))));
+                        return;
+                    } else {
+                        PlayerTimer timer = new PlayerTimer(p.getUniqueId(), Timer.CHAT, BigDecimal.valueOf(Main.getInstance().getChat().getSlowMode()));
+                        user.addTimer(timer);
+                    }
+                }
+            }
             Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
                 for (Player recipient : recipients) {
                     if (!User.get(recipient).isGlobalChat()) continue;
@@ -85,6 +105,23 @@ public class FormatChatEvent implements Listener {
         // ChatType logic
         if (user.getChatType().equals(ChatType.PUBLIC)) {
             e.setCancelled(true);
+            if (Main.getInstance().getChat().isMuted()) {
+                if (!p.hasPermission("relic.bypass.chat")) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.chat.chat-muted"))));
+                    return;
+                }
+            }
+            if (Main.getInstance().getChat().getSlowMode() != 0) {
+                if (!p.hasPermission("relic.bypass.chat")) {
+                    if (user.hasTimer("chat")) {
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.chat.chat-slowed")).replace("%time%", Timer.getMessageFormat(user.getTimer("chat").getDuration()))));
+                        return;
+                    } else {
+                        PlayerTimer timer = new PlayerTimer(p.getUniqueId(), Timer.CHAT, BigDecimal.valueOf(Main.getInstance().getChat().getSlowMode()));
+                        user.addTimer(timer);
+                    }
+                }
+            }
             Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
                 for (Player recipient : recipients) {
                     if (!User.get(recipient).isGlobalChat()) continue;

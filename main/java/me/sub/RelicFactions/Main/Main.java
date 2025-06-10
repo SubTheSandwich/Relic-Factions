@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 
 public class Main extends JavaPlugin {
 
-    // TODO: More Listeners, Manage Chat Commands
+    // TODO: More Listeners
 
     // TODO: Tab List
 
@@ -75,6 +75,7 @@ public class Main extends JavaPlugin {
     public HashMap<UUID, RunningKOTH> runningKOTHS = new HashMap<>();
     private RunningConquest runningConquest = null;
 
+    private final Chat chat;
 
     public HashMap<UUID, FastBoard> boards = new HashMap<>();
 
@@ -92,7 +93,12 @@ public class Main extends JavaPlugin {
     }
 
     public Main() {
+        chat = new Chat();
         instance = this;
+    }
+
+    public Chat getChat() {
+        return chat;
     }
 
     public RunningConquest getRunningConquest() {
@@ -174,6 +180,7 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("heal")).setExecutor(new HealCommand()); Objects.requireNonNull(getCommand("heal")).setTabCompleter(new HealCommand());
         Objects.requireNonNull(getCommand("feed")).setExecutor(new FeedCommand()); Objects.requireNonNull(getCommand("feed")).setTabCompleter(new FeedCommand());
         Objects.requireNonNull(getCommand("notes")).setExecutor(new NotesCommand()); Objects.requireNonNull(getCommand("notes")).setTabCompleter(new NotesCommand());
+        Objects.requireNonNull(getCommand("chat")).setExecutor(new ChatCommand()); Objects.requireNonNull(getCommand("chat")).setTabCompleter(new ChatCommand());
 
         // User
         Objects.requireNonNull(getCommand("faction")).setExecutor(new FactionCommand()); Objects.requireNonNull(getCommand("faction")).setTabCompleter(new FactionCommand());

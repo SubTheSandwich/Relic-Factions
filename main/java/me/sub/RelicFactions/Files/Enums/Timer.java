@@ -24,7 +24,8 @@ public enum Timer {
     LFF(Main.getInstance().getConfig().getInt("timers.lff")),
     REQUEST(Main.getInstance().getConfig().getInt("timers.request")),
     REPORT(Main.getInstance().getConfig().getInt("timers.report")),
-    LOGOUT(Main.getInstance().getConfig().getInt("timers.logout"));
+    LOGOUT(Main.getInstance().getConfig().getInt("timers.logout")),
+    CHAT(Main.getInstance().getChat().getSlowMode());
 
     private final int duration;
 

@@ -168,7 +168,7 @@ public class PlayerTimer {
                     cancel();
                     return;
                 }
-                Objects.requireNonNull(player).sendMessage(Objects.requireNonNull(C.chat(Locale.get().getString("events.timer.player.expire." + timer.name().toLowerCase()) == null ? Objects.requireNonNull(Locale.get().getString("events.timer.player.expire.default")).replace("%timer%", timer.name()) : Objects.requireNonNull(Locale.get().getString("events.timer.expire." + timer.name().toLowerCase())))));
+                Objects.requireNonNull(player).sendMessage(Objects.requireNonNull(C.chat(Locale.get().getString("events.timer.player.expire." + timer.name().toLowerCase()) == null ? Objects.requireNonNull(Locale.get().getString("events.timer.player.expire.default")).replace("%timer%", timer.name()) : Objects.requireNonNull(Locale.get().getString("events.timer.player.expire." + timer.name().toLowerCase())))));
                 user.removeTimer(timer.name());
                 cancel();
             }

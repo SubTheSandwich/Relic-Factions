@@ -170,6 +170,7 @@ public class Faction {
                     isDeathban() ? "faction.deathban" : "faction.non-deathban"
             );
         }
+        baseName += "&r";
         return C.chat(baseName);
     }
 

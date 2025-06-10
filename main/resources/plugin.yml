@@ -131,3 +131,5 @@ commands:
     description: Conquest
   notes:
     description: Notes
+  chat:
+    description: Chat

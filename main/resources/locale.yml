@@ -116,6 +116,7 @@ events:
       start: # no default
         combat: "&eYou have been spawn-tagged for &c30 &eseconds!"
       expire:
+        chat: "&eYou may chat again."
         default: "&eYour &b%timer% &etimer has expired."
       cooldown:
         default: "&cYou cannot do this for &l%time%"
@@ -123,7 +124,7 @@ events:
 chat:
   public:
     no-faction: "&7[*] &r%player%&7: &r%message%"
-    faction: "&7[%faction%&7] &r%player%&7: &r%message%"
+    faction: "&7[%faction%&r&7] &r%player%&7: &r%message%"
   faction: "&a(Faction) &r%player%&7: &r%message%"
   ally: "&3(Ally) &r%player%&7: &r%message%"
 
@@ -155,6 +156,14 @@ faction:
     damage: "&eBe careful, &e%player% &eis an ally."
 
 commands:
+  chat:
+    cleared: "&eThe chat has been cleared."
+    muted: "&eThe chat has been muted."
+    unmuted: "&eThe chat is no longer muted."
+    chat-muted: "&cThe chat is currently muted!"
+    slowed: "&eThe chat is now slowed for %time% seconds."
+    unslowed: "&eThe chat is no longer slowed."
+    chat-slowed: "&cThe chat is currently slowed. You may type again in &l%time%&c."
   notes:
     usage: "&cUsage: /notes <add/remove/view> <player> <data>"
     none: "&cThe specified player does not have any notes."

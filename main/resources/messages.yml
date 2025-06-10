@@ -25,6 +25,14 @@ help:
     - "&eRules: &d%website%/rules"
     - "&eStore: &d%store%/"
     - "&7&m----------------------------------------------------"
+  chat:
+    - "&7&m----------------------------------------------------"
+    - "%primary%&lChat %secondary%Help"
+    - "&7&m----------------------------------------------------"
+    - "&e/chat mute - Mutes or unmutes the chat"
+    - "&e/chat clear - Clears the chat of all messages"
+    - "&e/chat slow <time> - Slows the chat"
+    - "&7&m----------------------------------------------------"
   economy:
     - "&7&m----------------------------------------------------"
     - "%primary%&lEconomy %secondary%Help"

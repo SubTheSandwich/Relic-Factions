@@ -16,7 +16,7 @@ public class EnchantLimitEvents implements Listener {
     @EventHandler
     public void onEnchant(EnchantItemEvent e) {
         Player p = e.getEnchanter();
-        if (Permission.has(p, "admin") || p.hasPermission("relic.bypass-limiters")) return;
+        if (Permission.has(p, "admin") || p.hasPermission("relic.bypass.enchant-limiters")) return;
         for (Enchantment enchantment : e.getEnchantsToAdd().keySet()) {
             for (String s : Main.getInstance().getConfig().getStringList("limiters.enchants")) {
                 String name = s.split(";")[0];
@@ -35,7 +35,7 @@ public class EnchantLimitEvents implements Listener {
         Player p = (Player) e.getWhoClicked();
         if (e.getClickedInventory() == null) return;
         if (e.getView().getType().equals(InventoryType.ANVIL)) {
-            if (Permission.has(p, "admin") || p.hasPermission("relic.bypass-limiters")) return;
+            if (Permission.has(p, "admin") || p.hasPermission("relic.bypass.enchant-limiters")) return;
             if (e.getSlot() != 2) return;
             if (e.getClickedInventory().getItem(2) == null) return;
             ItemStack item = e.getClickedInventory().getItem(2);

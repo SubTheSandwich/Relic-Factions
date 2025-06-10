@@ -4,11 +4,13 @@ import me.sub.RelicFactions.Main.Main;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.md_5.bungee.api.ChatColor;
 
 import java.util.Objects;
 
 public class C {
 
+    @SuppressWarnings("deprecation")
     public static String chat(String s) {
         if (s.contains("%primary%")) s = s.replace("%primary%", Objects.requireNonNull(C.convertFromName(Main.getInstance().getConfig().getString("server.color.primary"))));
         if (s.contains("%secondary%")) s = s.replace("%secondary%", Objects.requireNonNull(C.convertFromName(Main.getInstance().getConfig().getString("server.color.secondary"))));
@@ -20,7 +22,7 @@ public class C {
         if (s.contains("%discord%")) s = s.replace("%discord%", Objects.requireNonNull(Main.getInstance().getConfig().getString("server.discord")));
         if (s.contains("%website%")) s = s.replace("%website%", Objects.requireNonNull(Main.getInstance().getConfig().getString("server.website")));
         if (s.contains("%store%")) s = s.replace("%store%", Objects.requireNonNull(Main.getInstance().getConfig().getString("server.store")));
-        return serialize(LegacyComponentSerializer.legacyAmpersand().deserialize(s));
+        return ChatColor.translateAlternateColorCodes('&', s);
     }
 
     public static String chat(String s, String alias) {
