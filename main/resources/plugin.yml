@@ -129,3 +129,5 @@ commands:
     description: Mountain
   conquest:
     description: Conquest
+  notes:
+    description: Notes

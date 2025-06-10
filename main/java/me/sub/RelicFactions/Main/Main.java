@@ -47,7 +47,7 @@ public class Main extends JavaPlugin {
 
     // TODO: Listeners (ex. hide other players in safezone)
 
-    // TODO: notes command, tablist
+    // TODO: tablist
 
     /*
 
@@ -173,6 +173,7 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("panic")).setExecutor(new PanicCommand()); Objects.requireNonNull(getCommand("panic")).setTabCompleter(new PanicCommand());
         Objects.requireNonNull(getCommand("heal")).setExecutor(new HealCommand()); Objects.requireNonNull(getCommand("heal")).setTabCompleter(new HealCommand());
         Objects.requireNonNull(getCommand("feed")).setExecutor(new FeedCommand()); Objects.requireNonNull(getCommand("feed")).setTabCompleter(new FeedCommand());
+        Objects.requireNonNull(getCommand("notes")).setExecutor(new NotesCommand()); Objects.requireNonNull(getCommand("notes")).setTabCompleter(new NotesCommand());
 
         // User
         Objects.requireNonNull(getCommand("faction")).setExecutor(new FactionCommand()); Objects.requireNonNull(getCommand("faction")).setTabCompleter(new FactionCommand());
@@ -214,6 +215,7 @@ public class Main extends JavaPlugin {
         pm.registerEvents(new SettingsInteractEvent(), this);
         pm.registerEvents(new BlockCommandEvent(), this);
         pm.registerEvents(new EnchantLimitEvents(), this);
+        pm.registerEvents(new NotesInteractEvent(), this);
 
         // Server
         pm.registerEvents(new ListenerEvents(), this);
@@ -392,6 +394,7 @@ public class Main extends JavaPlugin {
             userData.get().set("customTimers", Maps.serializeCustomMap(user.getCustomTimers()));
             userData.get().set("lastInventoryContents", Maps.toBase64(user, user.getLastInventoryContents()));
             userData.get().set("playtime", user.getStoredPlaytime());
+            userData.get().set("notes", Note.serializeList(user.getNotes()));
             userData.get().set("settings.global-chat", user.isGlobalChat());
             userData.get().set("settings.messages.enabled", user.isMessages());
             userData.get().set("settings.messages.sounds", user.isMessageSounds());

@@ -2,6 +2,30 @@ filler:
   enabled: true
   item: GRAY_STAINED_GLASS_PANE
 
+notes-view: # notes will only be filled in the first 4 rows (aka 36 notes each page). Notes menu is 54 size
+  name: "&aNotes View"
+  items:
+    page:
+      name: "&ePage %page%"
+      item: PAPER
+      slot: 49
+    next:
+      name: "&eNext Page"
+      item: ARROW
+      slot: 50
+    previous:
+      name: "&ePrevious Page"
+      item: ARROW
+      slot: 48
+    note: # base format for notes
+      item: WRITABLE_BOOK
+      name: "&eNote &b#%id%"
+      lore:
+        - "&6Given By&7: &e%giver%"
+        - "&6Timestamp&7: &e%timestamp%"
+        - "&6Text&7: &e%text%"
+
+
 settings:
   name: "&aSettings"
   size: 45

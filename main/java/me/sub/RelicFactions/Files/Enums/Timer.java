@@ -5,6 +5,9 @@ import me.sub.RelicFactions.Utils.Calculate;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Calendar;
 
@@ -159,5 +162,11 @@ public enum Timer {
                     .append(seconds == 1 ? "" : "s");
         }
         return format.toString();
+    }
+
+    public static String formatTimestamp(long timestamp) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy 'at' h:mm:ss a")
+                .withZone(ZoneId.systemDefault());
+        return formatter.format(Instant.ofEpochMilli(timestamp));
     }
 }

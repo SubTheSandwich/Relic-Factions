@@ -158,6 +158,7 @@ public class UserRegisterEvent implements Listener {
             public void run() {
                 if (!Main.getInstance().getConfig().getBoolean("features.scoreboard.enabled")) return;
                 FastBoard board = Main.getInstance().boards.getOrDefault(p.getUniqueId(), null);
+
                 ArrayList<String> lines = new ArrayList<>();
                 if (board == null) {
                     board = new FastBoard(p);

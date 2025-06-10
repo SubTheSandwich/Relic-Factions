@@ -11,10 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class User {
 
@@ -64,6 +61,7 @@ public class User {
     private boolean foundDiamonds;
     private Location stuckLocation;
     private boolean mountains;
+    private ArrayList<Note> notes;
 
     public User(UserData userData) {
         userDisconnected = true;
@@ -110,7 +108,7 @@ public class User {
         quartzMined = userData.get().getInt("ores.quartz");
         debrisMined = userData.get().getInt("ores.debris");
         stuckLocation = null;
-
+        notes = Note.deserializeList(userData.get().getString("notes"));
         modified = false;
         lastMessaged = null;
         revived = false;
@@ -564,5 +562,23 @@ public class User {
 
     public void setStuckLocation(Location stuckLocation) {
         this.stuckLocation = stuckLocation;
+    }
+
+    public ArrayList<Note> getNotes() {
+        return notes;
+    }
+
+    public void setNotes(ArrayList<Note> notes) {
+        modified = true;
+        this.notes = notes;
+    }
+
+    public List<Note> getNotesOnPage(int page) {
+        int start = (page - 1) * 36;
+        int end = Math.min(start + 36, notes.size());
+        if (start >= notes.size() || page < 1) {
+            return Collections.emptyList();
+        }
+        return notes.subList(start, end);
     }
 }

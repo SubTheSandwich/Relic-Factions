@@ -155,6 +155,17 @@ faction:
     damage: "&eBe careful, &e%player% &eis an ally."
 
 commands:
+  notes:
+    usage: "&cUsage: /notes <add/remove/view> <player> <data>"
+    none: "&cThe specified player does not have any notes."
+    view:
+      invalid-page: "&cThe specified page is invalid."
+      success: "&eViewing &dpage %page% &eof &b%player%'s &enotes..."
+    remove:
+      invalid-id: "&cThe specified ID is invalid."
+      success: "&eYou have removed a note with &dID %id% &efrom &b%player%"
+    add:
+      success: "&eYou have added a note to &b%player% &ewith the text: &d%text%"
   conquest:
     usage: "&cUsage: /conquest <name> <create/delete/start/stop/setarea/setpoints>"
     already-exists: "&7[Conquest] &eConquest &6%conquest% &ealready exists."
