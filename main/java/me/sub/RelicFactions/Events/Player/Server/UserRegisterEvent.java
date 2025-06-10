@@ -56,14 +56,16 @@ public class UserRegisterEvent implements Listener {
             if (entity == null || entity.isDead()) {
                 user.setDeaths(user.getDeaths() + 1);
                 // TODO: EOTW
-                int time = User.getDeathbanTime(p);
-                Calendar calendar = Calendar.getInstance();
-                calendar.add(Calendar.MINUTE, time);
-                long deathban = calendar.getTimeInMillis();
-                user.setDeathbannedTill(deathban);
-                user.setDeathBanned(true);
-                p.kick(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("events.deathban.kick")).replace("%time%", Timer.getMessageFormat(deathban - System.currentTimeMillis())))));
                 user.getTimers().clear();
+                if (Main.getInstance().getConfig().getBoolean("features.deathban")) {
+                    int time = User.getDeathbanTime(p);
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.add(Calendar.MINUTE, time);
+                    long deathban = calendar.getTimeInMillis();
+                    user.setDeathbannedTill(deathban);
+                    user.setDeathBanned(true);
+                    p.kick(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("events.deathban.kick")).replace("%time%", Timer.getMessageFormat(deathban - System.currentTimeMillis())))));
+                }
                 if (user.hasFaction()) {
                     Faction faction = Faction.get(user.getFaction());
                     faction.setDTR(BigDecimal.valueOf(Calculate.round(Math.max(-0.99, faction.getDTR().doubleValue() - Main.getInstance().getConfig().getDouble("factions.dtr.death")), 2)));
@@ -78,24 +80,25 @@ public class UserRegisterEvent implements Listener {
             p.setHealth(entity.getHealth());
             entity.remove();
         }
-        if (user.isDeathBanned()) {
-            long time = user.getDeathbannedTill();
-            if (time - System.currentTimeMillis() <= 0) {
-                user.setDeathbannedTill(0);
-                user.setDeathBanned(false);
-            } else {
-                if (user.getLives() > 0) {
-                    user.setLives(user.getLives() - 1);
-                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.deathban.used-life"))));
+        if (Main.getInstance().getConfig().getBoolean("features.deathban")) {
+            if (user.isDeathBanned()) {
+                long time = user.getDeathbannedTill();
+                if (time - System.currentTimeMillis() <= 0) {
                     user.setDeathbannedTill(0);
                     user.setDeathBanned(false);
                 } else {
-                    p.kick(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("events.deathban.kick")).replace("%time%", Timer.getMessageFormat(user.getDeathbannedTill() - System.currentTimeMillis())))));
-                    return;
+                    if (user.getLives() > 0) {
+                        user.setLives(user.getLives() - 1);
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.deathban.used-life"))));
+                        user.setDeathbannedTill(0);
+                        user.setDeathBanned(false);
+                    } else {
+                        p.kick(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("events.deathban.kick")).replace("%time%", Timer.getMessageFormat(user.getDeathbannedTill() - System.currentTimeMillis())))));
+                        return;
+                    }
                 }
             }
         }
-
         if (user.isRevived()) {
             user.setRevived(false);
             if (user.getLastInventoryContents() != null) {

@@ -41,6 +41,11 @@ public class NotesCommand implements TabExecutor {
             return true;
         }
 
+        if (!Main.getInstance().getConfig().getBoolean("features.notes")) {
+            sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.feature-disabled"))));
+            return true;
+        }
+
         if (args.length < 2) {
             p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.notes.usage"))));
             return true;

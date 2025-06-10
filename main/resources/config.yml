@@ -192,6 +192,13 @@ scoreboard:
     line: "&d&l%type%&7: &c%time%"
 
 features:
+  deathbans: true
+  staff-chat: true
+  report: true
+  notes: true
+  request: true
+  msg: true
+  hidden-safezone-players: false
   autosmelt: true
   scoreboard:
     enabled: true

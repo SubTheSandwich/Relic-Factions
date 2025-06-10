@@ -3,6 +3,7 @@ package me.sub.RelicFactions.Files.Data;
 import java.util.*;
 
 import me.sub.RelicFactions.Main.Main;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -156,5 +157,17 @@ public class Cuboid {
         // Check if any part of the cuboid is outside the border square (centered at 0,0)
         // This assumes the border is a square from -border to +border on X and Z
         return xMin < -border || xMax > border || zMin < -border || zMax > border;
+    }
+
+    public List<Player> getPlayersCurrentlyIn() {
+        List<Player> players = new ArrayList<>();
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            Location clone = player.getLocation().clone();
+            clone.setY(0);
+            if (isIn(clone)) {
+                players.add(player);
+            }
+        }
+        return players;
     }
 }

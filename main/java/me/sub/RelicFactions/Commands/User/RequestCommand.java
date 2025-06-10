@@ -25,6 +25,11 @@ public class RequestCommand implements TabExecutor {
             return true;
         }
 
+        if (!Main.getInstance().getConfig().getBoolean("features.request")) {
+            sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.feature-disabled"))));
+            return true;
+        }
+
         User user = User.get(p);
         if (user.hasTimer("request")) {
             p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.request.cooldown"))));

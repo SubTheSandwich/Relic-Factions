@@ -29,6 +29,11 @@ public class StaffChatCommand implements TabExecutor {
             return true;
         }
 
+        if (!Main.getInstance().getConfig().getBoolean("features.staff-chat")) {
+            sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.feature-disabled"))));
+            return true;
+        }
+
         User user = User.get(p);
 
         if (args.length == 0) {

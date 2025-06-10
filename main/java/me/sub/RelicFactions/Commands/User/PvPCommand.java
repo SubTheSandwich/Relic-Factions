@@ -5,6 +5,7 @@ import me.sub.RelicFactions.Files.Data.PlayerTimer;
 import me.sub.RelicFactions.Files.Enums.Timer;
 import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Files.Normal.Messages;
+import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
 import me.sub.RelicFactions.Utils.Permission;
 import org.bukkit.command.Command;
@@ -45,6 +46,10 @@ public class PvPCommand implements TabExecutor {
         if (args.length == 2 && args[0].equalsIgnoreCase("revive")) {
             if (!(sender instanceof Player p)) {
                 sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.not-player"))));
+                return true;
+            }
+            if (!Main.getInstance().getConfig().getBoolean("features.deathban")) {
+                sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.feature-disabled"))));
                 return true;
             }
             User user = User.get(p);

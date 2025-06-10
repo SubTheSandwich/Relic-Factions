@@ -2,6 +2,7 @@ package me.sub.RelicFactions.Commands.Admin;
 
 import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Normal.Locale;
+import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
 import me.sub.RelicFactions.Utils.Permission;
 import org.bukkit.command.Command;
@@ -20,6 +21,12 @@ public class ReviveCommand implements TabExecutor {
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
             return true;
         }
+
+        if (!Main.getInstance().getConfig().getBoolean("features.deathban")) {
+            sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.feature-disabled"))));
+            return true;
+        }
+
         if (args.length != 1) {
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.revive.usage"))));
             return true;

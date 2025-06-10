@@ -2,6 +2,7 @@ package me.sub.RelicFactions.Commands.User;
 
 import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Normal.Locale;
+import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
 import me.sub.RelicFactions.Utils.Permission;
 import org.bukkit.Bukkit;
@@ -20,6 +21,11 @@ import java.util.Objects;
 public class MessageCommand implements TabExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
+
+        if (!Main.getInstance().getConfig().getBoolean("features.msg")) {
+            sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.feature-disabled"))));
+            return true;
+        }
 
         if (args.length < 2) {
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.message.usage")), s));

@@ -487,15 +487,16 @@ public class UserDamageEvents implements Listener {
         // TODO: EOTW
 
         e.getEntity().getWorld().strikeLightningEffect(e.getEntity().getLocation());
-
-        int time = User.getDeathbanTime(p);
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MINUTE, time);
-        long deathban = calendar.getTimeInMillis();
-        user.setDeathbannedTill(deathban);
-        user.setDeathBanned(true);
         user.getTimers().clear();
-        p.kick(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("events.deathban.kick")).replace("%time%", Timer.getMessageFormat(deathban - System.currentTimeMillis())))));
+        if (Main.getInstance().getConfig().getBoolean("features.deathban")) {
+            int time = User.getDeathbanTime(p);
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.MINUTE, time);
+            long deathban = calendar.getTimeInMillis();
+            user.setDeathbannedTill(deathban);
+            user.setDeathBanned(true);
+            p.kick(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("events.deathban.kick")).replace("%time%", Timer.getMessageFormat(deathban - System.currentTimeMillis())))));
+        }
         if (user.hasFaction()) {
             Faction faction = Faction.get(user.getFaction());
             if (Main.getInstance().getConfig().getBoolean("elo.enable")) {

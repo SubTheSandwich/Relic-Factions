@@ -143,35 +143,34 @@ public class Faction {
 
     public String getValidName(Player p, boolean includeDeathban) {
         User user = User.get(p);
-        String validName;
+        String baseName;
         if (factionType.equals(FactionType.PLAYER)) {
             if (!user.hasFaction()) {
-                validName = C.chat("&c" + name);
+                baseName = "&c" + name;
             } else {
                 if (user.getFaction().equals(uuid)) {
-                    validName = C.chat("&a" + name);
+                    baseName = "&a" + name;
                 } else if (Faction.get(user.getFaction()).getAllies().contains(uuid)) {
-                    validName = C.chat("&9" + name);
+                    baseName = "&9" + name;
                 } else {
-                    validName = C.chat("&c" + name);
+                    baseName = "&c" + name;
                 }
             }
         } else if (factionType.equals(FactionType.MOUNTAIN)) {
-            validName = C.chat(color.toColorCode() + name + " Mountain");
+            baseName = color.toColorCode() + name + " Mountain";
         } else if (factionType.equals(FactionType.KOTH)) {
-            validName = C.chat(color.toColorCode() + name + " KOTH");
+            baseName = color.toColorCode() + name + " KOTH";
         } else if (factionType.equals(FactionType.ROAD)) {
-            validName = C.chat(color.toColorCode() + name + " Road");
+            baseName = color.toColorCode() + name + " Road";
         } else {
-            validName = C.chat(color.toColorCode() + name);
+            baseName = color.toColorCode() + name;
         }
         if (includeDeathban) {
-            validName += " ";
-            validName += isDeathban()
-                    ? Locale.get().getString("faction.deathban")
-                    : Locale.get().getString("faction.non-deathban");
+            baseName += " " + Locale.get().getString(
+                    isDeathban() ? "faction.deathban" : "faction.non-deathban"
+            );
         }
-        return validName;
+        return C.chat(baseName);
     }
 
     public boolean isDeathban() {
@@ -433,5 +432,15 @@ public class Faction {
 
     public void setFocusedFaction(UUID focusedFaction) {
         this.focusedFaction = focusedFaction;
+    }
+
+    public Cuboid getCuboidAtLocation(Location location) {
+        Location clone = location.clone();
+        clone.setY(0);
+        if (claims == null || claims.isEmpty()) return null;
+        for (Cuboid cuboid : claims) {
+            if (cuboid.isIn(clone)) return cuboid;
+        }
+        return null;
     }
 }

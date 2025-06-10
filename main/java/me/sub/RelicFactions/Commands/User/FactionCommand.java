@@ -633,6 +633,10 @@ public class FactionCommand implements TabExecutor {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
                     return true;
                 }
+                if (!Main.getInstance().getConfig().getBoolean("features.deathban")) {
+                    sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.feature-disabled"))));
+                    return true;
+                }
                 Faction faction = Faction.get(user.getFaction());
                 if (faction.getLives() == 0) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.lives.not-enough"))));

@@ -45,9 +45,9 @@ import java.util.stream.Collectors;
 
 public class Main extends JavaPlugin {
 
-    // TODO: Listeners (ex. hide other players in safezone)
+    // TODO: More Listeners, Manage Chat Commands
 
-    // TODO: tablist
+    // TODO: Tab List
 
     /*
 

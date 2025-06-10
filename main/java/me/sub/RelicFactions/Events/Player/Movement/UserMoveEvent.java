@@ -4,6 +4,7 @@ import me.sub.RelicFactions.Commands.User.FactionCommand;
 import me.sub.RelicFactions.Events.Player.Interact.UserClaimEvents;
 import me.sub.RelicFactions.Files.Classes.*;
 import me.sub.RelicFactions.Files.Data.ClaimBufferManager;
+import me.sub.RelicFactions.Files.Data.Cuboid;
 import me.sub.RelicFactions.Files.Data.PlayerTimer;
 import me.sub.RelicFactions.Files.Enums.FactionType;
 import me.sub.RelicFactions.Files.Normal.Locale;
@@ -419,7 +420,6 @@ public class UserMoveEvent implements Listener {
                 }
                 setTimerPaused(user, true);
             }
-
             String leave = isWilderness(from, used) ? Locale.get().getString("faction.wilderness") + " " + Locale.get().getString("faction.deathban") : Locale.get().getString("faction.warzone") + " " + Locale.get().getString("faction.deathban");
             sendLeaveEnter(p, leave, factionTo.getValidName(p, true));
         } else if (factionTo == null) {
@@ -428,7 +428,9 @@ public class UserMoveEvent implements Listener {
 
             if (factionFrom.getType().equals(FactionType.SAFEZONE)) setTimerPaused(user, false);
         } else {
-            if (factionFrom == factionTo) return false;
+            if (factionFrom == factionTo) {
+                return false;
+            }
             if (factionTo.getType().equals(FactionType.PLAYER)) {
                 if (user.hasTimer("pvp") || user.hasTimer("starting")) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.movement.deny.pvp"))));
@@ -443,6 +445,37 @@ public class UserMoveEvent implements Listener {
             sendLeaveEnter(p, factionFrom.getValidName(p, true), factionTo.getValidName(p, true));
             setTimerPaused(user, factionTo.getType().equals(FactionType.SAFEZONE));
         }
+
+        // --- Safezone Hide/Show Logic ---
+        boolean hideSafezonePlayers = Main.getInstance().getConfig().getBoolean("features.hidden-safezone-players");
+        boolean notInModMode = user.getModMode() == null;
+
+        // Hide players when entering a safezone
+        if (factionTo != null && factionTo.getType().equals(FactionType.SAFEZONE) && hideSafezonePlayers && notInModMode) {
+            Cuboid cuboid = factionTo.getCuboidAtLocation(to);
+            if (cuboid != null) {
+                for (Player other : cuboid.getPlayersCurrentlyIn()) {
+                    if (!other.equals(p)) {
+                        p.hidePlayer(Main.getInstance(), other);
+                        other.hidePlayer(Main.getInstance(), p);
+                    }
+                }
+            }
+        }
+
+        // Show players when leaving a safezone
+        if (factionFrom != null && factionFrom.getType().equals(FactionType.SAFEZONE) && hideSafezonePlayers && notInModMode) {
+            Cuboid cuboid = factionFrom.getCuboidAtLocation(from);
+            if (cuboid != null) {
+                for (Player other : cuboid.getPlayersCurrentlyIn()) {
+                    if (!other.equals(p)) {
+                        p.showPlayer(Main.getInstance(), other);
+                        other.showPlayer(Main.getInstance(), p);
+                    }
+                }
+            }
+        }
+
         return false;
     }
 

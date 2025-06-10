@@ -2,6 +2,7 @@ package me.sub.RelicFactions.Commands.User;
 
 import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Normal.Locale;
+import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
 import me.sub.RelicFactions.Utils.Permission;
 import org.bukkit.Bukkit;
@@ -22,6 +23,11 @@ public class ReplyCommand implements TabExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String @NotNull [] args) {
         if (!(sender instanceof Player p)) {
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.not-player"))));
+            return true;
+        }
+
+        if (!Main.getInstance().getConfig().getBoolean("features.msg")) {
+            sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.feature-disabled"))));
             return true;
         }
 
