@@ -262,10 +262,17 @@ public class FactionCommand implements TabExecutor {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.unclaim.none"))));
                     return true;
                 }
+                Faction fac = Faction.getAt(p.getLocation());
+                if (fac == null || !faction.getUUID().equals(fac.getUUID())) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.unclaim.not-in"))));
+                    return true;
+                }
                 for (Player player : faction.getOnlineMembers()) {
                     player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.unclaim.success")).replace("%player%", p.getName())));
                 }
-                faction.setClaims(new ArrayList<>());
+                ArrayList<Cuboid> claims = faction.getClaims();
+                claims.remove(faction.getCuboidAtLocation(p.getLocation()));
+                faction.setClaims(claims);
                 return true;
             }
             if (args[0].equalsIgnoreCase("ff")) {
@@ -420,6 +427,23 @@ public class FactionCommand implements TabExecutor {
                 PlayerTimer timer = new PlayerTimer(p.getUniqueId(), Timer.HOME, BigDecimal.valueOf(duration));
                 user.addTimer(timer);
                 p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.home.waiting")).replace("%time%", duration + "")));
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("forceunclaim")) {
+                if (!Permission.has(p, "faction.forceunclaim")) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
+                    return true;
+                }
+                Faction faction = Faction.getAt(p.getLocation());
+                if (faction == null) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.forceunclaim.none"))));
+                    return true;
+                }
+                Cuboid cuboid = faction.getCuboidAtLocation(p.getLocation());
+                ArrayList<Cuboid> claims = faction.getClaims();
+                claims.remove(cuboid);
+                faction.setClaims(claims);
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.forceunclaim.success")).replace("%faction%", faction.getName())));
                 return true;
             }
 
@@ -1514,8 +1538,14 @@ public class FactionCommand implements TabExecutor {
             if (Permission.has(p, "faction.setdeathban")) values.add("setdeathban");
             if (Permission.has(p, "faction.setregening")) values.add("setregening");
             if (Permission.has(p, "faction.setdtr")) values.add("setdtr");
+            if (Permission.has(p, "faction.forceunclaim")) values.add("forceunclaim");
         }
         if (args.length == 2) {
+            if (args[0].equalsIgnoreCase("forceunclaim") && Permission.has(p, "faction.forceunclaim")) {
+                values.addAll(Main.getInstance().factionNameHolder.values().stream()
+                        .map(Faction::getName)
+                        .toList());
+            }
             if ((args[0].equalsIgnoreCase("claimfor") && Permission.has(p, "faction.claimfor"))
                     || (args[0].equalsIgnoreCase("setcolor") && Permission.has(p, "faction.setcolor"))
                     || (args[0].equalsIgnoreCase("settype") && Permission.has(p, "faction.settype"))

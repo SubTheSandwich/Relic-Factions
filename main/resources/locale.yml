@@ -558,6 +558,7 @@ commands:
       none: "&cThere are no factions to list."
     unclaim:
       none: "&cYour faction does not have a claim."
+      not-in: "&cYou are not in your claim."
       success: "&3%player% has removed the faction claim."
     rename: "&3%player% has renamed the faction to %faction%"
     disband:
@@ -609,6 +610,9 @@ commands:
       self: "&eYou have transferred ownership of your faction to &b%player%&e."
       other: "&eYou are now the leader of &b%faction%&e."
       no: "&cYou cannot leader yourself."
+    forceunclaim:
+      none: "&cYou are not standing in a faction."
+      success: "&eYou have removed the current claim from &b%faction%&e."
   economy:
     set: "&eYou have set the balance of &b%player% &eto &d%amount%&e."
     give: "&eYou have added &d%amount% &eto &b%player%&e's balance."
