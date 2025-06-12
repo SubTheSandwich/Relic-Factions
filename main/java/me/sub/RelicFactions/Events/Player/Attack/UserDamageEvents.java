@@ -4,6 +4,7 @@ import me.sub.RelicFactions.Events.Player.Interact.UserInteractAtFactionEvent;
 import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.RunningConquest;
 import me.sub.RelicFactions.Files.Classes.User;
+import me.sub.RelicFactions.Files.Data.HCFClass;
 import me.sub.RelicFactions.Files.Data.PlayerTimer;
 import me.sub.RelicFactions.Files.Data.ServerTimer;
 import me.sub.RelicFactions.Files.Enums.FactionType;
@@ -22,6 +23,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 
 import java.math.BigDecimal;
@@ -55,6 +58,7 @@ public class UserDamageEvents implements Listener {
         if (damagerUser.getModMode() != null) {
             if (damagerUser.getModMode().isInBypass()) {
                 generateCombat(hit, damager);
+                if (hitUser.hasTimer("archermark")) e.setDamage(e.getDamage() * Main.getInstance().getConfig().getDouble("kits.archer.multiplier"));
                 return;
             }
             e.setCancelled(true);
@@ -123,6 +127,7 @@ public class UserDamageEvents implements Listener {
             }
             e.setDamage(e.getDamage() * Main.getInstance().getConfig().getDouble("factions.allies.attacking.damage-multiplier"));
             generateCombat(hit, damager);
+            if (hitUser.hasTimer("archermark")) e.setDamage(e.getDamage() * Main.getInstance().getConfig().getDouble("kits.archer.multiplier"));
             return;
         }
 
@@ -133,10 +138,37 @@ public class UserDamageEvents implements Listener {
                 return;
             }
             generateCombat(hit, damager);
+            if (hitUser.hasTimer("archermark")) e.setDamage(e.getDamage() * Main.getInstance().getConfig().getDouble("kits.archer.multiplier"));
             return;
         }
 
         generateCombat(hit, damager);
+        if (hitUser.hasTimer("archermark")) e.setDamage(e.getDamage() * Main.getInstance().getConfig().getDouble("kits.archer.multiplier"));
+
+        if (damagerUser.getUserClass() != null && damagerUser.getUserClass().equals(HCFClass.ROGUE)) {
+            if (!damager.getInventory().getItemInMainHand().getType().equals(Material.GOLDEN_SWORD)) return;
+            if (!User.isBehind(damager, hit, 45.0)) return;
+            if (damagerUser.hasTimer("backstab")) {
+                String message = Locale.get().getString("events.timer.player.cooldown.backstab") == null ? Locale.get().getString("events.timer.player.cooldown.default") : Locale.get().getString("events.timer.cooldown.backstab");
+                message = Objects.requireNonNull(message).replace("%time%", Timer.format(damagerUser.getTimer("backstab").getDuration()));
+                damager.sendMessage(C.chat(message));
+                return;
+            }
+            e.setDamage(0);
+            PlayerTimer backstab = new PlayerTimer(damager.getUniqueId(), Timer.BACKSTAB);
+            damagerUser.addTimer(backstab);
+            damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.kit.rogue.backstab")).replace("%player%", hit.getName())));
+            hit.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.kit.rogue.backstabbed")).replace("%player%", damager.getName())));
+            damager.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
+            double newHealth = hit.getHealth() - 8.0;
+            PotionEffect slow = new PotionEffect(PotionEffectType.SLOWNESS, 20 * 8, 1, true, false);
+            damager.addPotionEffect(slow);
+            if (newHealth <= 0) {
+                hit.setHealth(0);
+            } else {
+                hit.setHealth(newHealth);
+            }
+        }
     }
 
     /*
@@ -394,6 +426,7 @@ public class UserDamageEvents implements Listener {
         if (damagerUser.getModMode() != null) {
             if (damagerUser.getModMode().isInBypass()) {
                 generateCombat(hit, damager);
+                if (hitUser.hasTimer("archermark")) e.setDamage(e.getDamage() * Main.getInstance().getConfig().getDouble("kits.archer.multiplier"));
                 return;
             }
             e.setCancelled(true);
@@ -462,6 +495,7 @@ public class UserDamageEvents implements Listener {
             }
             e.setDamage(e.getDamage() * Main.getInstance().getConfig().getDouble("factions.allies.attacking.damage-multiplier"));
             generateCombat(hit, damager);
+            if (hitUser.hasTimer("archermark")) e.setDamage(e.getDamage() * Main.getInstance().getConfig().getDouble("kits.archer.multiplier"));
             return;
         }
 
@@ -472,10 +506,39 @@ public class UserDamageEvents implements Listener {
                 return;
             }
             generateCombat(hit, damager);
+            if (hitUser.hasTimer("archermark")) e.setDamage(e.getDamage() * Main.getInstance().getConfig().getDouble("kits.archer.multiplier"));
             return;
         }
-
         generateCombat(hit, damager);
+        if (hitUser.hasTimer("archermark")) e.setDamage(e.getDamage() * Main.getInstance().getConfig().getDouble("kits.archer.multiplier"));
+
+        if (damagerUser.getUserClass() != null && damagerUser.getUserClass() == HCFClass.ARCHER) {
+
+            if (!(projectile instanceof Arrow arrow)) return;
+
+            Float force = Main.getInstance().arrowForceMap.remove(arrow.getUniqueId());
+            if (force == null || force < 0.95F) return;
+
+            int distance = (int) Math.round(damager.getLocation().distance(hit.getLocation()));
+            int hearts = (int) Math.round(e.getDamage() / 2);
+
+            if (hitUser.getUserClass() != null && hitUser.getUserClass() == HCFClass.ARCHER) {
+                damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.kit.archer.cannot-tag")).replace("%range%", distance + "").replace("%hearts%", hearts + "")));
+                return;
+            }
+            damager.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.kit.archer.tag")).replace("%time%", Main.getInstance().getConfig().getInt("timers.archermark") + "").replace("%range%", distance + "").replace("%hearts%", hearts + "")));
+            PlayerTimer timer = new PlayerTimer(hit.getUniqueId(), Timer.ARCHERMARK);
+            hitUser.addTimer(timer);
+        }
+    }
+
+    @EventHandler
+    public void onShoot(EntityShootBowEvent e) {
+        if (!(e.getEntity() instanceof Player)) return;
+        if (!(e.getProjectile() instanceof Arrow arrow)) return;
+
+        // Store the force for this arrow
+        Main.getInstance().arrowForceMap.put(arrow.getUniqueId(), e.getForce());
     }
 
     @EventHandler

@@ -136,7 +136,6 @@ public class UserRegisterEvent implements Listener {
             }
         }
 
-
         for (String s : Messages.get().getStringList("join-message")) {
             if (s.contains("<display=%has_faction%")) {
                 if (!user.hasFaction()) continue;
@@ -156,9 +155,11 @@ public class UserRegisterEvent implements Listener {
             Main.getInstance().userNameHolder.put(user.getName().toLowerCase(), user);
         }
         User finalUser = user;
+        user.updateClass();
         new BukkitRunnable() {
             @Override
             public void run() {
+                // TODO: Class lines
                 if (!Main.getInstance().getConfig().getBoolean("features.scoreboard.enabled")) return;
                 FastBoard board = Main.getInstance().boards.getOrDefault(p.getUniqueId(), null);
 
@@ -173,6 +174,21 @@ public class UserRegisterEvent implements Listener {
                     return;
                 }
                 for (String s : Main.getInstance().getConfig().getStringList("scoreboard.lines")) {
+
+                    if (s.contains("<display=%player_is_bard%")) {
+                        if (finalUser.getUserClass() == null || !finalUser.getUserClass().equals(HCFClass.BARD)) continue;
+                        s = s.replace("<display=%player_is_bard%", "");
+                        if (s.contains("%bard_energy%")) {
+                            s = s.replace("%bard_energy%", Calculate.round(finalUser.getBardEnergy().doubleValue(), 1) + "");
+                        }
+                    }
+
+                    if (s.contains("<display=%has_active_class")) {
+                        if (finalUser.getUserClass() == null) continue;
+                        s = s.replace("<display=%has_active_class%", "");
+                        if (s.contains("%active_class%")) s = s.replace("%active_class%", C.capitalizeWord(finalUser.getUserClass().name()));
+                    }
+
                     if (s.contains("%conquest-lines%")) {
                         if (Main.getInstance().getRunningConquest() == null) continue;
                         RunningConquest runningConquest = Main.getInstance().getRunningConquest();

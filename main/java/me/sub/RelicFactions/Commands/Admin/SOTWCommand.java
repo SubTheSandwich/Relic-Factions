@@ -34,7 +34,7 @@ public class SOTWCommand implements TabExecutor {
                 return true;
             }
             if (Main.getInstance().sotwEnabled.contains(p.getUniqueId()) && user.hasTimer("combat")) {
-                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.command.combat"))));
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.timer.player.cannot-do"))));
                 return true;
             }
             if (Main.getInstance().sotwEnabled.contains(p.getUniqueId())) {

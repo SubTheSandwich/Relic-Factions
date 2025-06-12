@@ -49,6 +49,27 @@ claiming:
     two: "&eSet position 2"
 
 events:
+  kit:
+    speed-active: "&eYou have activated your &aSpeed Effect&e."
+    jump-active: "&eYou have activated your &aJump Effect&e."
+    archer:
+      tag: "&e[&9Arrow Range &e(&c%range%&e)] &6Marked player for %time% seconds. &9(%hearts%
+        hearts)"
+      cannot-tag: "&e[&9Arrow Range &e(&c%range%&e)] &cCannot mark other Archers. &9(%hearts%
+        hearts)"
+    bard:
+      safezone: "&cYou cannot use Bard effects in Safe Zone areas."
+      not-enough: "&cYou do not have enough energy to use this effect."
+      used-effect: "&eYou used &b%effect% &efor &b%energy%&e."
+    miner:
+      invis-change: "&eMiner Invisibility: %status%"
+    rogue:
+      backstab: "&cYou backstabbed %player%"
+      backstabbed: "&cYou were backstabbed by %player%"
+    enabled:
+      - "&bClass: &b&l%name% &7--> &aEnabled!"
+      - "&bClass Info: &a%website%/%name%"
+    disabled: "&bClass: &b&l%name% &7--> &cDisabled!"
   conquest:
     started: "&7[Conquest] &eConquest &6%conquest% &ehas started."
     end:
@@ -93,8 +114,6 @@ events:
     in: "&cYou cannot do this to someone while they are in Mod Mode."
     cant: "&cYou cannot do this while in Mod Mode."
     online-staff: "&6Online Staff&7: &r%players%"
-  command:
-    combat: "&cYou cannot do this while in combat!"
   deathban:
     kick: "&cYou are currently deathbanned. \nYour deathban will expire in %time% \nBuy lives @ %store%"
     used-life: "&aYou have used a life to remove your deathban."
@@ -113,6 +132,8 @@ events:
       end: "&eYou cannot enter end whilst having a combat timer."
       cannot-claim: "&cYou cannot claim whilst having a PvP timer."
       cannot-place: "&cYou cannot place blocks while in combat."
+      cannot-do: "&cYou cannot do this while in combat!"
+      cannot-do-pvp: "&cYou cannot do this whilst having a PvP timer."
       start: # no default
         combat: "&eYou have been spawn-tagged for &c30 &eseconds!"
       expire:

@@ -30,12 +30,13 @@ public class UserMoveEvent implements Listener {
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
         Player p = e.getPlayer();
+        User user = User.get(p);
+        user.updateClass();
 
         bufferManager.updateBufferWall(p);
 
         if (Faction.getAt(e.getTo()) != null) {
             Faction faction = Faction.getAt(e.getTo());
-            User user = User.get(p);
             if (faction == null) return;
             if (faction.getType().equals(FactionType.SAFEZONE) && user.hasTimer("combat")) {
                 if (Faction.getAt(e.getFrom()) == null || !Objects.requireNonNull(Faction.getAt(e.getFrom())).getType().equals(FactionType.SAFEZONE)) {
@@ -90,7 +91,6 @@ public class UserMoveEvent implements Listener {
 
 
 
-        User user = User.get(p);
         if (user.getModMode() != null) return;
         if (user.hasTimer("pvp") || user.hasTimer("starting")) return;
         if (!user.hasFaction()) return;
@@ -255,13 +255,14 @@ public class UserMoveEvent implements Listener {
 
     @EventHandler
     public void onMove(PlayerTeleportEvent e) {
+        Player p = e.getPlayer();
+        User user = User.get(p);
+        user.updateClass();
         if (e.getFrom().getBlockX() == e.getTo().getBlockX() && e.getFrom().getBlockZ() == e.getTo().getBlockZ()) return;
         processHome(e.getPlayer());
         processLogout(e.getPlayer());
         if (notAllowed(e.getPlayer(), e.getTo(), e.getFrom())) e.setCancelled(true);
 
-        Player p = e.getPlayer();
-        User user = User.get(p);
         if (user.hasTimer("combat") && !Main.getInstance().getConfig().getBoolean("combat.allow-end-portal-enter")) {
             if (!e.getCause().equals(PlayerTeleportEvent.TeleportCause.END_PORTAL)) return;
             e.setCancelled(true);
@@ -323,6 +324,7 @@ public class UserMoveEvent implements Listener {
     public void onPortal(PlayerPortalEvent e) {
         Player p = e.getPlayer();
         User user = User.get(p);
+        user.updateClass();
         if (user.hasTimer("combat") && !Main.getInstance().getConfig().getBoolean("combat.allow-end-portal-enter")) {
             e.setCancelled(true);
             p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.timer.player.end"))));

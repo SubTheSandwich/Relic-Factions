@@ -1,14 +1,22 @@
 package me.sub.RelicFactions.Files.Classes;
 
 import me.sub.RelicFactions.Files.Data.*;
+import me.sub.RelicFactions.Files.Data.Note;
 import me.sub.RelicFactions.Files.Enums.ChatType;
 import me.sub.RelicFactions.Files.Data.CustomTimer;
+import me.sub.RelicFactions.Files.Enums.FactionType;
+import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Main.Main;
+import me.sub.RelicFactions.Utils.C;
 import me.sub.RelicFactions.Utils.Maps;
-import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -62,6 +70,8 @@ public class User {
     private Location stuckLocation;
     private boolean mountains;
     private ArrayList<Note> notes;
+    private HCFClass hcfClass;
+    private BigDecimal bardEnergy;
 
     public User(UserData userData) {
         userDisconnected = true;
@@ -112,6 +122,24 @@ public class User {
         modified = false;
         lastMessaged = null;
         revived = false;
+        hcfClass = null;
+        bardEnergy = BigDecimal.ZERO;
+    }
+
+    public BigDecimal getBardEnergy() {
+        return bardEnergy;
+    }
+
+    public void setBardEnergy(BigDecimal bardEnergy) {
+        this.bardEnergy = bardEnergy;
+    }
+
+    public HCFClass getUserClass() {
+        return hcfClass;
+    }
+
+    public void setUserClass(HCFClass hcfClass) {
+        this.hcfClass = hcfClass;
     }
 
     public UUID getLoggerUUID() {
@@ -580,5 +608,181 @@ public class User {
             return Collections.emptyList();
         }
         return notes.subList(start, end);
+    }
+
+    public void updateClass() {
+        Player player = Bukkit.getPlayer(uuid);
+        if (player == null) return;
+        HCFClass active = HCFClass.getActiveClass(player);
+        if (hcfClass != null && active == null) {
+            player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.kit.disabled")).replace("%name%", C.capitalizeWord(getUserClass().name()))));
+            for (PotionEffectType effect : hcfClass.getPassiveEffectTypes()) {
+                player.removePotionEffect(effect);
+            }
+            setUserClass(null);
+            return;
+        }
+        if (hcfClass == null && active != null) {
+            if (!Main.getInstance().getConfig().getBoolean("kits." + active.getConfigKey() + ".enabled", true)) return;
+            setUserClass(active);
+            for (String s : Locale.get().getStringList("events.kit.enabled")) {
+                s = s.replace("%name%", C.capitalizeWord(active.name()));
+                player.sendMessage(C.chat(Objects.requireNonNull(s)));
+            }
+            active.applyPassiveEffects(player);
+            // TODO: Bard energy recharge, as well as passive effects
+            if (hcfClass.equals(HCFClass.BARD)) {
+                new BukkitRunnable() {
+                    int messageDelay = 0;
+                    @Override
+                    public void run() {
+                        Player p = Bukkit.getPlayer(uuid);
+                        if (messageDelay != 0) messageDelay--;
+                        if (p == null) {
+                            setBardEnergy(BigDecimal.ZERO);
+                            cancel();
+                            return;
+                        }
+                        if (hcfClass == null || !hcfClass.equals(HCFClass.BARD)) {
+                            setBardEnergy(BigDecimal.ZERO);
+                            cancel();
+                            return;
+                        }
+                        if (getBardEnergy().doubleValue() < Main.getInstance().getConfig().getInt("kits.bard.max-energy")) setBardEnergy(getBardEnergy().add(BigDecimal.valueOf(0.05)));
+                        if (!p.getInventory().getItemInMainHand().getType().equals(Material.AIR)) {
+                            ConfigurationSection itemsSection = Main.getInstance().getConfig().getConfigurationSection("kits.bard.items");
+                            if (itemsSection == null) return;
+
+                            for (String s : itemsSection.getKeys(false)) {
+                                String basePath = "kits.bard.items." + s;
+                                if (!Main.getInstance().getConfig().getBoolean(basePath + ".hold")) continue;
+
+                                String itemName = Main.getInstance().getConfig().getString(basePath + ".item");
+                                if (itemName == null) continue;
+
+                                Material itemMaterial = Material.matchMaterial(itemName);
+                                if (itemMaterial == null) continue;
+
+                                if (!p.getInventory().getItemInMainHand().getType().equals(itemMaterial)) continue;
+
+                                if (!Main.getInstance().getConfig().getBoolean("kits.bard.hold-effects-in-spawn")) {
+                                    Faction in = Faction.getAt(p.getLocation());
+                                    if (in != null && in.getType().equals(FactionType.SAFEZONE)) {
+                                        if (messageDelay == 0) {
+                                            messageDelay = 100;
+                                            p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.kit.bard.safezone"))));
+                                            return;
+                                        }
+                                    }
+                                }
+
+                                if (hasTimer("pvp") || hasTimer("starting")) {
+                                    if (messageDelay == 0) {
+                                        messageDelay = 100;
+                                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.timer.player.cannot-do-pvp"))));
+                                        return;
+                                    }
+                                }
+
+                                String effectName = Main.getInstance().getConfig().getString(basePath + ".effect");
+                                if (effectName == null) continue;
+
+                                PotionEffectType effectType = Registry.POTION_EFFECT_TYPE.get(NamespacedKey.minecraft(effectName.toLowerCase()));
+                                if (effectType == null) continue;
+
+                                int duration = Main.getInstance().getConfig().getInt(basePath + ".duration");
+                                int amplifier = Main.getInstance().getConfig().getInt(basePath + ".amplifier");
+
+                                PotionEffect potionEffect = new PotionEffect(effectType, duration, amplifier, true, false);
+
+                                if (Main.getInstance().getConfig().getBoolean(basePath + ".applyOnBard")) {
+                                    p.addPotionEffect(potionEffect);
+                                }
+
+                                if (hasFaction()) {
+                                    Faction faction = Faction.get(getFaction());
+                                    for (Player player : faction.getOnlineMembers()) {
+                                        if (player.equals(p)) continue;
+                                        if (!player.getWorld().equals(p.getWorld())) continue;
+                                        if (player.getLocation().distance(p.getLocation()) > Main.getInstance().getConfig().getInt("kits.bard.effect-range")) continue;
+                                        player.addPotionEffect(potionEffect);
+                                    }
+                                }
+                            }
+                        }
+                        if (!p.getInventory().getItemInOffHand().getType().equals(Material.AIR)){
+                            ConfigurationSection itemsSection = Main.getInstance().getConfig().getConfigurationSection("kits.bard.items");
+                            if (itemsSection == null) return;
+
+                            for (String s : itemsSection.getKeys(false)) {
+                                String basePath = "kits.bard.items." + s;
+                                if (!Main.getInstance().getConfig().getBoolean(basePath + ".hold")) continue;
+
+                                String itemName = Main.getInstance().getConfig().getString(basePath + ".item");
+                                if (itemName == null) continue;
+
+                                Material itemMaterial = Material.matchMaterial(itemName);
+                                if (itemMaterial == null) continue;
+
+                                if (!p.getInventory().getItemInOffHand().getType().equals(itemMaterial)) continue;
+
+                                String effectName = Main.getInstance().getConfig().getString(basePath + ".effect");
+                                if (effectName == null) continue;
+
+                                PotionEffectType effectType = Registry.POTION_EFFECT_TYPE.get(NamespacedKey.minecraft(effectName.toLowerCase()));
+                                if (effectType == null) continue;
+
+                                int duration = Main.getInstance().getConfig().getInt(basePath + ".duration");
+                                int amplifier = Main.getInstance().getConfig().getInt(basePath + ".amplifier");
+
+                                PotionEffect potionEffect = new PotionEffect(effectType, duration, amplifier, true, false);
+
+                                if (Main.getInstance().getConfig().getBoolean(basePath + ".applyOnBard")) {
+                                    p.addPotionEffect(potionEffect);
+                                }
+
+                                if (hasFaction()) {
+                                    Faction faction = Faction.get(getFaction());
+                                    for (Player player : faction.getOnlineMembers()) {
+                                        if (player.equals(p)) continue;
+                                        if (!player.getWorld().equals(p.getWorld())) continue;
+                                        if (player.getLocation().distance(p.getLocation()) > Main.getInstance().getConfig().getInt("kits.bard.effect-range")) continue;
+                                        player.addPotionEffect(potionEffect);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }.runTaskTimer(Main.getInstance(), 0, 1);
+            }
+        }
+        if (hcfClass != null) {
+            if (!hcfClass.equals(HCFClass.MINER)) return;
+            double y = player.getLocation().getY();
+            if (y <= 20) {
+                if (player.hasPotionEffect(PotionEffectType.INVISIBILITY)) return;
+                player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, PotionEffect.INFINITE_DURATION, 0, true, false));
+                player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.kit.miner.invis-change")).replace("%status%", Objects.requireNonNull(player.hasPotionEffect(PotionEffectType.INVISIBILITY) ? Locale.get().getString("primary.enabled") : Locale.get().getString("primary.disabled")))));
+            } else {
+                if (!player.hasPotionEffect(PotionEffectType.INVISIBILITY)) return;
+                player.removePotionEffect(PotionEffectType.INVISIBILITY);
+                player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.kit.miner.invis-change")).replace("%status%", Objects.requireNonNull(player.hasPotionEffect(PotionEffectType.INVISIBILITY) ? Locale.get().getString("primary.enabled") : Locale.get().getString("primary.disabled")))));
+            }
+        }
+    }
+
+    public static boolean isBehind(Player attacker, Player target, double maxAngleDegrees) {
+        // 1. Target's facing direction (normalized)
+        org.bukkit.util.Vector targetFacing = target.getLocation().getDirection().setY(0).normalize();
+
+        // 2. Vector from target to attacker (normalized)
+        Vector toAttacker = attacker.getLocation().toVector().subtract(target.getLocation().toVector()).setY(0).normalize();
+
+        // 3. Calculate the angle (in degrees) between the two vectors
+        double angle = targetFacing.angle(toAttacker); // in radians
+        double angleDegrees = Math.toDegrees(angle);
+
+        // 4. Check if within allowed angle (e.g., 45 degrees)
+        return angleDegrees > (180.0 - maxAngleDegrees);
     }
 }

@@ -59,6 +59,11 @@ timers:
   request: 300
   report: 300
   logout: 30
+  bardeffect: 5
+  jumpeffect: 15
+  speedeffect: 15
+  backstab: 15
+  archermark: 10
 
 economy:
   type: en-US
@@ -155,12 +160,19 @@ scoreboard:
     - "&a&lSale&7: &c%server_sale_timer%<display=%has_server_sale_timer%"
     - "&a&lKey Sale&7: &c%server_keysale_timer%<display=%has_server_keysale_timer%"
     - "&b&lKey All&7: &c%server_keyall_timer%<display=%has_server_keyall_timer%"
+    - "&6&l%active_class%<display=%has_active_class%"
+    - " &7* &eEnergy&7: &f%bard_energy%<display=%player_is_bard%"
+    - " &7* &eEffect&7: &f%player_bardeffect_timer%<display=%has_player_bardeffect_timer%"
+    - " &7* &eSpeed&7: &f%player_speedeffect_timer%<display=%has_player_speedeffect_timer%"
+    - " &7* &eJump&7: &f%player_jumpeffect_timer%<display=%has_player_jumpeffect_timer%"
+    - " &7* &eBackstab&7: &f%player_backstab_timer%<display=%has_player_backstab_timer%"
     - "&a&lStarting&7: &c%player_starting_timer%<display=%has_player_starting_timer%"
     - "&a&lPvP Timer&7: &c%player_pvp_timer%<display=%has_player_pvp_timer%"
     - "&9&lHome&7: &c%player_home_timer%<display=%has_player_home_timer%"
     - "&5&lEnderpearl&7: &c%player_enderpearl_timer%<display=%has_player_enderpearl_timer%"
     - "&6&lApple&7: &c%player_apple_timer%<display=%has_player_apple_timer%"
     - "&6&lGApple&7: &c%player_gapple_timer%<display=%has_player_gapple_timer%"
+    - "&6&lArcher Tag&7: &c%player_archermark_timer%<display=%has_player_archermark_timer%"
     - "&c&lSpawn Tag&7: &c%player_combat_timer%<display=%has_player_combat_timer%"
     - "&a&lSOTW&7: &c%server_sotw_timer%<display=%has_server_sotw_timer%"
     - "&4&lLogout&7: &c%player_logout_timer%<display=%has_player_logout_timer%"
@@ -190,6 +202,164 @@ scoreboard:
     special: "&5&l%koth%&7: &c%time%"
   mountain:
     line: "&d&l%type%&7: &c%time%"
+
+kits:
+  archer:
+    enabled: true
+    multiplier: 1.25
+    speed:
+      item: SUGAR
+      effect: SPEED
+      duration: 160
+      amplifier: 3
+    jump:
+      item: FEATHER
+      effect: JUMP_BOOST
+      duration: 140
+      amplifier: 6
+  bard:
+    enabled: true
+    effect-range: 20
+    max-energy: 100
+    click-effects-combat: true
+    hold-effects-in-spawn: true
+    click-effects-in-spawn: false
+    items:
+      strength_hold:
+        name: Strength I
+        item: BLAZE_POWDER
+        energy: 0
+        hold: true
+        effect: STRENGTH
+        duration: 100
+        amplifier: 0
+        applyOnBard: false
+        otherFaction: false
+      resistance_hold:
+        name: Resistance I
+        item: IRON_INGOT
+        energy: 0
+        hold: true
+        effect: RESISTANCE
+        duration: 100
+        amplifier: 0
+        applyOnBard: true
+        otherFaction: false
+      jumpboost_hold:
+        name: Jump Boost II
+        item: FEATHER
+        energy: 0
+        hold: true
+        effect: JUMP_BOOST
+        duration: 100
+        amplifier: 1
+        applyOnBard: true
+        otherFaction: false
+      speed_hold:
+        name: Speed II
+        item: SUGAR
+        energy: 0
+        hold: true
+        effect: SPEED
+        duration: 100
+        amplifier: 1
+        applyOnBard: true
+        otherFaction: false
+      fireres_hold:
+        name: Fire Resistance I
+        item: MAGMA_CREAM
+        energy: 0
+        hold: true
+        effect: FIRE_RESISTANCE
+        duration: 100
+        amplifier: 0
+        applyOnBard: true
+        otherFaction: false
+      regen_hold:
+        name: Regeneration I
+        item: GHAST_TEAR
+        energy: 0
+        hold: true
+        effect: REGENERATION
+        duration: 160
+        amplifier: 0
+        applyOnBard: true
+        otherFaction: false
+      strength_click:
+        name: Strength II
+        item: BLAZE_POWDER
+        energy: 45
+        hold: false
+        effect: STRENGTH
+        duration: 110
+        amplifier: 1
+        applyOnBard: true
+        otherFaction: false
+      resistance_click:
+        name: Resistance II
+        item: IRON_INGOT
+        energy: 40
+        hold: false
+        effect: RESISTANCE
+        duration: 110
+        amplifier: 1
+        applyOnBard: true
+        otherFaction: false
+      jumpboost_click:
+        name: Jump Boost VII
+        item: FEATHER
+        energy: 20
+        hold: false
+        effect: JUMP_BOOST
+        duration: 110
+        amplifier: 6
+        applyOnBard: true
+        otherFaction: false
+      speed_click:
+        name: Speed III
+        item: SUGAR
+        energy: 30
+        hold: false
+        effect: SPEED
+        duration: 110
+        amplifier: 2
+        applyOnBard: true
+        otherFaction: false
+      wither_click:
+        name: Wither I
+        item: SPIDER_EYE
+        energy: 40
+        hold: false
+        effect: WITHER
+        duration: 110
+        amplifier: 0
+        applyOnBard: false
+        otherFaction: true
+      regen_click:
+        name: Regeneration II
+        item: GHAST_TEAR
+        energy: 35
+        hold: false
+        effect: REGENERATION
+        duration: 110
+        amplifier: 1
+        applyOnBard: true
+        otherFaction: false
+  miner:
+    enabled: true
+    invis-level: 20
+  rogue:
+    enabled: true
+    speed:
+      item: SUGAR
+      effect: SPEED
+      duration: 160
+      amplifier: 4
+    jump:
+      item: FEATHER
+      effect: JUMP_BOOST
+      duration: 140
+      amplifier: 6
 
 features:
   deathbans: true

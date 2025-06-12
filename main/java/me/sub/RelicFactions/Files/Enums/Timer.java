@@ -25,7 +25,12 @@ public enum Timer {
     REQUEST(Main.getInstance().getConfig().getInt("timers.request")),
     REPORT(Main.getInstance().getConfig().getInt("timers.report")),
     LOGOUT(Main.getInstance().getConfig().getInt("timers.logout")),
-    CHAT(Main.getInstance().getChat().getSlowMode());
+    CHAT(Main.getInstance().getChat().getSlowMode()),
+    BACKSTAB(Main.getInstance().getConfig().getInt("timers.backstab")),
+    BARDEFFECT(Main.getInstance().getConfig().getInt("timers.bardeffect")),
+    SPEEDEFFECT(Main.getInstance().getConfig().getInt("timers.speedeffect")),
+    JUMPEFFECT(Main.getInstance().getConfig().getInt("timers.jumpeffect")),
+    ARCHERMARK(Main.getInstance().getConfig().getInt("timers.archermark"));
 
     private final int duration;
 

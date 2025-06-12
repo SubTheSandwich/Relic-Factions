@@ -3,6 +3,7 @@ package me.sub.RelicFactions.Main;
 import me.sub.RelicFactions.Commands.Admin.*;
 import me.sub.RelicFactions.Commands.Staff.*;
 import me.sub.RelicFactions.Commands.User.*;
+import me.sub.RelicFactions.Events.Player.Armor.HCFClassEvent;
 import me.sub.RelicFactions.Events.Player.Attack.UserDamageEvents;
 import me.sub.RelicFactions.Events.Player.Chat.FormatChatEvent;
 import me.sub.RelicFactions.Events.Player.Commands.BlockCommandEvent;
@@ -45,9 +46,7 @@ import java.util.stream.Collectors;
 
 public class Main extends JavaPlugin {
 
-    // TODO: More Listeners
-
-    // TODO: Tab List
+    // TODO: More Listeners, Tab List, Force Unclaim
 
     /*
 
@@ -74,6 +73,8 @@ public class Main extends JavaPlugin {
 
     public HashMap<UUID, RunningKOTH> runningKOTHS = new HashMap<>();
     private RunningConquest runningConquest = null;
+
+    public final Map<UUID, Float> arrowForceMap = new HashMap<>();
 
     private final Chat chat;
 
@@ -223,6 +224,7 @@ public class Main extends JavaPlugin {
         pm.registerEvents(new BlockCommandEvent(), this);
         pm.registerEvents(new EnchantLimitEvents(), this);
         pm.registerEvents(new NotesInteractEvent(), this);
+        pm.registerEvents(new HCFClassEvent(), this);
 
         // Server
         pm.registerEvents(new ListenerEvents(), this);
