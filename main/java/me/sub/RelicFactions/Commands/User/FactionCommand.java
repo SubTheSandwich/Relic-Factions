@@ -222,7 +222,7 @@ public class FactionCommand implements TabExecutor {
                 return true;
             }
             if (args[0].equalsIgnoreCase("bypass")) {
-                if (!Permission.has(p, "faction.bypass")) {
+                if (!Permission.has(p, "faction.bypass", "admin")) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
                     return true;
                 }
@@ -434,7 +434,7 @@ public class FactionCommand implements TabExecutor {
                 return true;
             }
             if (args[0].equalsIgnoreCase("forceunclaim")) {
-                if (!Permission.has(p, "faction.forceunclaim")) {
+                if (!Permission.has(p, "faction.forceunclaim", "admin")) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
                     return true;
                 }
@@ -455,6 +455,136 @@ public class FactionCommand implements TabExecutor {
             return true;
         }
         if (args.length == 2) {
+            if (args[0].equalsIgnoreCase("forcepromote")) {
+                if (!Permission.has(p, "faction.forcepromote", "admin")) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
+                    return true;
+                }
+                User promo = User.get(args[1]);
+                if (promo == null) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-player"))));
+                    return true;
+                }
+                if (!promo.hasFaction()) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.not-in"))));
+                    return true;
+                }
+                Faction faction = Faction.get(promo.getFaction());
+                if (faction.getLeader().equals(promo.getUUID())) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.forcepromote.cannot-more")).replace("%player%", promo.getName())));
+                    return true;
+                }
+                HashMap<UUID, Integer> members = faction.getMembers();
+                members.put(promo.getUUID(), members.get(promo.getUUID()) + 1);
+                if (members.get(promo.getUUID()) == 3) {
+                    members.put(faction.getLeader(), 2);
+                    faction.setLeader(promo.getUUID());
+                }
+                faction.setMembers(members);
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.forcepromote.success")).replace("%player%", promo.getName()).replace("%role%", faction.getRoleName(promo.getUUID()))));
+                Player player = Bukkit.getPlayer(promo.getUUID());
+                if (player != null) player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.forcepromote.player")).replace("%player%", user.getName()).replace("%role%", faction.getRoleName(promo.getUUID()))));
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("forcedemote")) {
+                if (!Permission.has(p, "faction.forcedemote", "admin")) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
+                    return true;
+                }
+                User promo = User.get(args[1]);
+                if (promo == null) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-player"))));
+                    return true;
+                }
+                if (!promo.hasFaction()) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.not-in"))));
+                    return true;
+                }
+                Faction faction = Faction.get(promo.getFaction());
+                if (faction.getMembers().get(promo.getUUID()) == 0) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.forcedemote.cannot-more")).replace("%player%", promo.getName())));
+                    return true;
+                }
+                HashMap<UUID, Integer> members = faction.getMembers();
+                if (members.size() == 1) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.forcedemote.cannot-more")).replace("%player%", promo.getName())));
+                    return true;
+                }
+                if (members.get(promo.getUUID()) == 3) {
+                    List<UUID> coleaders = new ArrayList<>();
+                    List<UUID> captains = new ArrayList<>();
+                    List<UUID> normalMembers = new ArrayList<>();
+
+                    for (Map.Entry<UUID, Integer> entry : members.entrySet()) {
+                        int role = entry.getValue();
+                        if (role == 2) {
+                            coleaders.add(entry.getKey());
+                        } else if (role == 1) {
+                            captains.add(entry.getKey());
+                        } else if (role == 0) {
+                            normalMembers.add(entry.getKey());
+                        }
+                    }
+
+                    Random random = new Random();
+                    UUID selectedUUID = null;
+
+                    if (!coleaders.isEmpty()) {
+                        selectedUUID = coleaders.get(random.nextInt(coleaders.size()));
+                    } else if (!captains.isEmpty()) {
+                        selectedUUID = captains.get(random.nextInt(captains.size()));
+                    } else if (!normalMembers.isEmpty()) {
+                        selectedUUID = normalMembers.get(random.nextInt(normalMembers.size()));
+                    }
+                    faction.setLeader(selectedUUID);
+                    members.put(selectedUUID, 3);
+                    members.put(promo.getUUID(), 2);
+                    if (selectedUUID == null) throw new NullPointerException("Selected UUID was null when it should not be.");
+                    Player select = Bukkit.getPlayer(selectedUUID);
+                    if (select != null) select.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.forcepromote.player")).replace("%player%", user.getName()).replace("%role%", faction.getRoleName(selectedUUID))));
+                } else {
+                    members.put(promo.getUUID(), members.get(promo.getUUID()) - 1);
+                }
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.forcedemote.success")).replace("%player%", promo.getName()).replace("%role%", faction.getRoleName(promo.getUUID()))));
+                Player player = Bukkit.getPlayer(promo.getUUID());
+                if (player != null) player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.forcedemote.player")).replace("%player%", user.getName()).replace("%role%", faction.getRoleName(promo.getUUID()))));
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("forcedisband")) {
+                Faction faction = Faction.get(args[1]);
+                if (faction == null) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.faction-only"))));
+                    return true;
+                }
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.forcedisband.success")).replace("%faction%", faction.getName())));
+                if (faction.getType() == FactionType.PLAYER) {
+                    for (Player player : faction.getOnlineMembers()) {
+                        player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.forcedisband.bc")).replace("%player%", p.getName())));
+                    }
+                    for (UUID uuid : faction.getMembers().keySet()) {
+                        User member = User.get(uuid);
+                        member.setFaction(null);
+                    }
+                    for (UUID uuid : faction.getAllies()) {
+                        Faction fac = Faction.get(uuid);
+                        if (fac == null) continue;
+                        ArrayList<UUID> allies = fac.getAllies();
+                        allies.remove(uuid);
+                        fac.setAllies(allies);
+                    }
+                    for (UUID uuid : faction.getAllyRequests()) {
+                        Faction fac = Faction.get(uuid);
+                        if (fac == null) continue;
+                        ArrayList<UUID> allies = fac.getAllyRequests();
+                        allies.remove(uuid);
+                        fac.setAllyRequests(allies);
+                    }
+                }
+                faction.getFactionData().delete();
+                Main.getInstance().factionNameHolder.remove(faction.getName().toLowerCase());
+                Main.getInstance().factions.remove(faction.getUUID());
+                return true;
+            }
             if (args[0].equalsIgnoreCase("focus")) {
                 if (!user.hasFaction()) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
@@ -754,7 +884,7 @@ public class FactionCommand implements TabExecutor {
                 return true;
             }
             if (args[0].equalsIgnoreCase("setregening")) {
-                if (!Permission.has(p, "faction.setregening")) {
+                if (!Permission.has(p, "faction.setregening", "admin")) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
                     return true;
                 }
@@ -779,7 +909,7 @@ public class FactionCommand implements TabExecutor {
                 return true;
             }
             if (args[0].equalsIgnoreCase("claimfor")) {
-                if (!Permission.has(p, "faction.claimfor")) {
+                if (!Permission.has(p, "faction.claimfor", "admin")) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
                     return true;
                 }
@@ -867,7 +997,7 @@ public class FactionCommand implements TabExecutor {
                 return true;
             }
             if (args[0].equalsIgnoreCase("createsystem")) {
-                if (!Permission.has(p, "faction.createsystem")) {
+                if (!Permission.has(p, "faction.createsystem", "admin")) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
                     return true;
                 }
@@ -921,6 +1051,34 @@ public class FactionCommand implements TabExecutor {
                     return true;
                 }
                 p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.doesnt-exist"))));
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("forcejoin")) {
+                if (!Permission.has(p, "faction.forcejoin", "admin")) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
+                    return true;
+                }
+                if (user.getFaction() != null) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.have"))));
+                    return true;
+                }
+                Faction faction = Faction.get(args[1]);
+                if (faction == null) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.doesnt-exist"))));
+                    return true;
+                }
+                if (faction.getType() != FactionType.PLAYER) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.player-only"))));
+                    return true;
+                }
+                for (Player player : faction.getOnlineMembers()) {
+                    player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.forcejoin.bc")).replace("%player%", p.getName())));
+                }
+                HashMap<UUID, Integer> members = faction.getMembers();
+                members.put(p.getUniqueId(), 0);
+                faction.setMembers(members);
+                user.setFaction(faction.getUUID());
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.faction.forcejoin.success")).replace("%faction%", faction.getName())));
                 return true;
             }
             if (args[0].equalsIgnoreCase("join")) {
@@ -1178,7 +1336,7 @@ public class FactionCommand implements TabExecutor {
                 return true;
             }
             if (args[0].equalsIgnoreCase("setdeathban")) {
-                if (!Permission.has(p, "faction.setlocation")) {
+                if (!Permission.has(p, "faction.setlocation", "admin")) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
                     return true;
                 }
@@ -1198,7 +1356,7 @@ public class FactionCommand implements TabExecutor {
                 return true;
             }
             if (args[0].equalsIgnoreCase("setlocation")) {
-                if (!Permission.has(p, "faction.setlocation")) {
+                if (!Permission.has(p, "faction.setlocation", "admin")) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
                     return true;
                 }
@@ -1413,7 +1571,7 @@ public class FactionCommand implements TabExecutor {
                 return true;
             }
             if (args[0].equalsIgnoreCase("setdtr")) {
-                if (!Permission.has(p, "faction.setbalance")) {
+                if (!Permission.has(p, "faction.setbalance", "admin")) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
                     return true;
                 }
@@ -1442,7 +1600,7 @@ public class FactionCommand implements TabExecutor {
                 return true;
             }
             if (args[0].equalsIgnoreCase("setbalance")) {
-                if (!Permission.has(p, "faction.setbalance")) {
+                if (!Permission.has(p, "faction.setbalance", "admin")) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
                     return true;
                 }
@@ -1471,7 +1629,7 @@ public class FactionCommand implements TabExecutor {
                 return true;
             }
             if (args[0].equalsIgnoreCase("setcolor")) {
-                if (!Permission.has(p, "faction.setcolor")) {
+                if (!Permission.has(p, "faction.setcolor", "admin")) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
                     return true;
                 }
@@ -1494,7 +1652,7 @@ public class FactionCommand implements TabExecutor {
                 return true;
             }
             if (args[0].equalsIgnoreCase("settype")) {
-                if (!Permission.has(p, "faction.settype")) {
+                if (!Permission.has(p, "faction.settype", "admin")) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
                     return true;
                 }
@@ -1533,36 +1691,44 @@ public class FactionCommand implements TabExecutor {
                     "subclaim", "captain", "coleader", "invites", "announcement", "uninvite", "leave", "kick",
                     "sethome", "claim", "home", "list", "unclaim", "rename", "disband", "ff", "chat", "ally",
                     "unally", "focus", "stuck", "leader"));
-            if (Permission.has(p, "faction.createsystem")) values.add("createsystem");
-            if (Permission.has(p, "faction.setcolor")) values.add("setcolor");
-            if (Permission.has(p, "faction.settype")) values.add("settype");
-            if (Permission.has(p, "faction.setlocation")) values.add("setlocation");
-            if (Permission.has(p, "faction.bypass")) values.add("bypass");
-            if (Permission.has(p, "faction.setbalance")) values.add("setbalance");
-            if (Permission.has(p, "faction.setdeathban")) values.add("setdeathban");
-            if (Permission.has(p, "faction.setregening")) values.add("setregening");
-            if (Permission.has(p, "faction.setdtr")) values.add("setdtr");
-            if (Permission.has(p, "faction.forceunclaim")) values.add("forceunclaim");
+            if (Permission.has(p, "faction.createsystem", "admin")) values.add("createsystem");
+            if (Permission.has(p, "faction.setcolor", "admin")) values.add("setcolor");
+            if (Permission.has(p, "faction.settype", "admin")) values.add("settype");
+            if (Permission.has(p, "faction.setlocation", "admin")) values.add("setlocation");
+            if (Permission.has(p, "faction.bypass", "admin")) values.add("bypass");
+            if (Permission.has(p, "faction.setbalance", "admin")) values.add("setbalance");
+            if (Permission.has(p, "faction.setdeathban", "admin")) values.add("setdeathban");
+            if (Permission.has(p, "faction.setregening", "admin")) values.add("setregening");
+            if (Permission.has(p, "faction.setdtr", "admin")) values.add("setdtr");
+            if (Permission.has(p, "faction.forceunclaim", "admin")) values.add("forceunclaim");
+            if (Permission.has(p, "faction.forcejoin", "admin")) values.add("forcejoin");
+            if (Permission.has(p, "faction.forcedisband", "admin")) values.add("forcedisband");
+            if (Permission.has(p, "faction.forcepromote", "admin")) values.add("forcepromote");
+            if (Permission.has(p, "faction.forcedemote", "admin")) values.add("forcedemote");
         }
         if (args.length == 2) {
-            if (args[0].equalsIgnoreCase("forceunclaim") && Permission.has(p, "faction.forceunclaim")) {
+            if ((args[0].equalsIgnoreCase("forceunclaim") && Permission.has(p, "faction.forceunclaim", "admin"))
+            || (args[0].equalsIgnoreCase("forcedisband") && Permission.has(p, "faction.forcedisband", "admin"))
+                    || (args[0].equalsIgnoreCase("forcepromote") && Permission.has(p, "faction.forcepromote", "admin"))
+                    || (args[0].equalsIgnoreCase("forcedemote") && Permission.has(p, "faction.forcedemote", "admin"))) {
                 values.addAll(Main.getInstance().factionNameHolder.values().stream()
                         .map(Faction::getName)
                         .toList());
             }
-            if ((args[0].equalsIgnoreCase("claimfor") && Permission.has(p, "faction.claimfor"))
-                    || (args[0].equalsIgnoreCase("setcolor") && Permission.has(p, "faction.setcolor"))
-                    || (args[0].equalsIgnoreCase("settype") && Permission.has(p, "faction.settype"))
-                    || (args[0].equalsIgnoreCase("setlocation") && Permission.has(p, "faction.setlocation"))
-                    || (args[0].equalsIgnoreCase("setdeathban") && Permission.has(p, "faction.setdeathban"))) {
+            if ((args[0].equalsIgnoreCase("claimfor") && Permission.has(p, "faction.claimfor", "admin"))
+                    || (args[0].equalsIgnoreCase("setcolor") && Permission.has(p, "faction.setcolor", "admin"))
+                    || (args[0].equalsIgnoreCase("settype") && Permission.has(p, "faction.settype", "admin"))
+                    || (args[0].equalsIgnoreCase("setlocation") && Permission.has(p, "faction.setlocation", "admin"))
+                    || (args[0].equalsIgnoreCase("setdeathban") && Permission.has(p, "faction.setdeathban", "admin"))) {
                 values.addAll(Main.getInstance().factionNameHolder.values().stream()
                         .filter(faction -> faction.getType() != FactionType.PLAYER)
                         .map(Faction::getName)
                         .toList());
             }
-            if ((args[0].equalsIgnoreCase("setbalance") && Permission.has(p, "faction.setbalance"))
-            || (args[0].equalsIgnoreCase("setregening") && Permission.has(p, "faction.setregening"))
-                    || (args[0].equalsIgnoreCase("setdtr") && Permission.has(p, "faction.setdtr"))) {
+            if ((args[0].equalsIgnoreCase("setbalance") && Permission.has(p, "faction.setbalance", "admin"))
+            || (args[0].equalsIgnoreCase("setregening") && Permission.has(p, "faction.setregening", "admin"))
+                    || (args[0].equalsIgnoreCase("setdtr") && Permission.has(p, "faction.setdtr", "admin"))
+                    || (args[0].equalsIgnoreCase("forcejoin") && Permission.has(p, "faction.forcejoin", "admin"))) {
                 values.addAll(Main.getInstance().factionNameHolder.values().stream()
                         .filter(faction -> faction.getType() == FactionType.PLAYER)
                         .map(Faction::getName)

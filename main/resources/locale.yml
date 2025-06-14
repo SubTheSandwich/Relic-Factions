@@ -21,7 +21,7 @@ primary:
     full: "&cThe specified faction is full."
     wrong-type: "&cYou may only perform this command on non-PLAYER factions."
     player-only: "&cYou may only perform this command on PLAYER factions."
-    not-in: "&cThe specified player is not a member of your faction."
+    not-in: "&cThe specified player is not a member of the faction."
   none: "None"
   error: "&cAn unknown error occurred."
   enabled: "&aEnabled"
@@ -628,6 +628,20 @@ commands:
     forceunclaim:
       none: "&cYou are not standing in a faction."
       success: "&eYou have removed the current claim from &b%faction%&e."
+    forcejoin:
+      success: "&eYou have forcefully joined &d%faction%"
+      bc: "&e%player% has &lforcefully joined &ethe faction."
+    forcedisband:
+      success: "&eYou have forcefully disbanded &b%faction%&e."
+      bc: "&c&l%player% has forcefully disbanded your faction."
+    forcepromote:
+      cannot-more: "&cYou cannot promote &l%player% &canymore."
+      success: "&eYou have forcefully promoted &b%player% &eto &d%role%&e."
+      player: "&eYou have been &lforcefully promoted &eto &d%role% &eby &b%player%&e."
+    forcedemote:
+      cannot-more: "&cYou cannot demote &l%player% &canymore."
+      success: "&eYou have forcefully demoted &b%player% &eto &d%role%&e."
+      player: "&eYou have been &lforcefully demoted &eto &d%role% &eby &b%player%&e."
   economy:
     set: "&eYou have set the balance of &b%player% &eto &d%amount%&e."
     give: "&eYou have added &d%amount% &eto &b%player%&e's balance."

@@ -1,6 +1,7 @@
 package me.sub.RelicFactions.Commands.Admin;
 
 import me.sub.RelicFactions.Files.Normal.Locale;
+import me.sub.RelicFactions.Files.Normal.Tab;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
 import me.sub.RelicFactions.Utils.Permission;
@@ -40,6 +41,7 @@ public class HCFCommand implements TabExecutor {
             Main.getInstance().userNameHolder.clear();
             Main.getInstance().loadFiles();
             Locale.load();
+            Tab.load();
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.hcf.reload.success"))));
             return true;
         }

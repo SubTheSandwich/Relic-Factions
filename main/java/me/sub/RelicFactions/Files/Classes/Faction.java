@@ -186,6 +186,16 @@ public class Faction {
         this.color = color;
     }
 
+    public String getRoleName(UUID uuid) {
+        return switch (getRoleID(uuid)) {
+            case 3 -> "leader";
+            case 2 -> "coleader";
+            case 1 -> "captain";
+            case 0 -> "member";
+            default -> null;
+        };
+    }
+
     public int getRoleID(UUID uuid) {
         /*
         leader = 3

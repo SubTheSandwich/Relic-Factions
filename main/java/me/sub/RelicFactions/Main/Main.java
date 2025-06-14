@@ -17,15 +17,14 @@ import me.sub.RelicFactions.Events.World.ListenerEvents;
 import me.sub.RelicFactions.Files.Classes.*;
 import me.sub.RelicFactions.Files.Data.*;
 import me.sub.RelicFactions.Files.Enums.FactionType;
-import me.sub.RelicFactions.Files.Normal.Inventories;
+import me.sub.RelicFactions.Files.Normal.*;
 import me.sub.RelicFactions.Files.Normal.Locale;
-import me.sub.RelicFactions.Files.Normal.Locations;
-import me.sub.RelicFactions.Files.Normal.ModModeFile;
 import me.sub.RelicFactions.Utils.C;
 import me.sub.RelicFactions.Utils.Econ;
 import me.sub.RelicFactions.Utils.Fastboard.FastBoard;
 import me.sub.RelicFactions.Utils.Maps;
 import me.sub.RelicFactions.Utils.Permission;
+import me.sub.RelicFactions.Utils.Tab.TabManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -46,6 +45,8 @@ import java.util.stream.Collectors;
 
 public class Main extends JavaPlugin {
 
+    // TODO: Ability Items (Switcher Ball, etc.)
+
     // TODO: Tab List
     /*
 
@@ -58,6 +59,7 @@ public class Main extends JavaPlugin {
 
     private static Economy econ = null;
     private final Logger logger = getLogger();
+    private TabManager manager;
 
     public HashMap<UUID, User> users = new HashMap<>();
     public HashMap<String, User> userNameHolder = new HashMap<>();
@@ -117,7 +119,7 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        if (!setupEconomy() ) {
+        if (!setupEconomy()) {
             getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getName()));
             getServer().getPluginManager().disablePlugin(this);
             return;
@@ -140,6 +142,7 @@ public class Main extends JavaPlugin {
         isServerFrozen = false;
         keyAllCommand = null;
         eotw = false;
+        manager = new TabManager();
     }
 
     @Override
@@ -236,6 +239,8 @@ public class Main extends JavaPlugin {
         saveResource("config.yml", false);
         saveResource("locale.yml", false);
         saveResource("messages.yml", false);
+        saveResource("tab.yml", false);
+        Tab.load();
         Locale.load();
         ModModeFile.save();
         Inventories.save();
@@ -426,7 +431,7 @@ public class Main extends JavaPlugin {
             user.setModified(false);
             saved++;
         }
-        logger.info("Saved " + saved + (saved == 1 ? " user" : " users"));
+        if (saved > 0) logger.info("Saved " + saved + (saved == 1 ? " user" : " users"));
     }
 
     private void saveFactions() {
@@ -461,7 +466,7 @@ public class Main extends JavaPlugin {
             faction.setModified(false);
             saved++;
         }
-        logger.info("Saved " + saved + (saved == 1 ? " faction" : " factions"));
+        if (saved > 0)  logger.info("Saved " + saved + (saved == 1 ? " faction" : " factions"));
 
     }
 
@@ -483,7 +488,7 @@ public class Main extends JavaPlugin {
             koth.setModified(false);
             saved++;
         }
-        logger.info("Saved " + saved + (saved == 1 ? " koth" : " koths"));
+        if (saved > 0)  logger.info("Saved " + saved + (saved == 1 ? " koth" : " koths"));
     }
 
     private void saveMountains() {
@@ -502,7 +507,7 @@ public class Main extends JavaPlugin {
             mountain.setModified(false);
             saved++;
         }
-        logger.info("Saved " + saved + (saved == 1 ? " mountain" : " mountains"));
+        if (saved > 0) logger.info("Saved " + saved + (saved == 1 ? " mountain" : " mountains"));
     }
 
     private void saveConquests() {
@@ -521,7 +526,7 @@ public class Main extends JavaPlugin {
             conquest.setModified(false);
             saved++;
         }
-        logger.info("Saved " + saved + (saved == 1 ? " conquest" : " conquests"));
+        if (saved > 0) logger.info("Saved " + saved + (saved == 1 ? " conquest" : " conquests"));
     }
 
     public static Economy getEconomy() {
@@ -637,5 +642,9 @@ public class Main extends JavaPlugin {
 
     public void setEOTW(boolean eotw) {
         this.eotw = eotw;
+    }
+
+    public TabManager getTabManager() {
+        return manager;
     }
 }

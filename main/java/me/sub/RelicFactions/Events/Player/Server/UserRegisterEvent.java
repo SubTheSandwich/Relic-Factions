@@ -167,6 +167,16 @@ public class UserRegisterEvent implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
+                if (!p.isOnline()) {
+                    cancel();
+                    return;
+                }
+                Main.getInstance().getTabManager().send(p);
+            }
+        }.runTaskTimer(Main.getInstance(), 0, 20);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
                 if (!Main.getInstance().getConfig().getBoolean("features.scoreboard.enabled")) return;
                 FastBoard board = Main.getInstance().boards.getOrDefault(p.getUniqueId(), null);
 
@@ -341,3 +351,4 @@ public class UserRegisterEvent implements Listener {
         }.runTaskTimer(Main.getInstance(), 0, 1);
     }
 }
+
