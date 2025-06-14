@@ -2,15 +2,14 @@ package me.sub.RelicFactions.Events.Player.Server;
 
 import me.sub.RelicFactions.Files.Classes.*;
 import me.sub.RelicFactions.Files.Data.*;
+import me.sub.RelicFactions.Files.Enums.HCFClass;
 import me.sub.RelicFactions.Files.Enums.Timer;
 import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Files.Normal.Messages;
 import me.sub.RelicFactions.Files.Normal.ModModeFile;
 import me.sub.RelicFactions.Main.Main;
-import me.sub.RelicFactions.Utils.C;
-import me.sub.RelicFactions.Utils.Calculate;
+import me.sub.RelicFactions.Utils.*;
 import me.sub.RelicFactions.Utils.Fastboard.FastBoard;
-import me.sub.RelicFactions.Utils.Permission;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -55,7 +54,6 @@ public class UserRegisterEvent implements Listener {
             Villager entity = (Villager) Bukkit.getServer().getEntity(user.getLoggerUUID());
             if (entity == null || entity.isDead()) {
                 user.setDeaths(user.getDeaths() + 1);
-                // TODO: EOTW
                 user.getTimers().clear();
                 if (Main.getInstance().getConfig().getBoolean("features.deathban")) {
                     int time = User.getDeathbanTime(p);
@@ -64,7 +62,11 @@ public class UserRegisterEvent implements Listener {
                     long deathban = calendar.getTimeInMillis();
                     user.setDeathbannedTill(deathban);
                     user.setDeathBanned(true);
-                    p.kick(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("events.deathban.kick")).replace("%time%", Timer.getMessageFormat(deathban - System.currentTimeMillis())))));
+                    if (Main.getInstance().isEOTW()) {
+                        p.kick(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("events.deathban.kick-eotw")))));
+                    } else {
+                        p.kick(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("events.deathban.kick")).replace("%time%", Timer.getMessageFormat(deathban - System.currentTimeMillis())))));
+                    }
                 }
                 if (user.hasFaction()) {
                     Faction faction = Faction.get(user.getFaction());
@@ -82,19 +84,25 @@ public class UserRegisterEvent implements Listener {
         }
         if (Main.getInstance().getConfig().getBoolean("features.deathban")) {
             if (user.isDeathBanned()) {
-                long time = user.getDeathbannedTill();
-                if (time - System.currentTimeMillis() <= 0) {
-                    user.setDeathbannedTill(0);
-                    user.setDeathBanned(false);
-                } else {
-                    if (user.getLives() > 0) {
-                        user.setLives(user.getLives() - 1);
-                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.deathban.used-life"))));
+                if (Main.getInstance().isEOTW() && !Main.getOnlineStaff().contains(p)) {
+                    p.kick(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("events.deathban.kick-eotw")))));
+                    return;
+                }
+                if (!Main.getInstance().isEOTW()) {
+                    long time = user.getDeathbannedTill();
+                    if (time - System.currentTimeMillis() <= 0) {
                         user.setDeathbannedTill(0);
                         user.setDeathBanned(false);
                     } else {
-                        p.kick(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("events.deathban.kick")).replace("%time%", Timer.getMessageFormat(user.getDeathbannedTill() - System.currentTimeMillis())))));
-                        return;
+                        if (user.getLives() > 0) {
+                            user.setLives(user.getLives() - 1);
+                            p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.deathban.used-life"))));
+                            user.setDeathbannedTill(0);
+                            user.setDeathBanned(false);
+                        } else {
+                            p.kick(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("events.deathban.kick")).replace("%time%", Timer.getMessageFormat(user.getDeathbannedTill() - System.currentTimeMillis())))));
+                            return;
+                        }
                     }
                 }
             }
@@ -159,7 +167,6 @@ public class UserRegisterEvent implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                // TODO: Class lines
                 if (!Main.getInstance().getConfig().getBoolean("features.scoreboard.enabled")) return;
                 FastBoard board = Main.getInstance().boards.getOrDefault(p.getUniqueId(), null);
 
@@ -253,6 +260,8 @@ public class UserRegisterEvent implements Listener {
                             String display;
                             if (koth.isSpecial()) {
                                 display = Main.getInstance().getConfig().getString("scoreboard.koth.special");
+                            } else if (koth.getName().equalsIgnoreCase("EOTW")) {
+                                display = Main.getInstance().getConfig().getString("scoreboard.koth.eotw");
                             } else {
                                 display = Main.getInstance().getConfig().getString("scoreboard.koth.normal");
                             }

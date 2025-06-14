@@ -5,7 +5,7 @@ import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.Mountain;
 import me.sub.RelicFactions.Files.Classes.User;
 import me.sub.RelicFactions.Files.Data.Cuboid;
-import me.sub.RelicFactions.Files.Data.HCFClass;
+import me.sub.RelicFactions.Files.Enums.HCFClass;
 import me.sub.RelicFactions.Files.Data.ModMode;
 import me.sub.RelicFactions.Files.Data.PlayerTimer;
 import me.sub.RelicFactions.Files.Enums.FactionType;
@@ -88,6 +88,7 @@ public class UserInteractAtFactionEvent implements Listener {
             if (!modMode.isInBypass()) return true;
         }
         if (Faction.getAt(location) == null) {
+            if (Main.getInstance().isEOTW()) return false;
             switch (Objects.requireNonNull(location.getWorld()).getEnvironment()) {
                 case NORMAL, CUSTOM -> {
                     return Faction.isInWilderness(location, Main.getInstance().getConfig().getInt("factions.sizes.worlds.default.warzone-build-limit"));
@@ -101,6 +102,7 @@ public class UserInteractAtFactionEvent implements Listener {
         }
         Faction faction = Faction.getAt(location);
         if (!Objects.requireNonNull(faction).getType().equals(FactionType.PLAYER)) return true;
+        if (Main.getInstance().isEOTW()) return false;
         if (faction.getDTR().doubleValue() <= 0) return false;
         if (user.getFaction() == null) return true;
         return !user.getFaction().equals(faction.getUUID());
@@ -484,15 +486,22 @@ public class UserInteractAtFactionEvent implements Listener {
                     ItemStack item = e.getItem();
                     boolean mainHand = e.getHand() == EquipmentSlot.HAND;
 
-                    if (item.getType().equals(Material.matchMaterial(Objects.requireNonNull(Main.getInstance().getConfig().getString("kits.archer.speed.item"))))) {
+                    // Archer Speed Consumable
+                    if (item.getType().equals(Material.matchMaterial(
+                            Objects.requireNonNull(Main.getInstance().getConfig().getString("kits.archer.speed.item"))))) {
                         e.setCancelled(true);
                         if (user.hasTimer("speedeffect")) {
-                            String message = Locale.get().getString("events.timer.player.cooldown.speedeffect") == null ? Locale.get().getString("events.timer.player.cooldown.default") : Locale.get().getString("events.timer.cooldown.speedeffect");
-                            message = Objects.requireNonNull(message).replace("%time%", Timer.format(user.getTimer("speedeffect").getDuration()));
+                            String message = Locale.get().getString("events.timer.player.cooldown.speedeffect") == null
+                                    ? Locale.get().getString("events.timer.player.cooldown.default")
+                                    : Locale.get().getString("events.timer.cooldown.speedeffect");
+                            message = Objects.requireNonNull(message)
+                                    .replace("%time%", Timer.format(user.getTimer("speedeffect").getDuration()));
                             p.sendMessage(C.chat(message));
                             return;
                         }
-                        PotionEffectType effectType = Registry.POTION_EFFECT_TYPE.get(NamespacedKey.minecraft(Objects.requireNonNull(Main.getInstance().getConfig().getString("kits.archer.speed.effect")).toLowerCase()));
+                        PotionEffectType effectType = Registry.POTION_EFFECT_TYPE.get(
+                                NamespacedKey.minecraft(Objects.requireNonNull(
+                                        Main.getInstance().getConfig().getString("kits.archer.speed.effect")).toLowerCase()));
 
                         int duration = Main.getInstance().getConfig().getInt("kits.archer.speed.duration");
                         int amplifier = Main.getInstance().getConfig().getInt("kits.archer.speed.amplifier");
@@ -502,30 +511,53 @@ public class UserInteractAtFactionEvent implements Listener {
                             if (p.getInventory().getItemInMainHand().getAmount() == 1) {
                                 p.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
                             } else {
-                                p.getInventory().getItemInMainHand().setAmount(p.getInventory().getItemInMainHand().getAmount() - 1);
+                                p.getInventory().getItemInMainHand().setAmount(
+                                        p.getInventory().getItemInMainHand().getAmount() - 1);
                             }
                         } else {
                             if (p.getInventory().getItemInOffHand().getAmount() == 1) {
                                 p.getInventory().setItemInOffHand(new ItemStack(Material.AIR));
                             } else {
-                                p.getInventory().getItemInOffHand().setAmount(p.getInventory().getItemInOffHand().getAmount() - 1);
+                                p.getInventory().getItemInOffHand().setAmount(
+                                        p.getInventory().getItemInOffHand().getAmount() - 1);
                             }
                         }
                         p.addPotionEffect(potionEffect);
                         PlayerTimer timer = new PlayerTimer(p.getUniqueId(), Timer.SPEEDEFFECT);
                         user.addTimer(timer);
                         p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.kit.speed-active"))));
+
+                        // Restore Archer passive effects after duration
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                if (user.getUserClass() == HCFClass.ARCHER &&
+                                        HCFClass.getActiveClass(p) == HCFClass.ARCHER) {
+                                    p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2, true, false));
+                                    p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 100, 0, true, false));
+                                }
+                            }
+                        }.runTaskLater(Main.getInstance(), duration + 5);
+
                         return;
                     }
-                    if (item.getType().equals(Material.matchMaterial(Objects.requireNonNull(Main.getInstance().getConfig().getString("kits.archer.jump.item"))))) {
+
+                    // Archer Jump Consumable
+                    if (item.getType().equals(Material.matchMaterial(
+                            Objects.requireNonNull(Main.getInstance().getConfig().getString("kits.archer.jump.item"))))) {
                         e.setCancelled(true);
                         if (user.hasTimer("jumpeffect")) {
-                            String message = Locale.get().getString("events.timer.player.cooldown.jumpeffect") == null ? Locale.get().getString("events.timer.player.cooldown.default") : Locale.get().getString("events.timer.cooldown.jumpeffect");
-                            message = Objects.requireNonNull(message).replace("%time%", Timer.format(user.getTimer("jumpeffect").getDuration()));
+                            String message = Locale.get().getString("events.timer.player.cooldown.jumpeffect") == null
+                                    ? Locale.get().getString("events.timer.player.cooldown.default")
+                                    : Locale.get().getString("events.timer.cooldown.jumpeffect");
+                            message = Objects.requireNonNull(message)
+                                    .replace("%time%", Timer.format(user.getTimer("jumpeffect").getDuration()));
                             p.sendMessage(C.chat(message));
                             return;
                         }
-                        PotionEffectType effectType = Registry.POTION_EFFECT_TYPE.get(NamespacedKey.minecraft(Objects.requireNonNull(Main.getInstance().getConfig().getString("kits.archer.jump.effect")).toLowerCase()));
+                        PotionEffectType effectType = Registry.POTION_EFFECT_TYPE.get(
+                                NamespacedKey.minecraft(Objects.requireNonNull(
+                                        Main.getInstance().getConfig().getString("kits.archer.jump.effect")).toLowerCase()));
 
                         int duration = Main.getInstance().getConfig().getInt("kits.archer.jump.duration");
                         int amplifier = Main.getInstance().getConfig().getInt("kits.archer.jump.amplifier");
@@ -535,19 +567,34 @@ public class UserInteractAtFactionEvent implements Listener {
                             if (p.getInventory().getItemInMainHand().getAmount() == 1) {
                                 p.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
                             } else {
-                                p.getInventory().getItemInMainHand().setAmount(p.getInventory().getItemInMainHand().getAmount() - 1);
+                                p.getInventory().getItemInMainHand().setAmount(
+                                        p.getInventory().getItemInMainHand().getAmount() - 1);
                             }
                         } else {
                             if (p.getInventory().getItemInOffHand().getAmount() == 1) {
                                 p.getInventory().setItemInOffHand(new ItemStack(Material.AIR));
                             } else {
-                                p.getInventory().getItemInOffHand().setAmount(p.getInventory().getItemInOffHand().getAmount() - 1);
+                                p.getInventory().getItemInOffHand().setAmount(
+                                        p.getInventory().getItemInOffHand().getAmount() - 1);
                             }
                         }
                         p.addPotionEffect(potionEffect);
                         PlayerTimer timer = new PlayerTimer(p.getUniqueId(), Timer.JUMPEFFECT);
                         user.addTimer(timer);
                         p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.kit.jump-active"))));
+
+                        // Restore Archer passive effects after duration
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                if (user.getUserClass() == HCFClass.ARCHER &&
+                                        HCFClass.getActiveClass(p) == HCFClass.ARCHER) {
+                                    p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2, true, false));
+                                    p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 100, 0, true, false));
+                                }
+                            }
+                        }.runTaskLater(Main.getInstance(), duration + 5);
+
                         return;
                     }
                 }
@@ -558,15 +605,22 @@ public class UserInteractAtFactionEvent implements Listener {
                     ItemStack item = e.getItem();
                     boolean mainHand = e.getHand() == EquipmentSlot.HAND;
 
-                    if (item.getType().equals(Material.matchMaterial(Objects.requireNonNull(Main.getInstance().getConfig().getString("kits.rogue.speed.item"))))) {
+                    // Rogue Speed Consumable
+                    if (item.getType().equals(Material.matchMaterial(
+                            Objects.requireNonNull(Main.getInstance().getConfig().getString("kits.rogue.speed.item"))))) {
                         e.setCancelled(true);
                         if (user.hasTimer("speedeffect")) {
-                            String message = Locale.get().getString("events.timer.player.cooldown.speedeffect") == null ? Locale.get().getString("events.timer.player.cooldown.default") : Locale.get().getString("events.timer.cooldown.speedeffect");
-                            message = Objects.requireNonNull(message).replace("%time%", Timer.format(user.getTimer("speedeffect").getDuration()));
+                            String message = Locale.get().getString("events.timer.player.cooldown.speedeffect") == null
+                                    ? Locale.get().getString("events.timer.player.cooldown.default")
+                                    : Locale.get().getString("events.timer.cooldown.speedeffect");
+                            message = Objects.requireNonNull(message)
+                                    .replace("%time%", Timer.format(user.getTimer("speedeffect").getDuration()));
                             p.sendMessage(C.chat(message));
                             return;
                         }
-                        PotionEffectType effectType = Registry.POTION_EFFECT_TYPE.get(NamespacedKey.minecraft(Objects.requireNonNull(Main.getInstance().getConfig().getString("kits.rogue.speed.effect")).toLowerCase()));
+                        PotionEffectType effectType = Registry.POTION_EFFECT_TYPE.get(
+                                NamespacedKey.minecraft(Objects.requireNonNull(
+                                        Main.getInstance().getConfig().getString("kits.rogue.speed.effect")).toLowerCase()));
 
                         int duration = Main.getInstance().getConfig().getInt("kits.rogue.speed.duration");
                         int amplifier = Main.getInstance().getConfig().getInt("kits.rogue.speed.amplifier");
@@ -576,30 +630,53 @@ public class UserInteractAtFactionEvent implements Listener {
                             if (p.getInventory().getItemInMainHand().getAmount() == 1) {
                                 p.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
                             } else {
-                                p.getInventory().getItemInMainHand().setAmount(p.getInventory().getItemInMainHand().getAmount() - 1);
+                                p.getInventory().getItemInMainHand().setAmount(
+                                        p.getInventory().getItemInMainHand().getAmount() - 1);
                             }
                         } else {
                             if (p.getInventory().getItemInOffHand().getAmount() == 1) {
                                 p.getInventory().setItemInOffHand(new ItemStack(Material.AIR));
                             } else {
-                                p.getInventory().getItemInOffHand().setAmount(p.getInventory().getItemInOffHand().getAmount() - 1);
+                                p.getInventory().getItemInOffHand().setAmount(
+                                        p.getInventory().getItemInOffHand().getAmount() - 1);
                             }
                         }
                         p.addPotionEffect(potionEffect);
                         PlayerTimer timer = new PlayerTimer(p.getUniqueId(), Timer.SPEEDEFFECT);
                         user.addTimer(timer);
                         p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.kit.speed-active"))));
+
+                        // Restore Rogue passive effects after duration
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                if (user.getUserClass() == HCFClass.ROGUE &&
+                                        HCFClass.getActiveClass(p) == HCFClass.ROGUE) {
+                                    p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2, true, false));
+                                    p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, 100, 1, true, false));
+                                }
+                            }
+                        }.runTaskLater(Main.getInstance(), duration + 5);
+
                         return;
                     }
-                    if (item.getType().equals(Material.matchMaterial(Objects.requireNonNull(Main.getInstance().getConfig().getString("kits.rogue.jump.item"))))) {
+
+                    // Rogue Jump Consumable
+                    if (item.getType().equals(Material.matchMaterial(
+                            Objects.requireNonNull(Main.getInstance().getConfig().getString("kits.rogue.jump.item"))))) {
                         e.setCancelled(true);
                         if (user.hasTimer("jumpeffect")) {
-                            String message = Locale.get().getString("events.timer.player.cooldown.jumpeffect") == null ? Locale.get().getString("events.timer.player.cooldown.default") : Locale.get().getString("events.timer.cooldown.jumpeffect");
-                            message = Objects.requireNonNull(message).replace("%time%", Timer.format(user.getTimer("jumpeffect").getDuration()));
+                            String message = Locale.get().getString("events.timer.player.cooldown.jumpeffect") == null
+                                    ? Locale.get().getString("events.timer.player.cooldown.default")
+                                    : Locale.get().getString("events.timer.cooldown.jumpeffect");
+                            message = Objects.requireNonNull(message)
+                                    .replace("%time%", Timer.format(user.getTimer("jumpeffect").getDuration()));
                             p.sendMessage(C.chat(message));
                             return;
                         }
-                        PotionEffectType effectType = Registry.POTION_EFFECT_TYPE.get(NamespacedKey.minecraft(Objects.requireNonNull(Main.getInstance().getConfig().getString("kits.rogue.jump.effect")).toLowerCase()));
+                        PotionEffectType effectType = Registry.POTION_EFFECT_TYPE.get(
+                                NamespacedKey.minecraft(Objects.requireNonNull(
+                                        Main.getInstance().getConfig().getString("kits.rogue.jump.effect")).toLowerCase()));
 
                         int duration = Main.getInstance().getConfig().getInt("kits.rogue.jump.duration");
                         int amplifier = Main.getInstance().getConfig().getInt("kits.rogue.jump.amplifier");
@@ -609,19 +686,34 @@ public class UserInteractAtFactionEvent implements Listener {
                             if (p.getInventory().getItemInMainHand().getAmount() == 1) {
                                 p.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
                             } else {
-                                p.getInventory().getItemInMainHand().setAmount(p.getInventory().getItemInMainHand().getAmount() - 1);
+                                p.getInventory().getItemInMainHand().setAmount(
+                                        p.getInventory().getItemInMainHand().getAmount() - 1);
                             }
                         } else {
                             if (p.getInventory().getItemInOffHand().getAmount() == 1) {
                                 p.getInventory().setItemInOffHand(new ItemStack(Material.AIR));
                             } else {
-                                p.getInventory().getItemInOffHand().setAmount(p.getInventory().getItemInOffHand().getAmount() - 1);
+                                p.getInventory().getItemInOffHand().setAmount(
+                                        p.getInventory().getItemInOffHand().getAmount() - 1);
                             }
                         }
                         p.addPotionEffect(potionEffect);
                         PlayerTimer timer = new PlayerTimer(p.getUniqueId(), Timer.JUMPEFFECT);
                         user.addTimer(timer);
                         p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.kit.jump-active"))));
+
+                        // Restore Rogue passive effects after duration
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                if (user.getUserClass() == HCFClass.ROGUE &&
+                                        HCFClass.getActiveClass(p) == HCFClass.ROGUE) {
+                                    p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2, true, false));
+                                    p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, 100, 1, true, false));
+                                }
+                            }
+                        }.runTaskLater(Main.getInstance(), duration + 5);
+
                         return;
                     }
                 }

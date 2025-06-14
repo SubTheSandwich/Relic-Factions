@@ -1,11 +1,13 @@
 primary:
   not-player: "&cYou must be a player in order to execute this command."
+  not-console: "&cSorry, but only CONSOLE may execute this command."
   no-permission: "&cNo permission."
   no-player: "&cA player by this name does not exist."
   invalid-number: "&cThe specified number is invalid."
   invalid-material: "&cThe specified material is invalid."
   cannot-do: "&cYou cannot do this to %player% at this time."
   lives:
+    eotw: "&cYou cannot use lives during EOTW."
     not-enough: "&cYou do not have enough lives to do this."
     not-deathbanned: "&cYou cannot revive a player that is not deathbanned."
     revive: "&eYou have revived &d%player%&e."
@@ -115,7 +117,8 @@ events:
     cant: "&cYou cannot do this while in Mod Mode."
     online-staff: "&6Online Staff&7: &r%players%"
   deathban:
-    kick: "&cYou are currently deathbanned. \nYour deathban will expire in %time% \nBuy lives @ %store%"
+    kick: "&cYou are currently deathbanned. \n&cYour deathban will expire in %time% \n&cBuy lives @ %store%"
+    kick-eotw: "&cYou are currently deathbanned. \n&cCome back next wipe!"
     used-life: "&aYou have used a life to remove your deathban."
   movement:
     deny:
@@ -124,6 +127,7 @@ events:
   timer:
     server:
       expire:
+        default: "&cThe server timer &l%name% &chas expired!"
         sotw: "&cThe SOTW period has ended!"
         sale: "&cThe Sale has expired."
         keysale: "&cThe Key Sale has expired."
@@ -177,6 +181,17 @@ faction:
     damage: "&eBe careful, &e%player% &eis an ally."
 
 commands:
+  eotw:
+    usage: "&cUsage: /eotw <start;stop;commence>"
+    already-starting: "&cEOTW has already started."
+    not-running: "&cEOTW is not running."
+    not-starting: "&cEOTW is not starting."
+    starting: "&cEOTW will commence in %time% minute(s)."
+    stopped: "&cEOTW has been cancelled."
+    cannot: "&cYou cannot do this while EOTW is running."
+    cannot-claim: "&cYou cannot claim during EOTW."
+    commenced: "&cThe EOTW period has commenced."
+    koth-not-right: "&cThe specified EOTW koth in the 'config.yml' does not exist, or is not setup. Please fix this before trying again."
   chat:
     cleared: "&eThe chat has been cleared."
     muted: "&eThe chat has been muted."

@@ -97,6 +97,11 @@ public class ServerTimer {
                         Bukkit.dispatchCommand(Main.getInstance().getServer().getConsoleSender(), Main.getInstance().getKeyAllCommand());
                         Main.getInstance().setKeyAllCommand(null);
                     }
+                    if (name.equalsIgnoreCase("EOTW")) {
+                        Bukkit.dispatchCommand(Main.getInstance().getServer().getConsoleSender(), "koth " + Main.getInstance().getConfig().getString("eotw.koth") + " start");
+                        Main.getInstance().setEOTW(true);
+                        Bukkit.broadcast(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("commands.eotw.commenced")))));
+                    }
                 }
             }
         }.runTaskTimer(Main.getInstance(), 0, 1);

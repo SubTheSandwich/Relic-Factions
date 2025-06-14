@@ -362,6 +362,10 @@ public class FactionCommand implements TabExecutor {
                 return true;
             }
             if (args[0].equalsIgnoreCase("claim")) {
+                if (Main.getInstance().isEOTW()) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.eotw.cannot-claim"))));
+                    return true;
+                }
                 if (!user.hasFaction()) {
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
                     return true;

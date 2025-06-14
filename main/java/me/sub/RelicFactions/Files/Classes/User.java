@@ -5,6 +5,7 @@ import me.sub.RelicFactions.Files.Data.Note;
 import me.sub.RelicFactions.Files.Enums.ChatType;
 import me.sub.RelicFactions.Files.Data.CustomTimer;
 import me.sub.RelicFactions.Files.Enums.FactionType;
+import me.sub.RelicFactions.Files.Enums.HCFClass;
 import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
@@ -630,7 +631,6 @@ public class User {
                 player.sendMessage(C.chat(Objects.requireNonNull(s)));
             }
             active.applyPassiveEffects(player);
-            // TODO: Bard energy recharge, as well as passive effects
             if (hcfClass.equals(HCFClass.BARD)) {
                 new BukkitRunnable() {
                     int messageDelay = 0;
@@ -761,7 +761,7 @@ public class User {
             double y = player.getLocation().getY();
             if (y <= 20) {
                 if (player.hasPotionEffect(PotionEffectType.INVISIBILITY)) return;
-                player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, PotionEffect.INFINITE_DURATION, 0, true, false));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 100, 0, true, false));
                 player.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.kit.miner.invis-change")).replace("%status%", Objects.requireNonNull(player.hasPotionEffect(PotionEffectType.INVISIBILITY) ? Locale.get().getString("primary.enabled") : Locale.get().getString("primary.disabled")))));
             } else {
                 if (!player.hasPotionEffect(PotionEffectType.INVISIBILITY)) return;

@@ -11,6 +11,10 @@ server:
     number: 1
     start-date: "5/16/25"
 
+eotw:
+  time: 1 # minutes
+  koth: EOTW # the koth to be auto-started once EOTW commences
+
 listeners:
   place-in-combat: true
   starting-timer: true
@@ -175,6 +179,7 @@ scoreboard:
     - "&6&lArcher Tag&7: &c%player_archermark_timer%<display=%has_player_archermark_timer%"
     - "&c&lSpawn Tag&7: &c%player_combat_timer%<display=%has_player_combat_timer%"
     - "&a&lSOTW&7: &c%server_sotw_timer%<display=%has_server_sotw_timer%"
+    - "&c&lEOTW&7: &c%server_eotw_timer%<display=%has_server_eotw_timer%"
     - "&4&lLogout&7: &c%player_logout_timer%<display=%has_player_logout_timer%"
     - "&4&lStuck&7: &c%player_stuck_timer%<display=%has_player_stuck_timer%"
     - "%mod-lines%"
@@ -200,6 +205,7 @@ scoreboard:
   koth:
     normal: "&9&l%koth%&7: &c%time%"
     special: "&5&l%koth%&7: &c%time%"
+    eotw: "&c&l%koth%&7: &c%time%"
   mountain:
     line: "&d&l%type%&7: &c%time%"
 

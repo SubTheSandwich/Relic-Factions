@@ -52,6 +52,10 @@ public class PvPCommand implements TabExecutor {
                 sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.feature-disabled"))));
                 return true;
             }
+            if (Main.getInstance().isEOTW()) {
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.lives.eotw"))));
+                return true;
+            }
             User user = User.get(p);
             User revive = User.get(args[1]);
             if (revive == null) {

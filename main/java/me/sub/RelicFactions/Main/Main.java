@@ -46,8 +46,7 @@ import java.util.stream.Collectors;
 
 public class Main extends JavaPlugin {
 
-    // TODO: More Listeners, Tab List, Force Unclaim
-
+    // TODO: Tab List
     /*
 
     Brewing Potion Limiting is very complex, may come back and tackle another time
@@ -73,6 +72,7 @@ public class Main extends JavaPlugin {
 
     public HashMap<UUID, RunningKOTH> runningKOTHS = new HashMap<>();
     private RunningConquest runningConquest = null;
+    private boolean eotw;
 
     public final Map<UUID, Float> arrowForceMap = new HashMap<>();
 
@@ -139,6 +139,7 @@ public class Main extends JavaPlugin {
         handleDTR();
         isServerFrozen = false;
         keyAllCommand = null;
+        eotw = false;
     }
 
     @Override
@@ -169,6 +170,7 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("koth")).setExecutor(new KOTHCommand()); Objects.requireNonNull(getCommand("koth")).setTabCompleter(new KOTHCommand());
         Objects.requireNonNull(getCommand("mountain")).setExecutor(new MountainCommand()); Objects.requireNonNull(getCommand("mountain")).setTabCompleter(new MountainCommand());
         Objects.requireNonNull(getCommand("conquest")).setExecutor(new ConquestCommand()); Objects.requireNonNull(getCommand("conquest")).setTabCompleter(new ConquestCommand());
+        Objects.requireNonNull(getCommand("eotw")).setExecutor(new EOTWCommand()); Objects.requireNonNull(getCommand("eotw")).setTabCompleter(new EOTWCommand());
 
         // Staff
         Objects.requireNonNull(getCommand("staffchat")).setExecutor(new StaffChatCommand()); Objects.requireNonNull(getCommand("staffchat")).setTabCompleter(new StaffChatCommand());
@@ -627,5 +629,13 @@ public class Main extends JavaPlugin {
         if (Tag.SHULKER_BOXES.isTagged(material)) return false;
         if (material.equals(Material.BAMBOO)) return false;
         return !name.contains("CORAL") || name.endsWith("_CORAL_BLOCK");
+    }
+
+    public boolean isEOTW() {
+        return eotw;
+    }
+
+    public void setEOTW(boolean eotw) {
+        this.eotw = eotw;
     }
 }

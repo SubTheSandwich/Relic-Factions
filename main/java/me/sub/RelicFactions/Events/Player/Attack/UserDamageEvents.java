@@ -4,7 +4,7 @@ import me.sub.RelicFactions.Events.Player.Interact.UserInteractAtFactionEvent;
 import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.RunningConquest;
 import me.sub.RelicFactions.Files.Classes.User;
-import me.sub.RelicFactions.Files.Data.HCFClass;
+import me.sub.RelicFactions.Files.Enums.HCFClass;
 import me.sub.RelicFactions.Files.Data.PlayerTimer;
 import me.sub.RelicFactions.Files.Data.ServerTimer;
 import me.sub.RelicFactions.Files.Enums.FactionType;
@@ -547,8 +547,6 @@ public class UserDamageEvents implements Listener {
         User user = User.get(p);
         user.setLastInventoryContents(p.getInventory().getContents());
         user.setDeaths(user.getDeaths() + 1);
-        // TODO: EOTW
-
         e.getEntity().getWorld().strikeLightningEffect(e.getEntity().getLocation());
         user.getTimers().clear();
         if (Main.getInstance().getConfig().getBoolean("features.deathban")) {
@@ -558,7 +556,11 @@ public class UserDamageEvents implements Listener {
             long deathban = calendar.getTimeInMillis();
             user.setDeathbannedTill(deathban);
             user.setDeathBanned(true);
-            p.kick(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("events.deathban.kick")).replace("%time%", Timer.getMessageFormat(deathban - System.currentTimeMillis())))));
+            if (Main.getInstance().isEOTW()) {
+                p.kick(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("events.deathban.kick-eotw")))));
+            } else {
+                p.kick(Component.text(C.chat(Objects.requireNonNull(Locale.get().getString("events.deathban.kick")).replace("%time%", Timer.getMessageFormat(deathban - System.currentTimeMillis())))));
+            }
         }
         if (user.hasFaction()) {
             Faction faction = Faction.get(user.getFaction());
