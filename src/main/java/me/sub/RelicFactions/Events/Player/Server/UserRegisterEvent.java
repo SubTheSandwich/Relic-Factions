@@ -7,10 +7,10 @@ import me.sub.RelicFactions.Files.Enums.Timer;
 import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Files.Normal.Messages;
 import me.sub.RelicFactions.Files.Normal.ModModeFile;
+import me.sub.RelicFactions.Files.Normal.Tab;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.*;
 import me.sub.RelicFactions.Utils.Fastboard.FastBoard;
-import me.sub.RelicFactions.Utils.Tab.TabManager;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -168,29 +168,27 @@ public class UserRegisterEvent implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (!Main.getInstance().getConfig().getBoolean("features.tab")) return;
-                if (!p.isOnline()) {
+                if (!Tab.enabled || !p.isOnline()) {
                     cancel();
                     return;
                 }
                 Main.getInstance().getTabManager().send(p);
             }
-        }.runTaskTimer(Main.getInstance(), 0, 20);
+        }.runTaskTimer(Main.getInstance(), 0, 10);
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (!Main.getInstance().getConfig().getBoolean("features.scoreboard.enabled")) return;
                 FastBoard board = Main.getInstance().boards.getOrDefault(p.getUniqueId(), null);
+                if (!Main.getInstance().getConfig().getBoolean("features.scoreboard.enabled") || !p.isOnline()) {
+                    cancel();
+                    board.delete();
+                    return;
+                }
 
                 ArrayList<String> lines = new ArrayList<>();
                 if (board == null) {
                     board = new FastBoard(p);
                     board.updateTitle(C.chat(Objects.requireNonNull(Main.getInstance().getConfig().getString("scoreboard.title"))));
-                }
-                if (!p.isOnline()) {
-                    cancel();
-                    board.delete();
-                    return;
                 }
                 for (String s : Main.getInstance().getConfig().getStringList("scoreboard.lines")) {
 

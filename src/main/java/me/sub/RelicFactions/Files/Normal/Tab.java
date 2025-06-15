@@ -18,25 +18,38 @@ public class Tab {
     private static FileConfiguration config;
     private static File file;
     private static final List<String> slotLines = new ArrayList<>();
+    public static boolean enabled;
+    public static boolean headerEnabled;
+    public static boolean footerEnabled;
 
     public static void load() {
         file = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder(), "tab.yml");
         config = YamlConfiguration.loadConfiguration(file);
+
+        enabled = config.getBoolean("tab.enabled");
+        headerEnabled = config.getBoolean("tab.header.enabled");
+        footerEnabled = config.getBoolean("tab.footer.enabled");
         
         // Load header and footer as lists and join with newlines
-        List<String> headerLines = config.getStringList("header");
+        List<String> headerLines = config.getStringList("tab.header.text");
         header = String.join("\n", headerLines);
                 
-        List<String> footerLines = config.getStringList("footer");
+        List<String> footerLines = config.getStringList("tab.footer.text");
         footer = String.join("\n", footerLines);
         
         // Load slot lines
         slotLines.clear();
-        for (int column = 1; column <= 4; column++) {
-            for (int slot = 1; slot <= 20; slot++) {
-                String line = C.chat(Objects.requireNonNull(config.getString("slots." + column + "." + slot)));
-                slotLines.add(line);
-            }
+        for (String s : config.getStringList("tab.left-rows")) {
+            slotLines.add(C.chat(s));
+        }
+        for (String s : config.getStringList("tab.center-rows")) {
+            slotLines.add(C.chat(s));
+        }
+        for (String s : config.getStringList("tab.right-rows")) {
+            slotLines.add(C.chat(s));
+        }
+        for (String s : config.getStringList("tab.far-right-rows")) {
+            slotLines.add(C.chat(s));
         }
     }
 

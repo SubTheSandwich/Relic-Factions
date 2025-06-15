@@ -322,6 +322,36 @@ public class Faction {
         this.claims = claims;
     }
 
+    public static String getAtName(Player p) {
+        Location clone = p.getLocation().clone();
+        clone.setY(0);
+        if (Main.getInstance().factions.isEmpty()) return null;
+        for (Faction faction : Main.getInstance().factions.values()) {
+            if (faction.getClaims().isEmpty()) continue;
+            for (Cuboid cuboid : faction.getClaims()) {
+                if (cuboid.isIn(clone)) return faction.getValidName(p, false);
+            }
+        }
+        switch (Objects.requireNonNull(clone.getWorld()).getEnvironment()) {
+            case NORMAL, CUSTOM -> {
+                if (!Faction.isInWilderness(clone, Main.getInstance().getConfig().getInt("factions.sizes.worlds.default.warzone"))) {
+                    return C.chat(Objects.requireNonNull(Locale.get().getString("faction.wilderness")));
+                }
+                return C.chat(Objects.requireNonNull(Locale.get().getString("faction.warzone")));
+            }
+            case NETHER -> {
+                if (!Faction.isInWilderness(clone, Main.getInstance().getConfig().getInt("factions.sizes.worlds.nether.warzone"))) {
+                    return C.chat(Objects.requireNonNull(Locale.get().getString("faction.wilderness")));
+                }
+                return C.chat(Objects.requireNonNull(Locale.get().getString("faction.warzone")));
+            }
+            case THE_END -> { return Locale.get().getString("faction.wilderness"); }
+            default -> {
+                return null;
+            }
+        }
+    }
+
     public static Faction getAt(Location location) {
         Location clone = location.clone();
         clone.setY(0);

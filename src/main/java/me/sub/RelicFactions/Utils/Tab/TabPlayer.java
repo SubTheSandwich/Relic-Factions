@@ -9,12 +9,14 @@ public class TabPlayer {
     private ArrayList<TabSlot> slots;
     private String header;
     private String footer;
+    private int currentKoth;
 
     public TabPlayer(UUID uuid) {
         this.uuid = uuid;
         slots = new ArrayList<>();
         header = null;
         footer = null;
+        currentKoth = 0;
     }
 
     public UUID getUUID() {
@@ -43,5 +45,13 @@ public class TabPlayer {
 
     public void setFooter(String footer) {
         this.footer = footer;
+    }
+
+    public int getCurrentKoth() {
+        return currentKoth;
+    }
+
+    public void setCurrentKoth(int currentKoth) {
+        this.currentKoth = currentKoth;
     }
 }

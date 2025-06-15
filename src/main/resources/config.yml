@@ -379,4 +379,3 @@ features:
   scoreboard:
     enabled: true
     line-limit: 2
-  tab: true
