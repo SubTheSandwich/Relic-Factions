@@ -5,7 +5,9 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.*;
 import me.sub.RelicFactions.Files.Classes.Faction;
+import me.sub.RelicFactions.Files.Classes.RunningKOTH;
 import me.sub.RelicFactions.Files.Classes.User;
+import me.sub.RelicFactions.Files.Enums.Timer;
 import me.sub.RelicFactions.Files.Normal.Tab;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
@@ -27,6 +29,7 @@ public class TabManager {
 
     public void send(Player player) {
         boolean diff = clear(player);
+        User user = User.get(player);
 
         if (!diff && manager.containsKey(player.getUniqueId())) return;
 
@@ -68,6 +71,58 @@ public class TabManager {
             headerFooter.getChatComponents().write(1, WrappedChatComponent.fromText(C.chat(Tab.footer)));
         }
         ProtocolLibrary.getProtocolManager().sendServerPacket(player, headerFooter);
+        Map<UUID, RunningKOTH> koths = Main.getInstance().runningKOTHS;
+
+        int current = tabPlayer.getCurrentKoth();
+        int kothCount = koths.size();
+
+        if (current >= kothCount || current < 0) current = 0;
+
+        tabPlayer.setTimeSinceLastKothUpdate(tabPlayer.getTimeSinceLastKothUpdate() + 1);
+        if (tabPlayer.getTimeSinceLastKothUpdate() >= 10) {
+            // Prepare for next update
+            if (koths.isEmpty()) {
+                int next = current + 1;
+                if (next >= kothCount) next = 0;
+                tabPlayer.setCurrentKoth(next);
+                tabPlayer.setTimeSinceLastKothUpdate(0);
+                return;
+            }
+
+
+            List<RunningKOTH> kothList = koths.values().stream()
+                    .sorted(Comparator.comparing(rk -> rk.getKOTH().getName()))
+                    .toList();
+
+            RunningKOTH runningKOTH = kothList.get(current);
+            if (runningKOTH.getControllingPlayer() == null) {
+                int next = current + 1;
+                if (next >= kothCount) next = 0;
+                tabPlayer.setCurrentKoth(next);
+                tabPlayer.setTimeSinceLastKothUpdate(0);
+                return;
+            }
+
+            UUID uuid = runningKOTH.getControllingPlayer();
+            if (!user.hasFaction()) {
+                int next = current + 1;
+                if (next >= kothCount) next = 0;
+                tabPlayer.setCurrentKoth(next);
+                tabPlayer.setTimeSinceLastKothUpdate(0);
+                return;
+            }
+            Faction faction = Faction.get(user.getFaction());
+            if (!uuid.equals(player.getUniqueId()) && faction.getOnlineMembers().stream()
+                    .map(Player::getUniqueId)
+                    .noneMatch(id -> id.equals(uuid))) {
+                int next = current + 1;
+                if (next >= kothCount) next = 0;
+                tabPlayer.setCurrentKoth(next);
+                tabPlayer.setTimeSinceLastKothUpdate(0);
+                return;
+            }
+            tabPlayer.setTimeSinceLastKothUpdate(0);
+        }
     }
 
     private void addTabSlot(
@@ -209,6 +264,30 @@ public class TabManager {
                             faction.getHome().getBlockX() + ", " + faction.getHome().getBlockZ());
                 }
             }
+        }
+
+        if (name.contains("<display=%is_koth%")) {
+            name = name.replace("<display=%is_koth%", "");
+            Map<UUID, RunningKOTH> koths = Main.getInstance().runningKOTHS;
+            if (koths.isEmpty()) return EMPTY;
+
+            // Sort KOTHs by name for a consistent order
+            List<RunningKOTH> kothList = koths.values().stream()
+                    .sorted(Comparator.comparing(rk -> rk.getKOTH().getName()))
+                    .toList();
+
+            TabPlayer tabPlayer = manager.get(player.getUniqueId());
+            int current = tabPlayer.getCurrentKoth();
+            int kothCount = kothList.size();
+
+            // Ensure current index is in bounds
+            if (current >= kothCount || current < 0) current = 0;
+
+            RunningKOTH runningKOTH = kothList.get(current);
+
+            // Replace placeholders
+            name = name.replace("%active-koth%", runningKOTH.getKOTH().getName());
+            name = name.replace("%active-koth-time%", Timer.format(runningKOTH.getTimeLeft()));
         }
         return name;
     }

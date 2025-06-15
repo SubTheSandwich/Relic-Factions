@@ -10,6 +10,7 @@ public class TabPlayer {
     private String header;
     private String footer;
     private int currentKoth;
+    private int timeSinceLastKothUpdate;
 
     public TabPlayer(UUID uuid) {
         this.uuid = uuid;
@@ -17,6 +18,7 @@ public class TabPlayer {
         header = null;
         footer = null;
         currentKoth = 0;
+        timeSinceLastKothUpdate = 0;
     }
 
     public UUID getUUID() {
@@ -53,5 +55,13 @@ public class TabPlayer {
 
     public void setCurrentKoth(int currentKoth) {
         this.currentKoth = currentKoth;
+    }
+
+    public int getTimeSinceLastKothUpdate() {
+        return timeSinceLastKothUpdate;
+    }
+
+    public void setTimeSinceLastKothUpdate(int timeSinceLastKothUpdate) {
+        this.timeSinceLastKothUpdate = timeSinceLastKothUpdate;
     }
 }

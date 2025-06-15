@@ -28,11 +28,11 @@ tab:
     - ""
     - "&6Home<display=%has_faction_home%"
     - "&f%faction-home%<display=%has_faction_home%"
-    - "&7• &fSlot &b#16"
-    - "&7• &fSlot &b#17"
-    - "&7• &fSlot &b#18"
-    - "&7• &fSlot &b#19"
-    - "&7• &fSlot &b#20"
+    - ""
+    - "&6%active-koth%<display=%is_koth%" # Will loop through all KOTHs if multiple are running
+    - "&f%active-koth-time%<display=%is_koth%"
+    - ""
+    - ""
   center-rows:
     - "&7• &fSlot &b#21"
     - "&7• &fSlot &b#22"
