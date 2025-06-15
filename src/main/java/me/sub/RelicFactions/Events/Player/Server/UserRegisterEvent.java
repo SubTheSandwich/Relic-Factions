@@ -10,6 +10,7 @@ import me.sub.RelicFactions.Files.Normal.ModModeFile;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.*;
 import me.sub.RelicFactions.Utils.Fastboard.FastBoard;
+import me.sub.RelicFactions.Utils.Tab.TabManager;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -167,6 +168,7 @@ public class UserRegisterEvent implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
+                if (!Main.getInstance().getConfig().getBoolean("features.tab")) return;
                 if (!p.isOnline()) {
                     cancel();
                     return;

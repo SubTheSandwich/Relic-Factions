@@ -60,7 +60,7 @@ public class Tab {
                 config.save(file);
             }
         } catch (IOException e) {
-            System.out.println("Unable to save file locale.yml");
+            System.out.println("Unable to save file tab.yml");
         }
     }
 }

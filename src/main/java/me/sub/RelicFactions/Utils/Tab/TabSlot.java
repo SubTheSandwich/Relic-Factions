@@ -1,5 +1,6 @@
 package me.sub.RelicFactions.Utils.Tab;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class TabSlot {
@@ -18,5 +19,17 @@ public class TabSlot {
 
     public UUID getUUID() {
         return uuid;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        TabSlot slot = (TabSlot) o;
+        return Objects.equals(name, slot.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(name);
     }
 }
