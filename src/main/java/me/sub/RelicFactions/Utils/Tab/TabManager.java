@@ -7,13 +7,17 @@ import com.comphenix.protocol.wrappers.*;
 import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.RunningKOTH;
 import me.sub.RelicFactions.Files.Classes.User;
+import me.sub.RelicFactions.Files.Enums.FactionType;
 import me.sub.RelicFactions.Files.Enums.Timer;
+import me.sub.RelicFactions.Files.Normal.Messages;
 import me.sub.RelicFactions.Files.Normal.Tab;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TabManager {
 
@@ -239,14 +243,30 @@ public class TabManager {
 
         // Handle <display=%has_faction%>
         if (name.contains("<display=%has_faction%")) {
-            if (!user.hasFaction()) {
-                return EMPTY;
-            } else {
-                Faction faction = Faction.get(user.getFaction());
-                name = name.replace("<display=%has_faction%", "");
-                name = name.replace("%dtr%", Faction.formatDTR(faction.getDTR()))
-                        .replace("%faction-online-count%", String.valueOf(faction.getOnlineMembers().size()))
-                        .replace("%faction-balance%", Main.getEconomy().format(faction.getBalance().doubleValue()));
+            if (!user.hasFaction()) return EMPTY;
+            Faction faction = Faction.get(user.getFaction());
+            name = name.replace("<display=%has_faction%", "");
+            name = name.replace("%dtr%", Faction.formatDTR(faction.getDTR()))
+                    .replace("%faction-online-count%", String.valueOf(faction.getOnlineMembers().size()))
+                    .replace("%faction-balance%", Main.getEconomy().format(faction.getBalance().doubleValue()));
+            if (name.contains("%faction-name%")) {
+                name = name.replace("%faction-name%", faction.getName());
+            }
+            if (name.contains("%faction-online-member-")) {
+                List<Player> onlineMembers = new ArrayList<>(faction.getOnlineMembers());
+                onlineMembers.sort(Comparator.comparing(Player::getName, String.CASE_INSENSITIVE_ORDER));
+
+                List<Integer> numbers = getNumbersFromPlaceholders(name);
+                for (int i : numbers) {
+                    String placeholder = "%faction-online-member-" + i + "%";
+                    String replacement;
+                    if (i > 0 && i <= onlineMembers.size()) {
+                        replacement = onlineMembers.get(i - 1).getName();
+                    } else {
+                        replacement = EMPTY;
+                    }
+                    name = name.replace(placeholder, replacement);
+                }
             }
         }
 
@@ -289,6 +309,67 @@ public class TabManager {
             name = name.replace("%active-koth%", runningKOTH.getKOTH().getName());
             name = name.replace("%active-koth-time%", Timer.format(runningKOTH.getTimeLeft()));
         }
+
+        if (name.contains("%faction-list-")) {
+            String format = Messages.get().getString("faction.list.team-format");
+            List<Faction> sortedPlayerFactions = Main.getInstance().factionNameHolder.values().stream()
+                    .filter(faction -> faction.getType() == FactionType.PLAYER)
+                    .sorted(
+                            Comparator.comparingInt((Faction f) -> f.getOnlineMembers().size()).reversed()
+                                    .thenComparing(Comparator.comparingInt((Faction f) -> f.getMembers().size()).reversed())
+                    )
+                    .toList();
+
+            List<Integer> numbers = getFactionListNumbers(name);
+            for (int i : numbers) {
+                String placeholder = "%faction-list-" + i + "%";
+                String replacement;
+                if (i > 0 && i <= sortedPlayerFactions.size()) {
+                    Faction faction = sortedPlayerFactions.get(i - 1);
+                    replacement = Objects.requireNonNull(C.chat(Objects.requireNonNull(format)))
+                            .replace("%number%", String.valueOf(i))
+                            .replace("%faction-name%", faction.getName())
+                            .replace("%online-members%", String.valueOf(faction.getOnlineMembers().size()))
+                            .replace("%members%", String.valueOf(faction.getMembers().size()));
+                } else {
+                    replacement = "";
+                }
+                name = name.replace(placeholder, replacement);
+            }
+        }
+
         return name;
+    }
+
+    private static List<Integer> getNumbersFromPlaceholders(String text) {
+        List<Integer> numbers = new ArrayList<>();
+        String pattern = "%faction-online-member-";
+        int startIndex = 0;
+
+        while ((startIndex = text.indexOf(pattern, startIndex)) != -1) {
+            try {
+                int numStart = startIndex + pattern.length();
+                int numEnd = text.indexOf("%", numStart);
+                if (numEnd != -1) {
+                    String numberStr = text.substring(numStart, numEnd);
+                    numbers.add(Integer.parseInt(numberStr));
+                }
+                startIndex = numEnd + 1;
+            } catch (Exception e) {
+                startIndex++;
+            }
+        }
+
+        return numbers;
+    }
+
+    private static List<Integer> getFactionListNumbers(String text) {
+        List<Integer> numbers = new ArrayList<>();
+        Pattern pattern = Pattern.compile("%faction-list-(\\d+)%");
+        Matcher matcher = pattern.matcher(text);
+        while (matcher.find()) {
+            numbers.add(Integer.parseInt(matcher.group(1)));
+        }
+        return numbers;
     }
 }

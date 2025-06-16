@@ -239,7 +239,7 @@ public class Main extends JavaPlugin {
         saveResource("config.yml", false);
         saveResource("locale.yml", false);
         saveResource("messages.yml", false);
-        saveResource("tab.yml", false);
+        Tab.save();
         Tab.load();
         Locale.load();
         ModModeFile.save();

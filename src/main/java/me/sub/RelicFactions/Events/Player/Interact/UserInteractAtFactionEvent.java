@@ -885,13 +885,14 @@ public class UserInteractAtFactionEvent implements Listener {
                 }
             }
             Material type = Objects.requireNonNull(block).getType();
-            if (Tag.TRAPDOORS.isTagged(type) || Tag.WOODEN_DOORS.isTagged(type) || Tag.BUTTONS.isTagged(type) || Tag.ANVIL.isTagged(type)
+            if (Tag.TRAPDOORS.isTagged(type) || type.equals(Material.LEVER) || Tag.WOODEN_DOORS.isTagged(type) || Tag.BUTTONS.isTagged(type) || Tag.ANVIL.isTagged(type)
                     || type.equals(Material.BARREL) || type.equals(Material.BEACON) || type.equals(Material.BLAST_FURNACE) || type.equals(Material.CARTOGRAPHY_TABLE)
                     || type.equals(Material.CHEST) || type.equals(Material.CRAFTER) || type.equals(Material.CRAFTING_TABLE) || type.equals(Material.DISPENSER)
                     || type.equals(Material.DROPPER) || type.equals(Material.TRAPPED_CHEST) || type.equals(Material.FURNACE) || type.equals(Material.SMOKER)
                     || type.equals(Material.HOPPER) || type.equals(Material.LOOM) || type.equals(Material.SHULKER_BOX) || type.equals(Material.SMITHING_TABLE)
                     || type.equals(Material.STONECUTTER) || Tag.FENCE_GATES.isTagged(type) || type.equals(Material.GRINDSTONE) || type.equals(Material.TNT)
                     || type.equals(Material.TNT_MINECART) || type.equals(Material.BREWING_STAND) || type.equals(Material.FLOWER_POT) || type.equals(Material.DECORATED_POT)) {
+                if (Tag.TRAPDOORS.isTagged(type) && type.equals(Material.IRON_TRAPDOOR)) return;
                 if (cannotModify(user, block.getLocation())) {
                     if (Objects.requireNonNull(rejectedModifierType(user, block.getLocation())).equalsIgnoreCase("FROZEN_SERVER")) {
                         if (!p.hasPermission("relic.bypass.freeze")) {
