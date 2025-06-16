@@ -16,10 +16,7 @@ import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.CreatureSpawner;
-import org.bukkit.block.Sign;
+import org.bukkit.block.*;
 import org.bukkit.block.sign.Side;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.*;
@@ -30,7 +27,9 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
+import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -140,6 +139,8 @@ public class UserInteractAtFactionEvent implements Listener {
         Player p = e.getPlayer();
         User user = User.get(p);
         Location location = e.getBlock().getLocation();
+        Block block = e.getBlock();
+
         for (Mountain mountain : Main.getInstance().mountains.values()) {
             if (!mountain.isSetup()) continue;
             Cuboid cuboid = mountain.getCuboid();
@@ -167,11 +168,83 @@ public class UserInteractAtFactionEvent implements Listener {
             combined(p, location, false);
             return;
         }
+
+        // --- SUBCLAIM PROTECTION START ---
+        // 1. Prevent breaking a [Subclaim] sign that is not theirs
+        if (block.getState() instanceof Sign sign) {
+            String firstLine = C.strip(C.serialize(sign.line(0)));
+            if (firstLine.equalsIgnoreCase("[Subclaim]")) {
+                String owner = C.strip(C.serialize(sign.line(1)));
+                if (!p.getName().equalsIgnoreCase(owner) && !user.isFactionBypass()) {
+                    e.setCancelled(true);
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.subclaim.cannot-open"))
+                            .replace("%name%", owner)));
+                    return;
+                }
+            }
+        }
+
+        // 2. Prevent breaking a container with a [Subclaim] sign not theirs (including double chests)
+        if (block.getState() instanceof Container) {
+            // Support for double chests
+            List<Block> chestBlocks = new ArrayList<>();
+            BlockState state = block.getState();
+            if (state instanceof Chest chest) {
+                Inventory inv = chest.getInventory();
+                if (inv instanceof DoubleChestInventory doubleInv) {
+                    DoubleChest doubleChest = doubleInv.getHolder();
+                    Chest left = (Chest) Objects.requireNonNull(doubleChest).getLeftSide();
+                    Chest right = (Chest) doubleChest.getRightSide();
+                    chestBlocks.add(Objects.requireNonNull(left).getBlock());
+                    chestBlocks.add(Objects.requireNonNull(right).getBlock());
+                    chestBlocks.add(Objects.requireNonNull(right).getBlock());
+                } else {
+                    chestBlocks.add(block);
+                }
+            } else {
+                chestBlocks.add(block);
+            }
+
+            boolean subclaimFound = false;
+            String subclaimOwner = null;
+
+            for (Block chestBlock : chestBlocks) {
+                for (BlockFace face : BlockFace.values()) {
+                    if (face == BlockFace.SELF) continue;
+                    Block relative = chestBlock.getRelative(face);
+                    BlockState relState = relative.getState();
+                    if (relState instanceof Sign foundSign) {
+                        boolean attached = false;
+                        if (relative.getBlockData() instanceof org.bukkit.block.data.Directional directional) {
+                            if (relative.getRelative(directional.getFacing().getOppositeFace()).equals(chestBlock)) {
+                                attached = true;
+                            }
+                        }
+                        String firstLine = C.strip(C.serialize(foundSign.line(0)));
+                        if (attached && firstLine.equalsIgnoreCase("[Subclaim]")) {
+                            subclaimFound = true;
+                            subclaimOwner = C.strip(C.serialize(foundSign.line(1)));
+                            break;
+                        }
+                    }
+                }
+                if (subclaimFound) break;
+            }
+
+            if (subclaimFound && !p.getName().equalsIgnoreCase(subclaimOwner) && !user.isFactionBypass()) {
+                e.setCancelled(true);
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.subclaim.cannot-open"))
+                        .replace("%name%", subclaimOwner)));
+                return;
+
+            }
+        }
+        // --- SUBCLAIM PROTECTION END ---
+
         if (isCrowbar(p.getInventory().getItemInMainHand())) {
             e.setCancelled(true);
             return;
         }
-        Block block = e.getBlock();
 
         if (isOre(block.getType()) && Main.getInstance().getConfig().getBoolean("features.autosmelt")) {
             Material smelted = getSmeltedResult(block.getType());
@@ -426,6 +499,98 @@ public class UserInteractAtFactionEvent implements Listener {
 
         String line0 = C.serialize(e.line(0));
         String line1 = C.serialize(e.line(1));
+
+        if (line0.equalsIgnoreCase("[Subclaim]")) {
+            Block signBlock = e.getBlock();
+            Block attachedBlock = null;
+            if (!user.hasFaction()) {
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.subclaim.need-faction"))));
+                e.setCancelled(true);
+                return;
+            }
+            Faction faction = Faction.get(user.getFaction());
+            if (faction.getCuboidAtLocation(e.getBlock().getLocation()) == null) {
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.subclaim.invalid-territory"))));
+                e.setCancelled(true);
+                return;
+            }
+
+            if (faction.getRoleID(p.getUniqueId()) < 1) {
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.subclaim.invalid-rank"))));
+                e.setCancelled(true);
+                return;
+            }
+
+            BlockState state = signBlock.getState();
+            if (state instanceof Sign) {
+                if (signBlock.getBlockData() instanceof org.bukkit.block.data.type.WallSign wallSign) {
+                    attachedBlock = signBlock.getRelative(wallSign.getFacing().getOppositeFace());
+                } else if (signBlock.getBlockData() instanceof org.bukkit.block.data.type.Sign) {
+                    attachedBlock = signBlock.getRelative(BlockFace.DOWN);
+                }
+            }
+
+            if (attachedBlock == null || !(attachedBlock.getState() instanceof Container)) {
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.subclaim.not-container"))));
+                e.setCancelled(true);
+                return;
+            }
+
+            // --- DOUBLE CHEST SUPPORT ---
+            BlockState attachedState = attachedBlock.getState();
+            List<Block> chestBlocks = new ArrayList<>();
+            if (attachedState instanceof Chest chest) {
+                Inventory inv = chest.getInventory();
+                if (inv instanceof DoubleChestInventory doubleInv) {
+                    DoubleChest doubleChest = doubleInv.getHolder();
+                    Chest left = (Chest) Objects.requireNonNull(doubleChest).getLeftSide();
+                    Chest right = (Chest) doubleChest.getRightSide();
+                    chestBlocks.add(Objects.requireNonNull(left).getBlock());
+                    chestBlocks.add(Objects.requireNonNull(right).getBlock());
+                } else {
+                    chestBlocks.add(attachedBlock);
+                }
+            } else {
+                chestBlocks.add(attachedBlock);
+            }
+
+            boolean signFound = false;
+            for (Block chestBlock : chestBlocks) {
+                for (BlockFace face : BlockFace.values()) {
+                    if (face == BlockFace.SELF) continue;
+                    Block relative = chestBlock.getRelative(face);
+                    BlockState relState = relative.getState();
+                    if (relState instanceof Sign foundSign) {
+                        boolean attached = false;
+                        if (relative.getBlockData() instanceof org.bukkit.block.data.Directional directional) {
+                            if (relative.getRelative(directional.getFacing().getOppositeFace()).equals(chestBlock)) {
+                                attached = true;
+                            }
+                        }
+                        String firstLine = C.strip(C.serialize(foundSign.line(0)));
+                        if (attached && firstLine.equalsIgnoreCase("[Subclaim]")) {
+                            signFound = true;
+                            break;
+                        }
+                    }
+                }
+                if (signFound) break;
+            }
+            if (signFound) {
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.subclaim.already-exists"))));
+                e.setCancelled(true);
+                return;
+            }
+
+            User in = User.get(line1);
+            if (in == null || !in.hasFaction() || !in.getFaction().equals(user.getFaction())) {
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.subclaim.invalid-faction-member")).replace("%name%", line1)));
+                e.setCancelled(true);
+                return;
+            }
+            p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.subclaim.created")).replace("%player%", in.getName())));
+            return;
+        }
 
         if (!line0.equalsIgnoreCase("[Elevator]")) return;
         if (!line1.equalsIgnoreCase("Up") && !line1.equalsIgnoreCase("Down")) return;
@@ -833,7 +998,62 @@ public class UserInteractAtFactionEvent implements Listener {
         }
         if (a.equals(Action.RIGHT_CLICK_BLOCK)) {
             Block block = e.getClickedBlock();
-            if (block != null && block.getState() instanceof Sign sign) {
+            // Check if the block is a container
+            if (Objects.requireNonNull(block).getState() instanceof Container) {
+                // Support for double chests
+                List<Block> chestBlocks = new ArrayList<>();
+                BlockState state = block.getState();
+                if (state instanceof Chest chest) {
+                    Inventory inv = chest.getInventory();
+                    if (inv instanceof DoubleChestInventory doubleInv) {
+                        DoubleChest doubleChest = doubleInv.getHolder();
+                        Chest left = (Chest) doubleChest.getLeftSide();
+                        Chest right = (Chest) doubleChest.getRightSide();
+                        chestBlocks.add(left.getBlock());
+                        chestBlocks.add(right.getBlock());
+                    } else {
+                        chestBlocks.add(block);
+                    }
+                } else {
+                    chestBlocks.add(block);
+                }
+
+                boolean subclaimFound = false;
+                String subclaimOwner = null;
+
+                for (Block chestBlock : chestBlocks) {
+                    for (BlockFace face : BlockFace.values()) {
+                        if (face == BlockFace.SELF) continue;
+                        Block relative = chestBlock.getRelative(face);
+                        BlockState relState = relative.getState();
+                        if (relState instanceof Sign foundSign) {
+                            boolean attached = false;
+                            if (relative.getBlockData() instanceof org.bukkit.block.data.Directional directional) {
+                                if (relative.getRelative(directional.getFacing().getOppositeFace()).equals(chestBlock)) {
+                                    attached = true;
+                                }
+                            }
+                            String firstLine = C.strip(C.serialize(foundSign.line(0)));
+                            if (attached && firstLine.equalsIgnoreCase("[Subclaim]")) {
+                                subclaimFound = true;
+                                subclaimOwner = C.strip(C.serialize(foundSign.line(1)));
+                                break;
+                            }
+                        }
+                    }
+                    if (subclaimFound) break;
+                }
+
+                if (subclaimFound && !user.isFactionBypass()) {
+                    if (!p.getName().equalsIgnoreCase(subclaimOwner)) {
+                        e.setCancelled(true);
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.subclaim.cannot-open"))
+                                .replace("%name%", subclaimOwner)));
+                        return;
+                    }
+                }
+            }
+            if (block.getState() instanceof Sign sign) {
                 List<Component> lines = sign.getSide(Side.FRONT).lines();
                 if (!C.serialize(lines.getFirst()).equalsIgnoreCase(C.chat("&9[Elevator]"))) return;
                 e.setCancelled(true);

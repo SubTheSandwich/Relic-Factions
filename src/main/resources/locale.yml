@@ -51,6 +51,15 @@ claiming:
     two: "&eSet position 2"
 
 events:
+  subclaim:
+    already-exists: "&cA subclaim already exists on this block."
+    need-faction: "&cYou need a Faction to create a subclaim."
+    invalid-rank: "&cYou need to be a Captain or above to create a subclaim."
+    invalid-territory: "&cYou need to be in your Faction's territory to create a subclaim."
+    invalid-faction-member: "&c%name% is not on your team."
+    cannot-open: "&cYou have no permission to open this subclaim."
+    not-container: "&cYou cannot create a subclaim here."
+    created: "&eYou have created a subclaim for &b%player%&e."
   kit:
     speed-active: "&eYou have activated your &aSpeed Effect&e."
     jump-active: "&eYou have activated your &aJump Effect&e."
