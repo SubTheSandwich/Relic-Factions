@@ -172,10 +172,20 @@ public class UserInteractAtFactionEvent implements Listener {
         // --- SUBCLAIM PROTECTION START ---
         // 1. Prevent breaking a [Subclaim] sign that is not theirs
         if (block.getState() instanceof Sign sign) {
-            String firstLine = C.strip(C.serialize(sign.line(0)));
-            if (firstLine.equalsIgnoreCase("[Subclaim]")) {
-                String owner = C.strip(C.serialize(sign.line(1)));
+            Side side = null;
+            if (C.serialize(sign.getSide(Side.FRONT).line(0)).equalsIgnoreCase(C.chat("&9[Subclaim]"))) {
+                side = Side.FRONT;
+            } else if (C.serialize(sign.getSide(Side.BACK).line(0)).equalsIgnoreCase(C.chat("&9[Subclaim]"))) {
+                side = Side.BACK;
+            }
+
+            if (side != null) {
+                String owner = C.strip(C.serialize(sign.getSide(side).line(1)));
                 if (!p.getName().equalsIgnoreCase(owner) && !user.isFactionBypass()) {
+                    Faction faction = Faction.getAt(sign.getLocation());
+                    if (faction == null) return;
+                    if (faction.getType() != FactionType.PLAYER) return;
+                    if (faction.getLeader().equals(user.getUUID())) return;
                     e.setCancelled(true);
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.subclaim.cannot-open"))
                             .replace("%name%", owner)));
@@ -220,10 +230,15 @@ public class UserInteractAtFactionEvent implements Listener {
                                 attached = true;
                             }
                         }
-                        String firstLine = C.strip(C.serialize(foundSign.line(0)));
-                        if (attached && firstLine.equalsIgnoreCase("[Subclaim]")) {
+                        Side side = null;
+                        if (C.serialize(foundSign.getSide(Side.FRONT).line(0)).equalsIgnoreCase(C.chat("&9[Subclaim]"))) {
+                            side = Side.FRONT;
+                        } else if (C.serialize(foundSign.getSide(Side.BACK).line(0)).equalsIgnoreCase(C.chat("&9[Subclaim]"))) {
+                            side = Side.BACK;
+                        }
+                        if (attached && side != null) {
                             subclaimFound = true;
-                            subclaimOwner = C.strip(C.serialize(foundSign.line(1)));
+                            subclaimOwner = C.strip(C.serialize(foundSign.getSide(side).line(1)));
                             break;
                         }
                     }
@@ -500,7 +515,7 @@ public class UserInteractAtFactionEvent implements Listener {
         String line0 = C.serialize(e.line(0));
         String line1 = C.serialize(e.line(1));
 
-        if (line0.equalsIgnoreCase("[Subclaim]")) {
+        if (C.strip(line0).equalsIgnoreCase(C.chat("[Subclaim]"))) {
             Block signBlock = e.getBlock();
             Block attachedBlock = null;
             if (!user.hasFaction()) {
@@ -555,6 +570,8 @@ public class UserInteractAtFactionEvent implements Listener {
             }
 
             boolean signFound = false;
+            Side sideFound = null;
+            Location signLocation = null;
             for (Block chestBlock : chestBlocks) {
                 for (BlockFace face : BlockFace.values()) {
                     if (face == BlockFace.SELF) continue;
@@ -567,9 +584,17 @@ public class UserInteractAtFactionEvent implements Listener {
                                 attached = true;
                             }
                         }
-                        String firstLine = C.strip(C.serialize(foundSign.line(0)));
-                        if (attached && firstLine.equalsIgnoreCase("[Subclaim]")) {
+                        Side side = null;
+                        if (C.serialize(foundSign.getSide(Side.FRONT).line(0)).equalsIgnoreCase(C.chat("&9[Subclaim]"))) {
+                            side = Side.FRONT;
+                        } else if (C.serialize(foundSign.getSide(Side.BACK).line(0)).equalsIgnoreCase(C.chat("&9[Subclaim]"))) {
+                            side = Side.BACK;
+                        }
+
+                        if (attached && side != null) {
                             signFound = true;
+                            sideFound = side;
+                            signLocation = foundSign.getLocation();
                             break;
                         }
                     }
@@ -577,6 +602,66 @@ public class UserInteractAtFactionEvent implements Listener {
                 if (signFound) break;
             }
             if (signFound) {
+                if (e.getSide() == sideFound && signLocation.equals(e.getBlock().getLocation())) {
+                    User play = User.get(line1);
+                    System.out.println(line1);
+                    System.out.println(play);
+                    if (play == null) {
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.subclaim.invalid-faction-member")).replace("%name%", line1)));
+                        e.setCancelled(true);
+                        return;
+                    }
+                    if (!play.hasFaction()) {
+                        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.subclaim.invalid-faction-member")).replace("%name%", line1)));
+                        e.setCancelled(true);
+                        return;
+                    }
+                    if (play.getName().equalsIgnoreCase(user.getName())) {
+                        if (block.getState() instanceof Sign sign) {
+                            List<Component> oldLines = sign.getSide(e.getSide()).lines();
+                            if (C.serialize(oldLines.getFirst()).equalsIgnoreCase(C.chat("&9[Subclaim]")) && !C.serialize(lines.getFirst()).equals("[Subclaim]")) {
+                                e.line(0, Component.text(C.strip(C.serialize(e.line(0)))));
+                                return;
+                            }
+                            if (!C.serialize(oldLines.get(1)).equalsIgnoreCase(C.serialize(lines.get(1)))) {
+                                User in = User.get(line1);
+                                if (in == null || !in.hasFaction() || !in.getFaction().equals(user.getFaction())) {
+                                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.subclaim.invalid-faction-member")).replace("%name%", line1)));
+                                    e.setCancelled(true);
+                                    return;
+                                }
+                                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.subclaim.created")).replace("%player%", in.getName())));
+                                e.line(0, Component.text(C.chat("&9[Subclaim]")));
+                                e.line(1, Component.text(in.getName()));
+                                return;
+                            }
+                        }
+                        return;
+                    }
+                    Faction playFac = Faction.get(play.getFaction());
+                    if (playFac.getLeader().equals(user.getUUID())) {
+                        if (block.getState() instanceof Sign sign) {
+                            List<Component> oldLines = sign.getSide(e.getSide()).lines();
+                            if (C.serialize(oldLines.getFirst()).equalsIgnoreCase(C.chat("&9[Subclaim]")) && !C.serialize(lines.getFirst()).equals("[Subclaim]")) {
+                                e.line(0, Component.text(C.strip(C.serialize(e.line(0)))));
+                                return;
+                            }
+                            if (!C.serialize(oldLines.get(1)).equalsIgnoreCase(C.serialize(lines.get(1)))) {
+                                User in = User.get(line1);
+                                if (in == null || !in.hasFaction() || !in.getFaction().equals(user.getFaction())) {
+                                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.subclaim.invalid-faction-member")).replace("%name%", line1)));
+                                    e.setCancelled(true);
+                                    return;
+                                }
+                                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.subclaim.created")).replace("%player%", in.getName())));
+                                e.line(0, Component.text(C.chat("&9[Subclaim]")));
+                                e.line(1, Component.text(in.getName()));
+                                return;
+                            }
+                        }
+                        return;
+                    }
+                }
                 p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.subclaim.already-exists"))));
                 e.setCancelled(true);
                 return;
@@ -589,6 +674,8 @@ public class UserInteractAtFactionEvent implements Listener {
                 return;
             }
             p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.subclaim.created")).replace("%player%", in.getName())));
+            e.line(0, Component.text(C.chat("&9[Subclaim]")));
+            e.line(1, Component.text(in.getName()));
             return;
         }
 
@@ -1007,10 +1094,10 @@ public class UserInteractAtFactionEvent implements Listener {
                     Inventory inv = chest.getInventory();
                     if (inv instanceof DoubleChestInventory doubleInv) {
                         DoubleChest doubleChest = doubleInv.getHolder();
-                        Chest left = (Chest) doubleChest.getLeftSide();
+                        Chest left = (Chest) Objects.requireNonNull(doubleChest).getLeftSide();
                         Chest right = (Chest) doubleChest.getRightSide();
-                        chestBlocks.add(left.getBlock());
-                        chestBlocks.add(right.getBlock());
+                        chestBlocks.add(Objects.requireNonNull(left).getBlock());
+                        chestBlocks.add(Objects.requireNonNull(right).getBlock());
                     } else {
                         chestBlocks.add(block);
                     }
@@ -1033,10 +1120,15 @@ public class UserInteractAtFactionEvent implements Listener {
                                     attached = true;
                                 }
                             }
-                            String firstLine = C.strip(C.serialize(foundSign.line(0)));
-                            if (attached && firstLine.equalsIgnoreCase("[Subclaim]")) {
+                            Side side = null;
+                            if (C.serialize(foundSign.getSide(Side.FRONT).line(0)).equalsIgnoreCase(C.chat("&9[Subclaim]"))) {
+                                side = Side.FRONT;
+                            } else if (C.serialize(foundSign.getSide(Side.BACK).line(0)).equalsIgnoreCase(C.chat("&9[Subclaim]"))) {
+                                side = Side.BACK;
+                            }
+                            if (attached && side != null) {
                                 subclaimFound = true;
-                                subclaimOwner = C.strip(C.serialize(foundSign.line(1)));
+                                subclaimOwner = C.strip(C.serialize(foundSign.getSide(side).line(1)));
                                 break;
                             }
                         }
@@ -1046,6 +1138,10 @@ public class UserInteractAtFactionEvent implements Listener {
 
                 if (subclaimFound && !user.isFactionBypass()) {
                     if (!p.getName().equalsIgnoreCase(subclaimOwner)) {
+                        Faction faction = Faction.getAt(block.getLocation());
+                        if (faction == null) return;
+                        if (faction.getType() != FactionType.PLAYER) return;
+                        if (faction.getLeader().equals(user.getUUID())) return;
                         e.setCancelled(true);
                         p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.subclaim.cannot-open"))
                                 .replace("%name%", subclaimOwner)));
