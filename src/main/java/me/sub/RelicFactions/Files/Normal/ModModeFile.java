@@ -20,32 +20,41 @@ import java.util.Objects;
 
 public class ModModeFile {
 
+    private static FileConfiguration config;
+    private static File file;
+
+    public static void load() {
+        File folder = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder(), "features");
+        file = new File(folder, "mod-mode.yml");
+        config = YamlConfiguration.loadConfiguration(file);
+    }
+
     public static FileConfiguration get() {
-        File file = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder(), "features" + File.separator + "mod-mode.yml");
-        return YamlConfiguration.loadConfiguration(file);
+        if (config == null) {
+            load();
+        }
+        return config;
     }
 
     public static void save() {
         try {
-            File folder = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder(), "features");
-            if (!folder.exists()) {
-                folder.mkdirs();
-            }
-
-            File file = new File(folder, "mod-mode.yml");
-
-            if (!file.exists()) {
-                Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).saveResource("mod-mode.yml", false);
-
-
-                File defaultFile = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder(), "mod-mode.yml");
-                if (defaultFile.exists()) {
-                    defaultFile.renameTo(file);
+            if (config != null && file != null) {
+                File folder = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder(), "features");
+                if (!folder.exists()) {
+                    folder.mkdirs();
                 }
-            }
 
-            FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-            config.save(file);
+                if (!file.exists()) {
+                    Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).saveResource("mod-mode.yml", false);
+
+                    File defaultFile = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder(), "mod-mode.yml");
+                    if (defaultFile.exists()) {
+                        defaultFile.renameTo(file);
+                    }
+                }
+
+                config.save(file);
+            }
         } catch (IOException e) {
             System.out.println("Unable to save file mod-mode.yml");
         }

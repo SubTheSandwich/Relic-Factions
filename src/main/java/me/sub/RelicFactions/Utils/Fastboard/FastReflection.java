@@ -79,6 +79,10 @@ public final class FastReflection {
         return optionalClass(nmsClassName(post1_17package, className));
     }
 
+    public static Optional<Class<?>> nmsOptionalClass(String post1_17package, String spigotClass, String mojangClass) {
+        return optionalClass(nmsClassName(post1_17package, MOJANG_MAPPINGS ? mojangClass : spigotClass));
+    }
+
     public static String obcClassName(String className) {
         return OBC_PACKAGE + '.' + className;
     }
@@ -132,7 +136,7 @@ public final class FastReflection {
         }
     }
 
-    static PacketConstructor findPacketConstructor(Class<?> packetClass, MethodHandles.Lookup lookup) throws Exception {
+    public static PacketConstructor findPacketConstructor(Class<?> packetClass, MethodHandles.Lookup lookup) throws Exception {
         try {
             MethodHandle constructor = lookup.findConstructor(packetClass, VOID_METHOD_TYPE);
             return constructor::invoke;

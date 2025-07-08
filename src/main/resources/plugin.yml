@@ -135,3 +135,5 @@ commands:
     description: Chat
   eotw:
     description: EOTW
+  research:
+    description: Research

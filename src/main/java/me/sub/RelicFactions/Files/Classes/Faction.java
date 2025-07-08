@@ -4,6 +4,7 @@ import me.sub.RelicFactions.Files.Data.Cuboid;
 import me.sub.RelicFactions.Files.Data.FactionData;
 import me.sub.RelicFactions.Files.Enums.Color;
 import me.sub.RelicFactions.Files.Enums.FactionType;
+import me.sub.RelicFactions.Files.Enums.Tree;
 import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
@@ -43,6 +44,7 @@ public class Faction {
     private ArrayList<UUID> allies;
     private ArrayList<UUID> allyRequests;
     private UUID focusedFaction;
+    private HashMap<String, Tree> tree;
 
     public Faction(FactionData factionData) {
         this.factionData = factionData;
@@ -70,6 +72,16 @@ public class Faction {
         focusedFaction = null;
         ff = false;
         modified = false;
+        if (factionData.get().getString("tree") == null) {
+            tree = Main.getInstance().getDefaultTree();
+        } else {
+            ArrayList<Tree> trees = Tree.deserializeTreeList(Objects.requireNonNull(factionData.get().getString("tree")));
+            HashMap<String, Tree> map = new HashMap<>();
+            for (Tree tree : trees) {
+                map.put(tree.getName(), tree);
+            }
+            tree = map;
+        }
     }
 
     public static boolean isInWilderness(Location location, int boundary) {
@@ -483,5 +495,14 @@ public class Faction {
             if (cuboid.isIn(clone)) return cuboid;
         }
         return null;
+    }
+
+    public HashMap<String, Tree> getTree() {
+        return tree;
+    }
+
+    public void setTree(HashMap<String, Tree> tree) {
+        modified = true;
+        this.tree = tree;
     }
 }

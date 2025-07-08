@@ -13,16 +13,26 @@ import java.util.Objects;
 
 public class Messages {
 
+    private static FileConfiguration config;
+    private static File file;
+
+    public static void load() {
+        file = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder(), "messages.yml");
+        config = YamlConfiguration.loadConfiguration(file);
+    }
+
     public static FileConfiguration get() {
-        File file = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder(), "messages.yml");
-        return YamlConfiguration.loadConfiguration(file);
+        if (config == null) {
+            load();
+        }
+        return config;
     }
 
     public static void save() {
         try {
-            File file = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder(), "messages.yml");
-            FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-            config.save(file);
+            if (config != null && file != null) {
+                config.save(file);
+            }
         } catch (IOException e) {
             System.out.println("Unable to save file messages.yml");
         }

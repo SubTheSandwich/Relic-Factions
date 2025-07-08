@@ -27,4 +27,25 @@ public class BlockCommandEvent implements Listener {
         e.setCancelled(true);
         p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.freeze.blocked"))));
     }
+
+    @EventHandler
+    public void onCombatCommand(PlayerCommandPreprocessEvent e) {
+        Player p = e.getPlayer();
+        User user = User.get(p);
+
+        String fullCommand = e.getMessage();
+        String[] args = fullCommand.substring(1).split(" ");
+
+        String command = args[0].toLowerCase();
+        if (!user.hasTimer("combat")) return;
+        String type = Main.getInstance().getConfig().getString("commands.combat.type");
+        if (!Objects.requireNonNull(type).equalsIgnoreCase("ALLOW") && !type.equalsIgnoreCase("DENY")) return;
+        if (type.equalsIgnoreCase("ALLOW")) {
+            if (Main.getInstance().getConfig().getStringList("commands.freeze-allowed").contains(command)) return;
+        } else {
+            if (!Main.getInstance().getConfig().getStringList("commands.freeze-allowed").contains(command)) return;
+        }
+        e.setCancelled(true);
+        p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.timer.player.cannot-do"))));
+    }
 }

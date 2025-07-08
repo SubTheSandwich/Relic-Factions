@@ -18,42 +18,40 @@ public class Tab {
     public static boolean headerEnabled;
     public static boolean footerEnabled;
     private static final List<String> slotLines = new ArrayList<>();
+    
+    private static FileConfiguration config;
+    private static File file;
+
+    private static void loadConfig() {
+        File folder = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder(), "features");
+        file = new File(folder, "tab.yml");
+        config = YamlConfiguration.loadConfiguration(file);
+    }
 
     public static FileConfiguration get() {
-        File file = new File(
-                Objects.requireNonNull(Bukkit.getServer().getPluginManager()
-                        .getPlugin("Relic-Factions")).getDataFolder(),
-                "features" + File.separator + "tab.yml"
-        );
-        return YamlConfiguration.loadConfiguration(file);
+        if (config == null) {
+            loadConfig();
+        }
+        return config;
     }
 
     public static void save() {
         try {
-            File folder = new File(
-                    Objects.requireNonNull(Bukkit.getServer().getPluginManager()
-                            .getPlugin("Relic-Factions")).getDataFolder(),
-                    "features"
-            );
-            folder.mkdirs();
+            if (config != null && file != null) {
+                File folder = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder(), "features");
+                folder.mkdirs();
 
-            File file = new File(folder, "tab.yml");
-            if (!file.exists()) {
-                Objects.requireNonNull(Bukkit.getServer().getPluginManager()
-                        .getPlugin("Relic-Factions")).saveResource("tab.yml", false);
+                if (!file.exists()) {
+                    Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).saveResource("tab.yml", false);
 
-                File defaultFile = new File(
-                        Objects.requireNonNull(Bukkit.getServer().getPluginManager()
-                                .getPlugin("Relic-Factions")).getDataFolder(),
-                        "tab.yml"
-                );
-                if (defaultFile.exists()) {
-                    defaultFile.renameTo(file);
+                    File defaultFile = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder(), "tab.yml");
+                    if (defaultFile.exists()) {
+                        defaultFile.renameTo(file);
+                    }
                 }
-            }
 
-            FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-            config.save(file);
+                config.save(file);
+            }
         } catch (IOException e) {
             System.out.println("Unable to save file tab.yml");
         }

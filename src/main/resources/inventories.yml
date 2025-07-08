@@ -2,6 +2,38 @@ filler:
   enabled: true
   item: GRAY_STAINED_GLASS_PANE
 
+tree: # Tree inventory contains more data. Be weary when modifying
+  name: "&5Faction Research"
+  unlock:
+    item: LIME_STAINED_GLASS_PANE # The item that replaces the unlocked part
+    lore:
+      retain-previous: false # Will retain same lore as locked item if true
+      text:
+        - "&aUnlocked!"
+  size: 54
+  items:
+    prot-first:
+      name: "&9Protection 3"
+      id: "Protection 3"
+      item: DIAMOND_CHESTPLATE
+      slot: 0
+      lore:
+        - "&eCost: &b%points% points"
+    prot-second:
+      name: "&9Protection 4"
+      id: "Protection 4"
+      item: DIAMOND_CHESTPLATE
+      slot: 1
+      lore:
+        - "&eCost: &b%points% points"
+    prot-third:
+      name: "&9Protection 5"
+      id: "Protection 5"
+      item: DIAMOND_CHESTPLATE
+      slot: 2
+      lore:
+        - "&eCost: &b%points% points"
+
 notes-view: # notes will only be filled in the first 4 rows (aka 36 notes each page). Notes menu is 54 size
   name: "&aNotes View"
   items:

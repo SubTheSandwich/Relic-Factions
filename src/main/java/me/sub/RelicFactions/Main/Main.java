@@ -16,7 +16,9 @@ import me.sub.RelicFactions.Events.Player.Server.UserRegisterEvent;
 import me.sub.RelicFactions.Events.World.ListenerEvents;
 import me.sub.RelicFactions.Files.Classes.*;
 import me.sub.RelicFactions.Files.Data.*;
+import me.sub.RelicFactions.Files.Data.Note;
 import me.sub.RelicFactions.Files.Enums.FactionType;
+import me.sub.RelicFactions.Files.Enums.Tree;
 import me.sub.RelicFactions.Files.Normal.*;
 import me.sub.RelicFactions.Files.Normal.Locale;
 import me.sub.RelicFactions.Utils.C;
@@ -26,15 +28,16 @@ import me.sub.RelicFactions.Utils.Maps;
 import me.sub.RelicFactions.Utils.Permission;
 import me.sub.RelicFactions.Utils.Tab.TabManager;
 import net.milkbowl.vault.economy.Economy;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.Tag;
+import org.bukkit.*;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
@@ -45,9 +48,19 @@ import java.util.stream.Collectors;
 
 public class Main extends JavaPlugin {
 
-    // TODO: Ability Items (Switcher Ball, etc.)
 
-    // TODO: Tab List
+    /*
+
+    TODO: Make all files load to limit amount of IO operations. Reload in /hcf reload
+
+    TODO: Figure out ability handling format
+
+    TODO: Trees. Implement them into factions
+
+    TODO: Force unlocking of tree nodes by staff, and normal tree behaviors
+
+     */
+
     /*
 
     Brewing Potion Limiting is very complex, may come back and tackle another time
@@ -87,6 +100,8 @@ public class Main extends JavaPlugin {
 
     private boolean isServerFrozen;
     private String keyAllCommand;
+
+    private final HashMap<String, Tree> defaultTrees = new HashMap<>();
 
 
     private static Main instance;
@@ -128,6 +143,7 @@ public class Main extends JavaPlugin {
         events();
         commands();
         loadFiles();
+        loadTrees();
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -143,6 +159,54 @@ public class Main extends JavaPlugin {
         keyAllCommand = null;
         eotw = false;
         manager = new TabManager();
+    }
+
+    @SuppressWarnings("deprecation")
+    public void loadTrees() {
+        defaultTrees.clear();
+        for (String node : Objects.requireNonNull(TreeFile.get().getConfigurationSection("nodes")).getKeys(false)) {
+            String sec = "nodes." + node + ".";
+            String type = TreeFile.get().getString(sec + "type");
+            if (type == null) continue;
+
+            int points = TreeFile.get().getInt(sec + "unlock.points");
+            String group = TreeFile.get().getString(sec + "unlock.group");
+            int level = TreeFile.get().getInt(sec + "unlock.level");
+            String name = TreeFile.get().getString(sec + "name");
+
+            if (type.equalsIgnoreCase("ENCHANTMENT")) {
+                String enchType = TreeFile.get().getString(sec + "enchantment.type");
+                int enchLevel = TreeFile.get().getInt(sec + "enchantment.level");
+                Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(Objects.requireNonNull(enchType.toLowerCase())));
+                if (enchantment == null) continue; // skip if invalid
+                EnchantmentTree enchantmentTree = new EnchantmentTree(
+                        false, // unlocked
+                        name,
+                        enchantment,
+                        enchLevel,
+                        points,
+                        group,
+                        level
+                );
+                defaultTrees.put(name, enchantmentTree);
+            } else if (type.equalsIgnoreCase("POTION")) {
+                String effectTypeKey = TreeFile.get().getString(sec + "potion.type");
+                int amplifier = TreeFile.get().getInt(sec + "potion.amplifier");
+                int duration = TreeFile.get().getInt(sec + "potion.duration");
+                PotionEffectType effectType = PotionEffectType.getByKey(NamespacedKey.minecraft(Objects.requireNonNull(effectTypeKey)));
+                if (effectType == null) continue; // skip if invalid
+                PotionEffect effect = new PotionEffect(effectType, duration, amplifier);
+                PotionTree potionTree = new PotionTree(
+                        false, // unlocked
+                        name,
+                        effect,
+                        points,
+                        group,
+                        level
+                );
+                defaultTrees.put(name, potionTree);
+            }
+        }
     }
 
     @Override
@@ -207,6 +271,7 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("reply")).setExecutor(new ReplyCommand()); Objects.requireNonNull(getCommand("reply")).setTabCompleter(new ReplyCommand());
         Objects.requireNonNull(getCommand("settings")).setExecutor(new SettingsCommand()); Objects.requireNonNull(getCommand("settings")).setTabCompleter(new SettingsCommand());
         Objects.requireNonNull(getCommand("profile")).setExecutor(new ProfileCommand()); Objects.requireNonNull(getCommand("profile")).setTabCompleter(new ProfileCommand());
+        Objects.requireNonNull(getCommand("research")).setExecutor(new ResearchCommand()); Objects.requireNonNull(getCommand("research")).setTabCompleter(new ResearchCommand());
     }
 
 
@@ -230,6 +295,7 @@ public class Main extends JavaPlugin {
         pm.registerEvents(new EnchantLimitEvents(), this);
         pm.registerEvents(new NotesInteractEvent(), this);
         pm.registerEvents(new HCFClassEvent(), this);
+        pm.registerEvents(new ResearchClickEvent(), this);
 
         // Server
         pm.registerEvents(new ListenerEvents(), this);
@@ -246,6 +312,7 @@ public class Main extends JavaPlugin {
         Inventories.save();
         Locations locations = new Locations();
         locations.save();
+        TreeFile.save();
     }
 
     private boolean setupEconomy() {
@@ -462,6 +529,7 @@ public class Main extends JavaPlugin {
             factionData.get().set("claims", Maps.cuboidListToString(faction.getClaims()));
             factionData.get().set("deathban", faction.isDeathban());
             factionData.get().set("home", faction.getHome() == null ? null : faction.getHome());
+            factionData.get().set("tree", Tree.serializeTreeList(new ArrayList<>(faction.getTree().values())));
             factionData.save();
             faction.setModified(false);
             saved++;
@@ -646,5 +714,9 @@ public class Main extends JavaPlugin {
 
     public TabManager getTabManager() {
         return manager;
+    }
+
+    public HashMap<String, Tree> getDefaultTree() {
+        return defaultTrees;
     }
 }

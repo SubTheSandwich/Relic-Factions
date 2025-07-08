@@ -190,6 +190,19 @@ faction:
     damage: "&eBe careful, &e%player% &eis an ally."
 
 commands:
+  research:
+    open:
+      self: "&eYou have opened your faction's research menu."
+      other: "&eYou have opened &b%faction%&e's research menu."
+    cannot: "&cYou can only perform this command in your own faction or a safezone."
+    force:
+      confirm: "&cAre you sure you want to force upgrade this? Click again to confirm!"
+      success: "&eYou have forcefully upgraded &b%node% &efor &a%faction%"
+    normal:
+      confirm: "&cAre you sure you want to upgrade this? Click again to confirm!"
+      cannot-skip: "&cYou cannot skip levels when upgrading!"
+      not-points: "&cYour faction does not have enough points for this upgrade."
+      success: "&eYou have successfully upgraded &b%node% &efor &a%points% points&e."
   eotw:
     usage: "&cUsage: /eotw <start;stop;commence>"
     already-starting: "&cEOTW has already started."

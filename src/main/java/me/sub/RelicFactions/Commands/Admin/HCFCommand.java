@@ -40,6 +40,7 @@ public class HCFCommand implements TabExecutor {
             Main.getInstance().users.clear();
             Main.getInstance().userNameHolder.clear();
             Main.getInstance().loadFiles();
+            Main.getInstance().loadTrees();
             Locale.load();
             Tab.load();
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.hcf.reload.success"))));

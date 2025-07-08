@@ -1,17 +1,39 @@
+/*
+ * This file is part of FastBoard, licensed under the MIT License.
+ *
+ * Copyright (c) 2019-2023 MrMicky
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package me.sub.RelicFactions.Utils.Fastboard;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
-import java.util.List;
 import java.util.Objects;
 
-// Modified FastBoard class to use Adventure
+/**
+ * {@inheritDoc}
+ */
 public class FastBoard extends FastBoardBase<String> {
 
     private static final MethodHandle MESSAGE_FROM_STRING;
@@ -28,21 +50,30 @@ public class FastBoard extends FastBoardBase<String> {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public FastBoard(Player player) {
         super(player);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void updateTitle(String title) {
         Objects.requireNonNull(title, "title");
 
-        if (!VersionType.V1_13.isHigherOrEqual() && title.length() > 32) {
+        if (!FastBoardBase.VersionType.V1_13.isHigherOrEqual() && title.length() > 32) {
             throw new IllegalArgumentException("Title is longer than 32 chars");
         }
 
         super.updateTitle(title);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void updateLines(String... lines) {
         Objects.requireNonNull(lines, "lines");
@@ -68,26 +99,29 @@ public class FastBoard extends FastBoardBase<String> {
         String suffix = "";
 
         if (line == null || line.isEmpty()) {
-            // Use reset code directly
-            prefix = COLOR_CODES[score] + "§r";
+            prefix = COLOR_CODES[score] + ChatColor.RESET;
         } else if (line.length() <= maxLength) {
             prefix = line;
         } else {
             // Prevent splitting color codes
-            int index = line.charAt(maxLength - 1) == '§'
+            int index = line.charAt(maxLength - 1) == ChatColor.COLOR_CHAR
                     ? (maxLength - 1) : maxLength;
             prefix = line.substring(0, index);
             String suffixTmp = line.substring(index);
+            ChatColor chatColor = null;
 
-            // Get the last color using Adventure
-            String color = getLastColor(prefix);
-            boolean addColor = !isFormatCode(suffixTmp);
+            if (suffixTmp.length() >= 2 && suffixTmp.charAt(0) == ChatColor.COLOR_CHAR) {
+                chatColor = ChatColor.getByChar(suffixTmp.charAt(1));
+            }
 
-            // Use reset code if no color, otherwise use the last color
-            suffix = (addColor ? (color.isEmpty() ? "§r" : color) : "") + suffixTmp;
+            String color = ChatColor.getLastColors(prefix);
+            boolean addColor = chatColor == null || chatColor.isFormat();
+
+            suffix = (addColor ? (color.isEmpty() ? ChatColor.RESET.toString() : color) : "") + suffixTmp;
         }
 
         if (prefix.length() > maxLength || suffix.length() > maxLength) {
+            // Something went wrong, just cut to prevent client crash/kick
             prefix = prefix.substring(0, Math.min(maxLength, prefix.length()));
             suffix = suffix.substring(0, Math.min(maxLength, suffix.length()));
         }
@@ -100,6 +134,7 @@ public class FastBoard extends FastBoardBase<String> {
         if (line == null || line.isEmpty()) {
             return EMPTY_MESSAGE;
         }
+
         return Array.get(MESSAGE_FROM_STRING.invoke(line), 0);
     }
 
@@ -113,36 +148,14 @@ public class FastBoard extends FastBoardBase<String> {
         return "";
     }
 
+    /**
+     * Return if the player has a prefix/suffix characters limit.
+     * By default, it returns true only in 1.12 or lower.
+     * This method can be overridden to fix compatibility with some versions support plugin.
+     *
+     * @return max length
+     */
     protected boolean hasLinesMaxLength() {
         return !VersionType.V1_13.isHigherOrEqual();
-    }
-
-    // --- Adventure color helpers ---
-
-    // Get the last color code in a string (Adventure equivalent)
-    private String getLastColor(String input) {
-        // Use Adventure to parse the string and get the last color
-        Component comp = LegacyComponentSerializer.legacySection().deserialize(input);
-        TextColor lastColor = getLastTextColor(comp);
-        if (lastColor == null) return "";
-        // Convert TextColor to legacy code
-        return LegacyComponentSerializer.legacySection().serialize(Component.text("").color(lastColor));
-    }
-
-    // Recursively get the last TextColor in a component
-    private TextColor getLastTextColor(Component comp) {
-        TextColor color = comp.color();
-        List<Component> children = comp.children();
-        if (!children.isEmpty()) {
-            TextColor childColor = getLastTextColor(children.getLast());
-            if (childColor != null) return childColor;
-        }
-        return color;
-    }
-
-    // Check if the suffix starts with a format code (bold, italic, etc.)
-    private boolean isFormatCode(String s) {
-        // Adventure doesn't use format codes in the same way, so just check for §l, §o, etc.
-        return s.length() >= 2 && s.charAt(0) == '§' && "lno".indexOf(Character.toLowerCase(s.charAt(1))) != -1;
     }
 }

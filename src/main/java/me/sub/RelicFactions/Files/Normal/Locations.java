@@ -10,26 +10,28 @@ import java.util.Objects;
 
 public class Locations {
 
-    File file;
-    FileConfiguration customFile;
+    private static File file;
+    private static FileConfiguration config;
 
-    public Locations() {
+    public static void load() {
         file = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder(), "locations.yml");
-        customFile = YamlConfiguration.loadConfiguration(file);
+        config = YamlConfiguration.loadConfiguration(file);
     }
 
-
-    public FileConfiguration get() {
-        return customFile;
+    public static FileConfiguration get() {
+        if (config == null) {
+            load();
+        }
+        return config;
     }
 
-
-    public void save() {
+    public static void save() {
         try {
-            customFile.save(file);
+            if (config != null && file != null) {
+                config.save(file);
+            }
         } catch (IOException e) {
             System.out.println("Unable to save file locations.yml");
         }
     }
-
 }

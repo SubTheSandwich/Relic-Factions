@@ -73,6 +73,9 @@ public class User {
     private ArrayList<Note> notes;
     private HCFClass hcfClass;
     private BigDecimal bardEnergy;
+    private UUID openedTreeFaction;
+    private boolean isTreeForceOnce;
+    private boolean isTreeOnce;
 
     public User(UserData userData) {
         userDisconnected = true;
@@ -125,6 +128,9 @@ public class User {
         revived = false;
         hcfClass = null;
         bardEnergy = BigDecimal.ZERO;
+        openedTreeFaction = null;
+        isTreeForceOnce = false;
+        isTreeOnce = false;
     }
 
     public BigDecimal getBardEnergy() {
@@ -784,5 +790,29 @@ public class User {
 
         // 4. Check if within allowed angle (e.g., 45 degrees)
         return angleDegrees > (180.0 - maxAngleDegrees);
+    }
+
+    public UUID getOpenedTreeFaction() {
+        return openedTreeFaction;
+    }
+
+    public void setOpenedTreeFaction(UUID openedTreeFaction) {
+        this.openedTreeFaction = openedTreeFaction;
+    }
+
+    public boolean isTreeForceOnce() {
+        return isTreeForceOnce;
+    }
+
+    public void setTreeForceOnce(boolean treeForceOnce) {
+        isTreeForceOnce = treeForceOnce;
+    }
+
+    public boolean isTreeOnce() {
+        return isTreeOnce;
+    }
+
+    public void setTreeOnce(boolean treeOnce) {
+        isTreeOnce = treeOnce;
     }
 }

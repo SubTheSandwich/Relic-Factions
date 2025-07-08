@@ -23,6 +23,7 @@
  */
 package me.sub.RelicFactions.Utils.Fastboard;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.lang.invoke.MethodHandle;
@@ -42,16 +43,14 @@ import java.util.stream.Stream;
  * The project is on <a href="https://github.com/MrMicky-FR/FastBoard">GitHub</a>.
  *
  * @author MrMicky
- * @version 2.1.4
+ * @version 2.1.5
  */
 public abstract class FastBoardBase<T> {
 
     private static final Map<Class<?>, Field[]> PACKETS = new HashMap<>(8);
-    protected static final String[] COLOR_CODES = {
-            "§0", "§1", "§2", "§3", "§4", "§5", "§6", "§7",
-            "§8", "§9", "§a", "§b", "§c", "§d", "§e", "§f",
-            "§k", "§l", "§m", "§n", "§o", "§r"
-    };
+    protected static final String[] COLOR_CODES = Arrays.stream(ChatColor.values())
+            .map(Object::toString)
+            .toArray(String[]::new);
     private static final VersionType VERSION_TYPE;
     // Packets and components
     private static final Class<?> CHAT_COMPONENT_CLASS;
@@ -166,7 +165,7 @@ public abstract class FastBoardBase<T> {
             PACKET_SB_SET_SCORE = packetSbSetScore;
             PACKET_SB_RESET_SCORE = packetSbResetScore;
             PACKET_SB_TEAM = FastReflection.findPacketConstructor(packetSbTeamClass, lookup);
-            PACKET_SB_SERIALIZABLE_TEAM = sbTeamClass == null ? null : FastReflection.findPacketConstructor(sbTeamClass, lookup);
+            PACKET_SB_SERIALIZABLE_TEAM = sbTeamClass != null ? FastReflection.findPacketConstructor(sbTeamClass, lookup) : null;
             FIXED_NUMBER_FORMAT = fixedFormatConstructor;
             BLANK_NUMBER_FORMAT = blankNumberFormat;
             SCORE_OPTIONAL_COMPONENTS = scoreOptionalComponents;
@@ -201,10 +200,10 @@ public abstract class FastBoardBase<T> {
                         ? "ScoreboardServer$Action"
                         : "PacketPlayOutScoreboardScore$EnumScoreboardAction";
                 ENUM_SB_HEALTH_DISPLAY = FastReflection.nmsClass("world.scores.criteria", "IScoreboardCriteria$EnumScoreboardHealthDisplay", "ObjectiveCriteria$RenderType");
-                ENUM_SB_ACTION = FastReflection.nmsClass("server", enumSbActionClass, "ServerScoreboard$Method");
+                ENUM_SB_ACTION = FastReflection.nmsOptionalClass("server", enumSbActionClass, "ServerScoreboard$Method").orElse(null);
                 ENUM_SB_HEALTH_DISPLAY_INTEGER = FastReflection.enumValueOf(ENUM_SB_HEALTH_DISPLAY, "INTEGER", 0);
-                ENUM_SB_ACTION_CHANGE = FastReflection.enumValueOf(ENUM_SB_ACTION, "CHANGE", 0);
-                ENUM_SB_ACTION_REMOVE = FastReflection.enumValueOf(ENUM_SB_ACTION, "REMOVE", 1);
+                ENUM_SB_ACTION_CHANGE = ENUM_SB_ACTION != null ? FastReflection.enumValueOf(ENUM_SB_ACTION, "CHANGE", 0) : null;
+                ENUM_SB_ACTION_REMOVE = ENUM_SB_ACTION != null ? FastReflection.enumValueOf(ENUM_SB_ACTION, "REMOVE", 1) : null;
             } else {
                 ENUM_SB_HEALTH_DISPLAY = null;
                 ENUM_SB_ACTION = null;
@@ -390,7 +389,6 @@ public abstract class FastBoardBase<T> {
      * @throws IllegalArgumentException if one line is longer than 30 chars on 1.12 or lower
      * @throws IllegalStateException    if {@link #delete()} was call before
      */
-    @SuppressWarnings("unchecked")
     public void updateLines(T... lines) {
         updateLines(Arrays.asList(lines));
     }
@@ -442,7 +440,7 @@ public abstract class FastBoardBase<T> {
                     for (int i = oldLinesCopy.size(); i > linesSize; i--) {
                         sendTeamPacket(i - 1, TeamMode.REMOVE);
                         sendScorePacket(i - 1, ScoreboardAction.REMOVE);
-                        oldLines.removeFirst();
+                        oldLines.remove(0);
                     }
                 } else {
                     for (int i = oldLinesCopy.size(); i < linesSize; i++) {
@@ -507,8 +505,7 @@ public abstract class FastBoardBase<T> {
      * @throws IllegalArgumentException if the size of the texts does not match the current size of the board
      * @throws IllegalStateException    if {@link #delete()} was call before
      */
-    @SuppressWarnings("unchecked")
-    public final synchronized void updateScores(T... texts) {
+    public synchronized void updateScores(T... texts) {
         updateScores(Arrays.asList(texts));
     }
 
