@@ -12,6 +12,12 @@ tree: # Tree inventory contains more data. Be weary when modifying
         - "&aUnlocked!"
   size: 54
   items:
+    apple: # If an item does not have an ID, it will be treated as a normal item
+      name: "&aApple"
+      item: APPLE
+      slot: 15
+      lore:
+        - "&aTest Apple Item"
     prot-first:
       name: "&9Protection 3"
       id: "Protection 3"

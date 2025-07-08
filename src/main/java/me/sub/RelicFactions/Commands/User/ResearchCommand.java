@@ -114,8 +114,36 @@ public class ResearchCommand implements TabExecutor {
 
         for (String s : Objects.requireNonNull(Inventories.get().getConfigurationSection("tree.items")).getKeys(false)) {
             String i = "tree.items." + s + ".";
+
+            if (Inventories.get().getString(i + "id") == null) {
+                ItemStack item = new ItemStack(Objects.requireNonNull(Material.matchMaterial(Objects.requireNonNull(Inventories.get().getString(i + "item")))));
+                ItemMeta meta = item.getItemMeta();
+                meta.addItemFlags(ItemFlag.values());
+                meta.displayName(Component.text(C.chat(Objects.requireNonNull(Inventories.get().getString(i + "name")))));
+                ArrayList<Component> lore = new ArrayList<>();
+                for (String l : Inventories.get().getStringList(i + "lore")) {
+                    lore.add(Component.text(C.chat(l)));
+                }
+                meta.lore(lore);
+                item.setItemMeta(meta);
+                inventory.setItem(Inventories.get().getInt(i + "slot"), item);
+                continue;
+            }
             Tree tree = faction.getTree().get(Objects.requireNonNull(Inventories.get().getString(i + "id")));
-            if (tree == null) continue;
+            if (tree == null) {
+                ItemStack item = new ItemStack(Objects.requireNonNull(Material.matchMaterial(Objects.requireNonNull(Inventories.get().getString(i + "item")))));
+                ItemMeta meta = item.getItemMeta();
+                meta.addItemFlags(ItemFlag.values());
+                meta.displayName(Component.text(C.chat(Objects.requireNonNull(Inventories.get().getString(i + "name")))));
+                ArrayList<Component> lore = new ArrayList<>();
+                for (String l : Inventories.get().getStringList(i + "lore")) {
+                    lore.add(Component.text(C.chat(l)));
+                }
+                meta.lore(lore);
+                item.setItemMeta(meta);
+                inventory.setItem(Inventories.get().getInt(i + "slot"), item);
+                continue;
+            }
             ItemStack item = new ItemStack(Objects.requireNonNull(Material.matchMaterial(Objects.requireNonNull(Inventories.get().getString(i + "item")))));
             ItemMeta meta = item.getItemMeta();
             meta.addItemFlags(ItemFlag.values());

@@ -173,7 +173,7 @@ public class Main extends JavaPlugin {
             if (type.equalsIgnoreCase("ENCHANTMENT")) {
                 String enchType = TreeFile.get().getString(sec + "enchantment.type");
                 int enchLevel = TreeFile.get().getInt(sec + "enchantment.level");
-                Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(Objects.requireNonNull(enchType.toLowerCase())));
+                Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(Objects.requireNonNull(Objects.requireNonNull(enchType).toLowerCase())));
                 if (enchantment == null) continue; // skip if invalid
                 EnchantmentTree enchantmentTree = new EnchantmentTree(
                         false, // unlocked
