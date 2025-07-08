@@ -302,11 +302,10 @@ public class UserMoveEvent implements Listener {
             return;
         }
 
-        Locations locations = new Locations();
         if (!e.getCause().equals(PlayerTeleportEvent.TeleportCause.END_PORTAL) && !e.getCause().equals(PlayerTeleportEvent.TeleportCause.UNKNOWN)) return;
         if (Objects.requireNonNull(e.getFrom().getWorld()).getEnvironment() == World.Environment.THE_END &&
                 Objects.requireNonNull(e.getTo().getWorld()).getEnvironment() == World.Environment.NORMAL) {
-            Location endExit = locations.get().getLocation("end.exit");
+            Location endExit = Locations.get().getLocation("end.exit");
             if (endExit != null) {
                 new BukkitRunnable() {
                     @Override
@@ -330,12 +329,11 @@ public class UserMoveEvent implements Listener {
             p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("events.timer.player.end"))));
             return;
         }
-        Locations locations = new Locations();
         if (!e.getCause().equals(PlayerTeleportEvent.TeleportCause.END_PORTAL)) return;
 
 
         if (Objects.requireNonNull(Objects.requireNonNull(e.getTo()).getWorld()).getEnvironment() == World.Environment.THE_END) {
-            Location endSpawn = locations.get().getLocation("end.spawn");
+            Location endSpawn = Locations.get().getLocation("end.spawn");
             if (endSpawn != null) {
                 new BukkitRunnable() {
                     @Override

@@ -2,6 +2,7 @@ package me.sub.RelicFactions.Commands.User;
 
 import me.sub.RelicFactions.Files.Classes.Faction;
 import me.sub.RelicFactions.Files.Classes.User;
+import me.sub.RelicFactions.Files.Data.TreeHandler;
 import me.sub.RelicFactions.Files.Enums.FactionType;
 import me.sub.RelicFactions.Files.Enums.Tree;
 import me.sub.RelicFactions.Files.Normal.Inventories;
@@ -36,6 +37,7 @@ public class ResearchCommand implements TabExecutor {
             return true;
         }
         User user = User.get(p);
+        TreeHandler treeHandler = user.getTreeHandler();
         if (args.length == 1) {
             if (!p.hasPermission("relic-factions.command.research.others")) {
                 p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
@@ -53,7 +55,7 @@ public class ResearchCommand implements TabExecutor {
             }
             p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.research.open.other")).replace("%faction%", faction.getName())));
             p.openInventory(getTree(faction));
-            user.setOpenedTreeFaction(faction.getUUID());
+            treeHandler.setFaction(faction.getUUID());
             return true;
         }
         if (!user.hasFaction()) {
@@ -76,7 +78,7 @@ public class ResearchCommand implements TabExecutor {
             }
         }
         p.openInventory(getTree(Faction.get(user.getFaction())));
-        user.setOpenedTreeFaction(user.getFaction());
+        treeHandler.setFaction(user.getFaction());
         p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.research.open.self")).replace("%faction%", faction.getName())));
         return false;
     }
@@ -136,6 +138,8 @@ public class ResearchCommand implements TabExecutor {
                     }
                 }
                 unlockMeta.lore(lore);
+                NamespacedKey name = new NamespacedKey(Main.getInstance(), "nodeRemoveName");
+                unlockMeta.getPersistentDataContainer().set(name, PersistentDataType.STRING, tree.getName());
                 unlocked.setItemMeta(unlockMeta);
                 inventory.setItem(Inventories.get().getInt(i + "slot"), unlocked);
                 continue;

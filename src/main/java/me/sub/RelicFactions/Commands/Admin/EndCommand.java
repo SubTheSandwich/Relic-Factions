@@ -32,15 +32,13 @@ public class EndCommand implements TabExecutor {
             return true;
         }
 
-        Locations locations = new Locations();
-
         if (args[0].equalsIgnoreCase("setspawn")) {
             if (!p.getWorld().getEnvironment().equals(World.Environment.THE_END)) {
                 p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.end.not-end"))));
                 return true;
             }
-            locations.get().set("end.spawn", p.getLocation());
-            locations.save();
+            Locations.get().set("end.spawn", p.getLocation());
+            Locations.save();
             p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.end.spawn"))));
             return true;
         }
@@ -49,8 +47,8 @@ public class EndCommand implements TabExecutor {
                 p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.end.not-overworld"))));
                 return true;
             }
-            locations.get().set("end.exit", p.getLocation());
-            locations.save();
+            Locations.get().set("end.exit", p.getLocation());
+            Locations.save();
             p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.end.exit"))));
             return true;
         }

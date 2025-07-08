@@ -8,14 +8,14 @@ nodes:
       level: 1
     enchantment:
       type: PROTECTION
-      level: 3
+      level: 2
   protection-4:
     name: "Protection 4"
     type: ENCHANTMENT
     unlock:
       points: 10
       group: PROTECTION
-      level: 2
+      level: 3
     enchantment:
       type: PROTECTION
       level: 4
@@ -28,4 +28,4 @@ nodes:
       level: 3
     enchantment:
       type: PROTECTION
-      level: 5
+      level: 4

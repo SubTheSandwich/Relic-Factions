@@ -51,13 +51,9 @@ public class Main extends JavaPlugin {
 
     /*
 
-    TODO: Make all files load to limit amount of IO operations. Reload in /hcf reload
-
     TODO: Figure out ability handling format
 
-    TODO: Trees. Implement them into factions
-
-    TODO: Force unlocking of tree nodes by staff, and normal tree behaviors
+    TODO: Potential potion trees (after potion limiting), and possibly making limited enchantment update in anvil?
 
      */
 
@@ -305,14 +301,12 @@ public class Main extends JavaPlugin {
         saveResource("config.yml", false);
         saveResource("locale.yml", false);
         saveResource("messages.yml", false);
-        Tab.save();
         Tab.load();
         Locale.load();
-        ModModeFile.save();
-        Inventories.save();
-        Locations locations = new Locations();
-        locations.save();
-        TreeFile.save();
+        Locations.load();
+        ModModeFile.load();
+        Inventories.load();
+        TreeFile.load();
     }
 
     private boolean setupEconomy() {
