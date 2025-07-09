@@ -53,7 +53,9 @@ public class Main extends JavaPlugin {
 
     TODO: Figure out ability handling format
 
-    TODO: Potential potion trees (after potion limiting), and possibly making limited enchantment update in anvil?
+    TODO: Potential potion trees (after potion limiting)
+
+    TODO: Crates (potentially)
 
      */
 
