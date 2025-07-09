@@ -47,11 +47,11 @@ public class ResearchClickEvent implements Listener {
             p.closeInventory();
             return;
         }
-        if (user.getFaction() == null && !p.hasPermission("relic-factions.command.research.others")) {
+        if (user.getFaction() == null && !p.hasPermission("relic.command.research.others")) {
             p.closeInventory();
             return;
         }
-        if (user.getFaction() != null && !user.getFaction().equals(treeHandler.getFaction()) && !p.hasPermission("relic-factions.command.research.others")) {
+        if (user.getFaction() != null && !user.getFaction().equals(treeHandler.getFaction()) && !p.hasPermission("relic.command.research.others")) {
             p.closeInventory();
             return;
         }
@@ -64,7 +64,7 @@ public class ResearchClickEvent implements Listener {
         if (!type.equals(ClickType.LEFT) && !type.equals(ClickType.RIGHT) && !type.equals(ClickType.MIDDLE)) return;
         if (type.equals(ClickType.MIDDLE)) {
             if (!meta.getPersistentDataContainer().has(remove)) return;
-            if (!p.hasPermission("relic-factions.command.research.others")) return;
+            if (!p.hasPermission("relic.command.research.others")) return;
             Tree treeNode = faction.getTree().get(nodeRemoveName);
             if (treeNode == null) return;
             if (!treeHandler.isTreeRemoveOne()) {
@@ -89,8 +89,8 @@ public class ResearchClickEvent implements Listener {
         if (!meta.getPersistentDataContainer().has(name)) return;
         Tree treeNode = faction.getTree().get(nodeName);
         if (treeNode == null) return;
-        if (type.equals(ClickType.RIGHT) || (p.hasPermission("relic-factions.command.research.others") && (user.getFaction() == null || !user.getFaction().equals(faction.getUUID())))) {
-            if (p.hasPermission("relic-factions.command.research.others")) {
+        if (type.equals(ClickType.RIGHT) || (p.hasPermission("relic.command.research.others") && (user.getFaction() == null || !user.getFaction().equals(faction.getUUID())))) {
+            if (p.hasPermission("relic.command.research.others")) {
                 if (!treeHandler.isTreeForceOnce()) {
                     treeHandler.setTreeForceOnce(true);
                     p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.research.force.confirm"))));
@@ -112,7 +112,7 @@ public class ResearchClickEvent implements Listener {
             }
         }
 
-        if (!p.hasPermission("relic-factions.command.research.others") && (user.getFaction() == null || !user.getFaction().equals(faction.getUUID()))) {
+        if (!p.hasPermission("relic.command.research.others") && (user.getFaction() == null || !user.getFaction().equals(faction.getUUID()))) {
             p.closeInventory();
             return;
         }
@@ -122,15 +122,14 @@ public class ResearchClickEvent implements Listener {
             return;
         }
 
-        int lowestLevel = 0;
+        int highestUnlockedLevel = 0;
         for (Tree tree : faction.getTree().values()) {
-            if (!tree.getGroup().equals(treeNode.getGroup())) return;
-            if (tree.getLevel() < treeNode.getLevel()) continue;
+            if (!tree.getGroup().equals(treeNode.getGroup())) continue; // Only process same group
             if (!tree.isUnlocked()) continue;
-            if (tree.getLevel() > lowestLevel) lowestLevel = tree.getLevel();
+            if (tree.getLevel() > highestUnlockedLevel) highestUnlockedLevel = tree.getLevel();
         }
 
-        if (Math.abs(lowestLevel - treeNode.getLevel()) > 1) {
+        if (Math.abs(highestUnlockedLevel - treeNode.getLevel()) > 1) {
             p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.research.normal.cannot-skip"))));
             return;
         }

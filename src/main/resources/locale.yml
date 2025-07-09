@@ -191,6 +191,7 @@ faction:
 
 commands:
   research:
+    delete: "&eYou have reset the research tree of &b%faction%&e."
     open:
       self: "&eYou have opened your faction's research menu."
       other: "&eYou have opened &b%faction%&e's research menu."

@@ -8,11 +8,14 @@ import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.enchantments.EnchantmentOffer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.enchantment.EnchantItemEvent;
+import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
 import org.bukkit.event.inventory.*;
+import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
@@ -24,6 +27,45 @@ import java.util.UUID;
 public class EnchantLimitEvents implements Listener {
 
     private final Map<Inventory, UUID> playerAnvils = new HashMap<>();
+
+    @EventHandler
+    public void onPrepareEnchant(PrepareItemEnchantEvent e) {
+        Player p = e.getEnchanter();
+        User user = User.get(p);
+        if (Permission.has(p, "admin") || p.hasPermission("relic.bypass.enchant-limiters")) return;
+        for (EnchantmentOffer offer : e.getOffers()) {
+            if (offer == null) continue;
+            Enchantment enchantment = offer.getEnchantment();
+            for (String s : Main.getInstance().getConfig().getStringList("limiters.enchants")) {
+                String name = s.split(";")[0];
+                if (name.equalsIgnoreCase(enchantment.getKey().getKey())) {
+                    int levelLimit = Integer.parseInt(s.split(";")[1]);
+                    if (offer.getEnchantmentLevel() > levelLimit) {
+                        if (!user.hasFaction()) {
+                            offer.setEnchantmentLevel(levelLimit);
+                            return;
+                        }
+                        Faction faction = Faction.get(user.getFaction());
+                        if (faction == null) {
+                            offer.setEnchantmentLevel(levelLimit);
+                            return;
+                        }
+                        HashMap<String, Tree> trees = faction.getTree();
+                        for (Tree tree : trees.values()) {
+                            if (!tree.isUnlocked()) continue;
+                            if (!(tree instanceof EnchantmentTree enchantmentTree)) continue;
+                            if (!enchantmentTree.getEnchantment().equals(enchantment)) continue;
+                            if (enchantmentTree.getEnchantLevel() > levelLimit)
+                                levelLimit = enchantmentTree.getEnchantLevel();
+                        }
+                        if (offer.getEnchantmentLevel() > levelLimit) {
+                            offer.setEnchantmentLevel(levelLimit);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     @EventHandler
     public void onEnchant(EnchantItemEvent e) {
@@ -82,13 +124,61 @@ public class EnchantLimitEvents implements Listener {
             playerAnvils.remove(e.getInventory());
             return;
         }
-        if (Permission.has(p, "admin") || p.hasPermission("relic.bypass.enchant-limiters")) return;
+        AnvilInventory inv = e.getInventory();
+        ItemStack first = inv.getItem(0);
+        ItemStack second = inv.getItem(1);
+        if (first == null || second == null) return;
         User user = User.get(p);
         ItemStack item = e.getResult();
         if (item == null) return;
         if (item.getItemMeta() == null) return;
         if (item.getItemMeta() instanceof EnchantmentStorageMeta meta) {
             for (Enchantment enchantment : meta.getStoredEnchants().keySet()) {
+
+                int firstLevel = -1;
+                int secondLevel = -2;
+                if (first.getItemMeta() instanceof EnchantmentStorageMeta storageMeta) {
+                    if (storageMeta.hasStoredEnchant(enchantment)) firstLevel = storageMeta.getStoredEnchantLevel(enchantment);
+                } else {
+                    if (first.getEnchantments().containsKey(enchantment)) firstLevel = first.getEnchantmentLevel(enchantment);
+                }
+
+                if (second.getItemMeta() instanceof EnchantmentStorageMeta storageMeta) {
+                    if (storageMeta.hasStoredEnchant(enchantment)) secondLevel = storageMeta.getStoredEnchantLevel(enchantment);
+                } else {
+                    if (second.getEnchantments().containsKey(enchantment)) second.getEnchantmentLevel(enchantment);
+                }
+
+                if (firstLevel == secondLevel) {
+                    if ((firstLevel + 1) > enchantment.getMaxLevel()) {
+
+                        for (String string : Main.getInstance().getConfig().getStringList("limiters.enchants")) {
+                            String name = string.split(";")[0];
+                            if (!name.equalsIgnoreCase(enchantment.getKey().getKey())) continue;
+                            int levelLimit = Integer.parseInt(string.split(";")[1]);
+                            Faction faction = Faction.get(user.getFaction());
+                            if (faction == null) continue;
+                            HashMap<String, Tree> trees = faction.getTree();
+                            for (Tree tree : trees.values()) {
+                                if (!tree.isUnlocked()) continue;
+                                if (!(tree instanceof EnchantmentTree enchantmentTree)) continue;
+                                if (!enchantmentTree.getEnchantment().equals(enchantment)) continue;
+                                if (enchantmentTree.getEnchantLevel() > levelLimit)
+                                    levelLimit = enchantmentTree.getEnchantLevel();
+                            }
+                            if (levelLimit >= (firstLevel + 1)) {
+                                meta.removeStoredEnchant(enchantment);
+                                meta.addStoredEnchant(enchantment, (firstLevel + 1), true);
+                                item.setItemMeta(meta);
+                                e.setResult(item);
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                if (Permission.has(p, "admin") || p.hasPermission("relic.bypass.enchant-limiters")) return;
+
                 for (String string : Main.getInstance().getConfig().getStringList("limiters.enchants")) {
                     String name = string.split(";")[0];
                     if (name.equalsIgnoreCase(enchantment.getKey().getKey())) {
@@ -131,6 +221,49 @@ public class EnchantLimitEvents implements Listener {
         }
         if (!item.getItemMeta().hasEnchants()) return;
         for (Enchantment enchantment : item.getEnchantments().keySet()) {
+
+            int firstLevel = -1;
+            int secondLevel = -2;
+            if (first.getItemMeta() instanceof EnchantmentStorageMeta storageMeta) {
+                if (storageMeta.hasStoredEnchant(enchantment)) firstLevel = storageMeta.getStoredEnchantLevel(enchantment);
+            } else {
+                if (first.getEnchantments().containsKey(enchantment)) firstLevel = first.getEnchantmentLevel(enchantment);
+            }
+
+            if (second.getItemMeta() instanceof EnchantmentStorageMeta storageMeta) {
+                if (storageMeta.hasStoredEnchant(enchantment)) secondLevel = storageMeta.getStoredEnchantLevel(enchantment);
+            } else {
+                if (second.getEnchantments().containsKey(enchantment)) second.getEnchantmentLevel(enchantment);
+            }
+
+            if (firstLevel == secondLevel) {
+                if ((firstLevel + 1) > enchantment.getMaxLevel()) {
+
+                    for (String string : Main.getInstance().getConfig().getStringList("limiters.enchants")) {
+                        String name = string.split(";")[0];
+                        if (!name.equalsIgnoreCase(enchantment.getKey().getKey())) continue;
+                        int levelLimit = Integer.parseInt(string.split(";")[1]);
+                        Faction faction = Faction.get(user.getFaction());
+                        if (faction == null) continue;
+                        HashMap<String, Tree> trees = faction.getTree();
+                        for (Tree tree : trees.values()) {
+                            if (!tree.isUnlocked()) continue;
+                            if (!(tree instanceof EnchantmentTree enchantmentTree)) continue;
+                            if (!enchantmentTree.getEnchantment().equals(enchantment)) continue;
+                            if (enchantmentTree.getEnchantLevel() > levelLimit)
+                                levelLimit = enchantmentTree.getEnchantLevel();
+                        }
+                        if (levelLimit >= (firstLevel + 1)) {
+                            item.removeEnchantment(enchantment);
+                            item.addUnsafeEnchantment(enchantment, (firstLevel + 1));
+                            return;
+                        }
+                    }
+                }
+            }
+
+            if (Permission.has(p, "admin") || p.hasPermission("relic.bypass.enchant-limiters")) return;
+
             for (String string : Main.getInstance().getConfig().getStringList("limiters.enchants")) {
                 String name = string.split(";")[0];
                 if (name.equalsIgnoreCase(enchantment.getKey().getKey())) {

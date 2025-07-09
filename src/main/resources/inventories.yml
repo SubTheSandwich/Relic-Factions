@@ -39,6 +39,13 @@ tree: # Tree inventory contains more data. Be weary when modifying
       slot: 2
       lore:
         - "&eCost: &b%points% points"
+    prot-fourth:
+      name: "&9Protection 6"
+      id: "Protection 6"
+      item: DIAMOND_CHESTPLATE
+      slot: 3
+      lore:
+        - "&eCost: &b%points% points"
 
 notes-view: # notes will only be filled in the first 4 rows (aka 36 notes each page). Notes menu is 54 size
   name: "&aNotes View"

@@ -317,7 +317,7 @@ public class User {
     public static int getDeathbanTime(Player player) {
         int time = Main.getInstance().getConfig().getInt("deathban.default-time");
         for (String rank : Objects.requireNonNull(Main.getInstance().getConfig().getConfigurationSection("deathban.times")).getKeys(false)) {
-            if (!player.hasPermission("relic-factions.deathban." + rank.toLowerCase())) return time;
+            if (!player.hasPermission("relic.deathban." + rank.toLowerCase())) return time;
             time = Main.getInstance().getConfig().getInt("deathban.times." + rank);
         }
         return time;

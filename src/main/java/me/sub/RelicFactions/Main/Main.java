@@ -303,12 +303,22 @@ public class Main extends JavaPlugin {
         saveResource("config.yml", false);
         saveResource("locale.yml", false);
         saveResource("messages.yml", false);
+        Tab.save();
         Tab.load();
+        Locale.save();
         Locale.load();
+        Locations.save();
         Locations.load();
+        ModModeFile.save();
         ModModeFile.load();
+        Inventories.save();
         Inventories.load();
+        TreeFile.save();
         TreeFile.load();
+        Reclaim.save();
+        Reclaim.load();
+        Messages.save();
+        Messages.load();
     }
 
     private boolean setupEconomy() {

@@ -39,7 +39,7 @@ public class ResearchCommand implements TabExecutor {
         User user = User.get(p);
         TreeHandler treeHandler = user.getTreeHandler();
         if (args.length == 1) {
-            if (!p.hasPermission("relic-factions.command.research.others")) {
+            if (!p.hasPermission("relic.command.research.others")) {
                 p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
                 return true;
             }
@@ -57,6 +57,26 @@ public class ResearchCommand implements TabExecutor {
             p.openInventory(getTree(faction));
             treeHandler.setFaction(faction.getUUID());
             return true;
+        }
+        if (args.length == 2) {
+            if (!p.hasPermission("relic.command.research.reset")) {
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.no-permission"))));
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("reset")) {
+                Faction faction = Faction.get(args[1]);
+                if (faction == null) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.faction-only"))));
+                    return true;
+                }
+                if (!faction.getType().equals(FactionType.PLAYER)) {
+                    p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.player-only"))));
+                    return true;
+                }
+                faction.setTree(Main.getInstance().getDefaultTree());
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.research.delete")).replace("%faction%", faction.getName())));
+                return true;
+            }
         }
         if (!user.hasFaction()) {
             p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("primary.faction.none"))));
@@ -90,14 +110,36 @@ public class ResearchCommand implements TabExecutor {
             @NotNull String alias,
             @NotNull String @NotNull [] args
     ) {
-        // Only tab complete for the first argument
-        if (args.length == 1 && sender instanceof Player p) {
-            if (!p.hasPermission("relic-factions.command.research.others")) return List.of();
+        if (!(sender instanceof Player p)) return List.of();
 
-            // Suggest all player faction names that start with the current input
-            String input = args[0].toLowerCase();
+        // Tab complete for first argument
+        if (args.length == 1) {
             List<String> suggestions = new ArrayList<>();
-            for (Faction faction : Main.getInstance().factions.values()) { // Replace with your method to get all factions
+
+            // Suggest "reset" if player has permission
+            if (p.hasPermission("relic.command.research.reset") && "reset".startsWith(args[0].toLowerCase())) {
+                suggestions.add("reset");
+            }
+
+            // Suggest faction names if player has permission
+            if (p.hasPermission("relic.command.research.others")) {
+                String input = args[0].toLowerCase();
+                for (Faction faction : Main.getInstance().factions.values()) {
+                    if (faction.getType() != FactionType.PLAYER) continue;
+                    String name = faction.getName();
+                    if (name.toLowerCase().startsWith(input)) {
+                        suggestions.add(name);
+                    }
+                }
+            }
+            return suggestions;
+        }
+
+        // Tab complete for second argument (after "reset")
+        if (args.length == 2 && args[0].equalsIgnoreCase("reset") && p.hasPermission("relic.command.research.reset")) {
+            String input = args[1].toLowerCase();
+            List<String> suggestions = new ArrayList<>();
+            for (Faction faction : Main.getInstance().factions.values()) {
                 if (faction.getType() != FactionType.PLAYER) continue;
                 String name = faction.getName();
                 if (name.toLowerCase().startsWith(input)) {
@@ -106,6 +148,7 @@ public class ResearchCommand implements TabExecutor {
             }
             return suggestions;
         }
+
         return List.of();
     }
 

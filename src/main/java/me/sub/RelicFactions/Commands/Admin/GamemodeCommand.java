@@ -145,8 +145,8 @@ public class GamemodeCommand implements TabExecutor {
                     return true;
                 }
                 p.setGameMode(GameMode.CREATIVE);
-                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.gamemode.other")).replace("%player%", sender.getName()).replace("%gamemode%", "Creative")));
-                sender.sendMessage(C.chat(Objects.requireNonNull(Objects.requireNonNull(Locale.get().getString("commands.gamemode.for-other")).replace("%player%", p.getName()).replace("%gamemode%", "Creative"))));
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.gamemode.for-other")).replace("%player%", sender.getName()).replace("%gamemode%", "Creative")));
+                sender.sendMessage(C.chat(Objects.requireNonNull(Objects.requireNonNull(Locale.get().getString("commands.gamemode.other")).replace("%player%", p.getName()).replace("%gamemode%", "Creative"))));
                 return true;
             }
             if (args[0].equalsIgnoreCase("spectator") || args[0].equalsIgnoreCase("sp")) {
@@ -155,8 +155,8 @@ public class GamemodeCommand implements TabExecutor {
                     return true;
                 }
                 p.setGameMode(GameMode.SPECTATOR);
-                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.gamemode.other")).replace("%player%", sender.getName()).replace("%gamemode%", "Spectator")));
-                sender.sendMessage(C.chat(Objects.requireNonNull(Objects.requireNonNull(Locale.get().getString("commands.gamemode.for-other")).replace("%player%", p.getName()).replace("%gamemode%", "Spectator"))));
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.gamemode.for-other")).replace("%player%", sender.getName()).replace("%gamemode%", "Spectator")));
+                sender.sendMessage(C.chat(Objects.requireNonNull(Objects.requireNonNull(Locale.get().getString("commands.gamemode.other")).replace("%player%", p.getName()).replace("%gamemode%", "Spectator"))));
                 return true;
             }
             if (args[0].equalsIgnoreCase("adventure") || args[0].equalsIgnoreCase("a")) {
@@ -165,8 +165,8 @@ public class GamemodeCommand implements TabExecutor {
                     return true;
                 }
                 p.setGameMode(GameMode.ADVENTURE);
-                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.gamemode.other")).replace("%player%", sender.getName()).replace("%gamemode%", "Adventure")));
-                sender.sendMessage(C.chat(Objects.requireNonNull(Objects.requireNonNull(Locale.get().getString("commands.gamemode.for-other")).replace("%player%", p.getName()).replace("%gamemode%", "Adventure"))));
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.gamemode.for-other")).replace("%player%", sender.getName()).replace("%gamemode%", "Adventure")));
+                sender.sendMessage(C.chat(Objects.requireNonNull(Objects.requireNonNull(Locale.get().getString("commands.gamemode.other")).replace("%player%", p.getName()).replace("%gamemode%", "Adventure"))));
                 return true;
             }
             if (args[0].equalsIgnoreCase("survival") || args[0].equalsIgnoreCase("s")) {
@@ -175,8 +175,8 @@ public class GamemodeCommand implements TabExecutor {
                     return true;
                 }
                 p.setGameMode(GameMode.SURVIVAL);
-                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.gamemode.other")).replace("%player%", sender.getName()).replace("%gamemode%", "Survival")));
-                sender.sendMessage(C.chat(Objects.requireNonNull(Objects.requireNonNull(Locale.get().getString("commands.gamemode.for-other")).replace("%player%", p.getName()).replace("%gamemode%", "Survival"))));
+                p.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.gamemode.for-other")).replace("%player%", sender.getName()).replace("%gamemode%", "Survival")));
+                sender.sendMessage(C.chat(Objects.requireNonNull(Objects.requireNonNull(Locale.get().getString("commands.gamemode.other")).replace("%player%", p.getName()).replace("%gamemode%", "Survival"))));
                 return true;
             }
         }

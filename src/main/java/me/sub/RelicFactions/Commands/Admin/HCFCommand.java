@@ -1,7 +1,6 @@
 package me.sub.RelicFactions.Commands.Admin;
 
-import me.sub.RelicFactions.Files.Normal.Locale;
-import me.sub.RelicFactions.Files.Normal.Tab;
+import me.sub.RelicFactions.Files.Normal.*;
 import me.sub.RelicFactions.Main.Main;
 import me.sub.RelicFactions.Utils.C;
 import me.sub.RelicFactions.Utils.Permission;
@@ -40,9 +39,23 @@ public class HCFCommand implements TabExecutor {
             Main.getInstance().users.clear();
             Main.getInstance().userNameHolder.clear();
             Main.getInstance().loadFiles();
-            Main.getInstance().loadTrees();
-            Locale.load();
+            Tab.save();
             Tab.load();
+            Locale.save();
+            Locale.load();
+            Locations.save();
+            Locations.load();
+            ModModeFile.save();
+            ModModeFile.load();
+            Inventories.save();
+            Inventories.load();
+            TreeFile.save();
+            TreeFile.load();
+            Reclaim.save();
+            Reclaim.load();
+            Messages.save();
+            Messages.load();
+            Main.getInstance().loadTrees();
             sender.sendMessage(C.chat(Objects.requireNonNull(Locale.get().getString("commands.hcf.reload.success"))));
             return true;
         }

@@ -34,23 +34,29 @@ public class Inventories {
 
     public static void save() {
         try {
-            if (config != null && file != null) {
-                File folder = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder(), "features");
-                if (!folder.exists()) {
-                    folder.mkdirs();
-                }
-
-                if (!file.exists()) {
-                    Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).saveResource("inventories.yml", false);
-
-                    File defaultFile = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder(), "inventories.yml");
-                    if (defaultFile.exists()) {
-                        defaultFile.renameTo(file);
-                    }
-                }
-
-                config.save(file);
+            File folder = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder(), "features");
+            if (!folder.exists()) {
+                folder.mkdirs();
             }
+
+            File targetFile = new File(folder, "inventories.yml");
+
+            if (!targetFile.exists()) {
+                Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).saveResource("inventories.yml", false);
+
+                File defaultFile = new File(Objects.requireNonNull(Bukkit.getServer().getPluginManager().getPlugin("Relic-Factions")).getDataFolder(), "inventories.yml");
+                if (defaultFile.exists()) {
+                    defaultFile.renameTo(targetFile);
+                }
+            }
+
+            // Use cached config if available, otherwise load fresh
+            FileConfiguration configToSave = (config != null) ? config : YamlConfiguration.loadConfiguration(targetFile);
+            configToSave.save(targetFile);
+            
+            // Update our cached references
+            file = targetFile;
+            config = configToSave;
         } catch (IOException e) {
             System.out.println("Unable to save file inventories.yml");
         }
